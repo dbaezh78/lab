@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Separar Música y Voz</title>
+</head>
+<body>
+    <h1>Separar Música y Voz</h1>
+    <input type="file" id="audioFile" accept="audio/*" />
+    <button onclick="processAudio()">Procesar Audio</button>
+    <div id="output"></div>
+
+    <script>
+        async function processAudio() {
+            const fileInput = document.getElementById('audioFile');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Por favor, selecciona un archivo de audio.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('http://tuserver.com/procesar-audio', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al procesar el audio.');
+                }
+
+                const result = await response.json();
+                document.getElementById('output').innerHTML = `
+                    <p>Voz: <a href="${result.vocal}" download>Descargar</a></p>
+                    <p>Música: <a href="${result.accompaniment}" download>Descargar</a></p>
+                `;
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Hubo un error al procesar el archivo de audio.');
+            }
+        }
+    </script>
+</body>
+</html>
