@@ -1,16 +1,17 @@
-// script.js
 document.getElementById('hoy').addEventListener('click', function() {
     const hoy = new Date();
     const tiempoLiturgico = calcularTiempoLiturgico(hoy);
-    document.getElementById('resultado').innerText = `Hoy es: ${tiempoLiturgico}`;
+    const semana = calcularSemanaTiempoLiturgico(hoy, tiempoLiturgico.toLowerCase().replace(/ /g, ''));
+    const rutaRecurso = generarRutaRecurso(hoy);
+
+    document.getElementById('resultado').innerHTML = `
+        <p><strong>Tiempo Litúrgico:</strong> ${tiempoLiturgico}</p>
+        <p><strong>Semana:</strong> ${semana}</p>
+        <p><strong>Ruta del Recurso:</strong> ${rutaRecurso}</p>
+    `;
 });
 
-document.getElementById('tiempoLiturgico').addEventListener('change', function(event) {
-    const tiempoSeleccionado = event.target.value;
-    const fecha = obtenerFechaPorTiempoLiturgico(tiempoSeleccionado);
-    document.getElementById('resultado').innerText = `Fecha correspondiente: ${fecha}`;
-});
-
+// Funciones para calcular tiempos litúrgicos y rutas
 function calcularTiempoLiturgico(fecha) {
     const año = fecha.getFullYear();
     const adviento = calcularPrimerDomingoAdviento(año);
@@ -18,21 +19,75 @@ function calcularTiempoLiturgico(fecha) {
     const cuaresma = calcularMiércolesDeCeniza(año);
     const pascua = calcularDomingoDePascua(año);
     const pentecostes = new Date(pascua);
-    pentecostes.setDate(pascua.getDate() + 49);
+    pentecostes.setDate(pascua.getDate() + 49); // Domingo de Pentecostés
+    const inicioOrdinario1 = calcularInicioTiempoOrdinario(año);
+    const finOrdinario1 = new Date(cuaresma);
+    finOrdinario1.setDate(cuaresma.getDate() - 1); // Martes antes del Miércoles de Ceniza
+    const inicioOrdinario2 = calcularFinTiempoOrdinario(año);
 
     if (fecha >= adviento && fecha < navidad) {
         return "Tiempo de Adviento";
-    } else if (fecha >= navidad && fecha < cuaresma) {
+    } else if (fecha >= navidad && fecha < inicioOrdinario1) {
         return "Tiempo de Navidad";
+    } else if (fecha >= inicioOrdinario1 && fecha <= finOrdinario1) {
+        return "Primera parte del Tiempo Ordinario";
     } else if (fecha >= cuaresma && fecha < pascua) {
         return "Tiempo de Cuaresma";
     } else if (fecha >= pascua && fecha < pentecostes) {
         return "Tiempo de Pascua";
+    } else if (fecha >= inicioOrdinario2 && fecha < adviento) {
+        return "Segunda parte del Tiempo Ordinario";
     } else {
-        return "Tiempo Ordinario";
+        return "Fecha no válida";
     }
 }
 
+function calcularSemanaTiempoLiturgico(fecha, tiempoLiturgico) {
+    let inicioTiempo;
+    switch (tiempoLiturgico) {
+        case 'tiempodeadviento':
+            inicioTiempo = calcularPrimerDomingoAdviento(fecha.getFullYear());
+            break;
+        case 'tiempodecuaresma':
+            inicioTiempo = calcularMiércolesDeCeniza(fecha.getFullYear());
+            break;
+        case 'tiempodepascua':
+            inicioTiempo = calcularDomingoDePascua(fecha.getFullYear());
+            break;
+        case 'primera partedeltiempoordinario':
+            inicioTiempo = calcularInicioTiempoOrdinario(fecha.getFullYear());
+            break;
+        case 'segunda partedeltiempoordinario':
+            inicioTiempo = calcularFinTiempoOrdinario(fecha.getFullYear());
+            break;
+        default:
+            return 0; // No aplica
+    }
+
+    const diferenciaDias = Math.floor((fecha - inicioTiempo) / (1000 * 60 * 60 * 24));
+    return Math.floor(diferenciaDias / 7) + 1; // Semana actual
+}
+
+function generarRutaRecurso(fecha) {
+    const tiempoLiturgico = calcularTiempoLiturgico(fecha).toLowerCase().replace(/ /g, '');
+    const mes = fecha.getMonth() + 1; // Los meses en JavaScript van de 0 a 11
+    const dia = fecha.getDate();
+
+    // Mapear el tiempo litúrgico a la abreviatura de la carpeta
+    const carpetasTiempo = {
+        'tiempodeadviento': 'adv',
+        'tiempodenavidad': 'nav',
+        'tiempodecuaresma': 'cua',
+        'tiempodepascua': 'pas',
+        'primera partedeltiempoordinario': 'to1',
+        'segunda partedeltiempoordinario': 'to2'
+    };
+
+    const carpetaTiempo = carpetasTiempo[tiempoLiturgico] || 'to'; // Por defecto, Tiempo Ordinario
+    return `/${carpetaTiempo}/${mes}/${dia}/recurso.mp3`;
+}
+
+// Funciones auxiliares
 function calcularPrimerDomingoAdviento(año) {
     const navidad = new Date(año, 11, 25);
     const diaSemana = navidad.getDay();
@@ -67,21 +122,19 @@ function calcularDomingoDePascua(año) {
     return new Date(año, mes - 1, dia);
 }
 
-function obtenerFechaPorTiempoLiturgico(tiempo) {
-    const hoy = new Date();
-    const año = hoy.getFullYear();
-    switch (tiempo) {
-        case 'adviento':
-            return calcularPrimerDomingoAdviento(año).toLocaleDateString();
-        case 'navidad':
-            return new Date(año, 11, 25).toLocaleDateString();
-        case 'cuaresma':
-            return calcularMiércolesDeCeniza(año).toLocaleDateString();
-        case 'pascual':
-            return calcularDomingoDePascua(año).toLocaleDateString();
-        case 'ordinario':
-            return "Tiempo Ordinario no tiene una fecha específica";
-        default:
-            return "Selección no válida";
-    }
+function calcularInicioTiempoOrdinario(año) {
+    const epifania = new Date(año, 0, 6); // 6 de enero
+    const diaSemanaEpifania = epifania.getDay();
+    const diasHastaDomingo = (7 - diaSemanaEpifania) % 7;
+    const primerDomingoOrdinario = new Date(epifania);
+    primerDomingoOrdinario.setDate(epifania.getDate() + diasHastaDomingo);
+    return primerDomingoOrdinario;
+}
+
+function calcularFinTiempoOrdinario(año) {
+    const pentecostes = new Date(calcularDomingoDePascua(año));
+    pentecostes.setDate(pentecostes.getDate() + 49); // Domingo de Pentecostés
+    const lunesDespuesPentecostes = new Date(pentecostes);
+    lunesDespuesPentecostes.setDate(pentecostes.getDate() + 1); // Lunes después de Pentecostés
+    return lunesDespuesPentecostes;
 }
