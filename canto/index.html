@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partitura: AMO AL SEÑOR</title>
+    <link rel="stylesheet" href="canto.css">
+    <style>
+        /* Estilos específicos para esta partitura */
+        .partitura-container {
+            width: 90%;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+        }
+
+        .titulo {
+            text-align: center;
+            font-size: 2.2em;
+            color: #333;
+            margin-bottom: 5px;
+            font-weight: bold;
+            border-top: 2px solid #aaa; /* Línea superior */
+            padding-top: 10px;
+        }
+
+        .salmo {
+            text-align: center;
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .dbnos {
+            text-align: center;
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        .letras-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .columna {
+            width: 48%; /* Para dejar un pequeño espacio entre las columnas */
+            margin-bottom: 20px;
+        }
+
+        .verso {
+            margin-bottom: 10px;
+        }
+
+        .letra {
+            font-size: 1.1em;
+            line-height: 1.4;
+            white-space: pre-wrap; /* Respeta los saltos de línea */
+        }
+
+        .acordes-container {
+            position: relative;
+            height: 25px;
+        }
+
+        .acorde-select {
+            position: absolute;
+            top: 0;
+            font-size: 0.9em;
+            color: #007bff;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        .acorde-select:focus {
+            outline: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="partitura-container">
+        <h1 class="titulo" id="titulo"></h1>
+        <p class="salmo" id="salmo"></p>
+        <p class="dbnos">DBnos: <span id="dbnos"></span></p>
+
+        <div class="letras-container">
+            <div class="columna" id="columna-izquierda"></div>
+            <div class="columna" id="columna-derecha"></div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
