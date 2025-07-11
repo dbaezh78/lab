@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Notas de Soporte</title>
+    <!-- Carga de Tailwind CSS para un diseño responsivo y moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos personalizados para la fuente y algunos ajustes */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Un color de fondo suave */
+        }
+        /* Asegura que las imágenes se ajusten al contenedor */
+        .note-image {
+            max-width: 100px;
+            height: auto;
+            border-radius: 8px; /* Bordes redondeados para las imágenes */
+            object-fit: cover; /* Asegura que la imagen cubra el área sin distorsionarse */
+            display: block; /* Para eliminar espacio extra debajo de la imagen */
+            margin: 0 auto; /* Centrar la imagen en la celda */
+        }
+        /* Estilo para el contenedor de la imagen en la tabla */
+        .image-cell {
+            text-align: center;
+        }
+        /* Estilo para que el textarea se ajuste */
+        textarea {
+            resize: vertical; /* Permite redimensionar verticalmente */
+            min-height: 80px; /* Altura mínima */
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+    <!-- Importar las librerías de Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Variables globales para Firebase
+        let app;
+        let db;
+        let auth;
+        let userId = null;
+        let isAuthReady = false; // Bandera para saber si la autenticación está lista
+
+        // Mostrar el overlay de carga
+        function showLoading() {
+            const overlay = document.createElement('div');
+            overlay.id = 'loadingOverlay';
+            overlay.classList.add('loading-overlay');
+            overlay.innerHTML = '<div class="spinner"></div>';
+            document.body.appendChild(overlay);
+        }
+
+        // Ocultar el overlay de carga
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.remove();
+            }
+        }
+
+        // Inicializar Firebase y autenticar inmediatamente cuando el módulo se carga
+        (async function() { // Usando una IIFE (Immediately Invoked Function Expression) asíncrona
+            showLoading(); // Mostrar carga al inicio
+            try {
+                // Variables globales proporcionadas por el entorno Canvas
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                // Asegurarse de que __firebase_config es una cadena no vacía antes de parsear
+                const firebaseConfig = JSON.parse(typeof __firebase_config === 'string' && __firebase_config.length > 0 ? __firebase_config : '{}');
+                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+                if (Object.keys(firebaseConfig).length === 0) {
+                    console.error("Firebase config no está disponible. Asegúrate de que __firebase_config esté definido y no vacío.");
+                    alert("Error: Configuración de Firebase no encontrada. La aplicación no puede funcionar sin ella.");
+                    hideLoading();
+                    return;
+                }
+
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Escuchar cambios en el estado de autenticación
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        console.log("Usuario autenticado:", userId);
+                        // Mostrar el ID de usuario en la UI
+                        document.getElementById('userIdDisplay').textContent = `ID de Usuario: ${userId}`;
+                        isAuthReady = true;
+                        window.loadAndRenderNotesFromFirestore(); // Renderizar notas desde Firestore una vez que el usuario esté autenticado
+                    } else {
+                        // Si no hay usuario autenticado, intentar iniciar sesión anónimamente
+                        try {
+                            if (initialAuthToken) {
+                                await signInWithCustomToken(auth, initialAuthToken);
+                            } else {
+                                await signInAnonymously(auth);
+                            }
+                        } catch (error) {
+                            console.error("Error al iniciar sesión:", error);
+                            alert("Error al iniciar sesión. Algunas funcionalidades podrían no estar disponibles.");
+                            isAuthReady = true; // Marcar como listo incluso si falló para evitar bloqueo
+                            window.loadAndRenderNotesFromFirestore(); // Intentar renderizar aunque sea sin autenticación completa
+                        }
+                    }
+                    hideLoading(); // Ocultar carga una vez que la autenticación ha sido procesada
+                });
+
+            } catch (error) {
+                console.error("Error al inicializar Firebase:", error);
+                alert("Error crítico al iniciar la aplicación. Por favor, revisa la consola para más detalles.");
+                hideLoading();
+            }
+        })(); // Se invoca la función asíncrona inmediatamente
+
+        // Función para cargar notas desde Firestore (en tiempo real)
+        window.loadAndRenderNotesFromFirestore = function() {
+            if (!isAuthReady || !userId) {
+                console.log("Autenticación no lista o userId no disponible. Esperando...");
+                return;
+            }
+
+            const notesCollectionRef = collection(db, `artifacts/${__app_id}/users/${userId}/notes`);
+            // Nota: Evitamos orderBy() para evitar problemas de índices, se ordenará en el cliente si es necesario.
+            const q = query(notesCollectionRef);
+
+            onSnapshot(q, (snapshot) => {
+                const notes = [];
+                snapshot.forEach(doc => {
+                    notes.push({ id: doc.id, ...doc.data() });
+                });
+                renderNotesToTable(notes); // Renderizar las notas de Firestore
+            }, (error) => {
+                console.error("Error al escuchar notas de Firestore:", error);
+                alert("Error al cargar las notas desde Firestore. Por favor, intenta de nuevo.");
+            });
+        };
+
+        // Función auxiliar para renderizar las notas en la tabla
+        function renderNotesToTable(notes) {
+            const tableBody = document.getElementById('notesTableBody');
+            const noNotesMessage = document.getElementById('noNotesMessage');
+            tableBody.innerHTML = ''; // Limpiar la tabla antes de renderizar
+
+            if (notes.length === 0) {
+                noNotesMessage.classList.remove('hidden');
+            } else {
+                noNotesMessage.classList.add('hidden');
+            }
+
+            // Opcional: ordenar las notas por algún campo si es necesario, por ejemplo, por categoría
+            // notes.sort((a, b) => a.category.localeCompare(b.category));
+
+            notes.forEach(note => {
+                const row = document.createElement('tr');
+                row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100');
+
+                // Celda para la categoría
+                const categoryCell = document.createElement('td');
+                categoryCell.classList.add('py-3', 'px-6', 'text-left', 'whitespace-nowrap');
+                categoryCell.textContent = note.category;
+                row.appendChild(categoryCell);
+
+                // Celda para el nombre
+                const nameCell = document.createElement('td');
+                nameCell.classList.add('py-3', 'px-6', 'text-left');
+                nameCell.textContent = note.name;
+                row.appendChild(nameCell);
+
+                // Celda para la solución
+                const solutionCell = document.createElement('td');
+                solutionCell.classList.add('py-3', 'px-6', 'text-left');
+                solutionCell.textContent = note.solution;
+                row.appendChild(solutionCell);
+
+                // Celda para la imagen
+                const imageCell = document.createElement('td');
+                imageCell.classList.add('py-3', 'px-6', 'image-cell'); // Clase para centrar contenido
+                if (note.imageDataUrl) {
+                    const img = document.createElement('img');
+                    img.src = note.imageDataUrl;
+                    img.alt = `Imagen de ${note.name}`;
+                    img.classList.add('note-image');
+                    // Manejo de errores para imágenes que no cargan (aunque con Data URLs es menos común)
+                    img.onerror = function() {
+                        this.onerror = null; // Evita bucles infinitos de error
+                        this.src = 'https://placehold.co/100x70/cccccc/333333?text=Error'; // Imagen de placeholder
+                        this.alt = 'Imagen no disponible';
+                    };
+                    imageCell.appendChild(img);
+                } else {
+                    imageCell.textContent = 'No hay imagen';
+                }
+                row.appendChild(imageCell);
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Función para agregar una nueva nota a Firestore
+        window.addNoteToFirestore = async function(noteData) {
+            if (!isAuthReady || !userId) {
+                alert("La aplicación no está lista. Por favor, espera a que se cargue completamente.");
+                return;
+            }
+            try {
+                const notesCollectionRef = collection(db, `artifacts/${__app_id}/users/${userId}/notes`);
+                await addDoc(notesCollectionRef, noteData);
+                console.log("Nota agregada a Firestore:", noteData);
+            } catch (e) {
+                console.error("Error al agregar nota a Firestore:", e);
+                alert("Error al guardar la nota. Por favor, intenta de nuevo.");
+            }
+        };
+
+        // Manejar el envío del formulario
+        document.getElementById('noteForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Evitar el envío tradicional del formulario
+
+            const category = document.getElementById('category').value.trim();
+            const name = document.getElementById('name').value.trim();
+            const solution = document.getElementById('solution').value.trim();
+            const imageFile = document.getElementById('imageUpload').files[0]; // Obtener el archivo de imagen
+
+            if (!category || !name || !solution) {
+                alert('Por favor, completa todos los campos requeridos (Categoría, Nombre, Solución).');
+                return;
+            }
+
+            let imageDataUrl = ''; // Variable para almacenar la Data URL de la imagen
+
+            // Si hay un archivo de imagen, leerlo como Data URL
+            if (imageFile) {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    imageDataUrl = e.target.result; // La Data URL de la imagen
+
+                    const newNote = { category, name, solution, imageDataUrl, timestamp: Date.now() };
+                    await addNoteToFirestore(newNote); // Guardar en Firestore
+                    // No necesitamos llamar a renderNotes() aquí, onSnapshot se encargará de ello
+                    document.getElementById('noteForm').reset();
+                };
+                reader.readAsDataURL(imageFile); // Lee el archivo como Data URL
+            } else {
+                // Si no hay archivo de imagen, guardar la nota sin imagen
+                const newNote = { category, name, solution, imageDataUrl: '', timestamp: Date.now() };
+                await addNoteToFirestore(newNote); // Guardar en Firestore
+                // No necesitamos llamar a renderNotes() aquí, onSnapshot se encargará de ello
+                document.getElementById('noteForm').reset();
+            }
+        });
+
+        // La función de exportar a CSV ahora tomará los datos de la tabla actual,
+        // que ya están sincronizados con Firestore a través de onSnapshot.
+        document.getElementById('exportCsvBtn').addEventListener('click', function() {
+            const notes = [];
+            const rows = document.getElementById('notesTableBody').querySelectorAll('tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length === 4) { // Asegurarse de que la fila tiene todas las celdas esperadas
+                    const category = cells[0].textContent;
+                    const name = cells[1].textContent;
+                    const solution = cells[2].textContent;
+                    const imageUrlElement = cells[3].querySelector('img');
+                    const imageDataUrl = imageUrlElement ? imageUrlElement.src : '';
+                    notes.push({ category, name, solution, imageDataUrl });
+                }
+            });
+
+            if (notes.length === 0) {
+                alert('No hay notas para exportar.');
+                return;
+            }
+
+            const headers = ['categoria', 'nombre', 'solucion', 'imagen_url'];
+            let csvContent = headers.map(escapeCsv).join(',') + '\n';
+
+            notes.forEach(note => {
+                const row = [
+                    note.category,
+                    note.name,
+                    note.solution,
+                    note.imageDataUrl
+                ];
+                csvContent += row.map(escapeCsv).join(',') + '\n';
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'notas_soporte.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                alert('Tu navegador no soporta la descarga directa. Por favor, copia el contenido manualmente.');
+                console.log(csvContent);
+            }
+        });
+
+        // Función para escapar comillas dobles en un string para CSV
+        function escapeCsv(value) {
+            if (value === null || value === undefined) {
+                return '';
+            }
+            let stringValue = String(value);
+            if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+                return `"${stringValue.replace(/"/g, '""')}"`;
+            }
+            return stringValue;
+        }
+
+        // --- Funcionalidad para cargar desde un archivo CSV estático ---
+        async function loadNotesFromCsvFile() {
+            try {
+                const response = await fetch('notes.csv'); // Asume que notes.csv está en el mismo directorio
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        alert('El archivo notes.csv no se encontró. Asegúrate de que existe en la misma ubicación que index.html en tu repositorio de GitHub.');
+                    } else {
+                        alert('Error al cargar el archivo CSV: ' + response.statusText);
+                    }
+                    console.error('Error fetching notes.csv:', response.status, response.statusText);
+                    return;
+                }
+                const csvText = await response.text();
+                const parsedNotes = parseCsv(csvText);
+                renderNotesToTable(parsedNotes); // Mostrar las notas del CSV en la tabla
+                alert('Notas cargadas desde notes.csv. Las nuevas notas se seguirán guardando en Firebase.');
+            } catch (error) {
+                console.error('Error al cargar notas desde CSV:', error);
+                alert('Ocurrió un error al cargar el archivo CSV.');
+            }
+        }
+
+        // Parser CSV simple (asume campos separados por coma, con comillas dobles para campos con comas o saltos de línea)
+        function parseCsv(csvText) {
+            const lines = csvText.trim().split('\n');
+            if (lines.length === 0) return [];
+
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+            const notes = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i];
+                if (!line.trim()) continue; // Saltar líneas vacías
+
+                const values = [];
+                let inQuote = false;
+                let currentField = '';
+                for (let j = 0; j < line.length; j++) {
+                    const char = line[j];
+                    if (char === '"') {
+                        if (inQuote && line[j+1] === '"') { // Comilla escapada (doble comilla dentro de un campo entre comillas)
+                            currentField += '"';
+                            j++; // Saltar la siguiente comilla
+                        } else {
+                            inQuote = !inQuote; // Alternar estado de comillas
+                        }
+                    } else if (char === ',' && !inQuote) {
+                        values.push(currentField.trim());
+                        currentField = '';
+                    } else {
+                        currentField += char;
+                    }
+                }
+                values.push(currentField.trim()); // Añadir el último campo
+
+                const note = {};
+                headers.forEach((header, index) => {
+                    if (values[index] !== undefined) {
+                        let val = values[index];
+                        // Eliminar comillas envolventes si existen
+                        if (val.startsWith('"') && val.endsWith('"')) {
+                            val = val.substring(1, val.length - 1).replace(/""/g, '"');
+                        }
+                        note[header] = val;
+                    }
+                });
+                notes.push(note);
+            }
+            return notes;
+        }
+
+        // Asignar el evento click al nuevo botón de cargar CSV
+        document.getElementById('loadCsvBtn').addEventListener('click', loadNotesFromCsvFile);
+    </script>
+</head>
+<body class="p-4 sm:p-6 md:p-8 lg:p-10">
+    <div class="max-w-4xl mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-lg">
+        <h1 class="text-3xl sm:text-4xl font-bold text-center text-blue-700 mb-8">Mis Notas de Soporte</h1>
+        <div class="text-center text-sm text-gray-600 mb-4 p-2 bg-gray-100 rounded-lg">
+            <span id="userIdDisplay">Cargando usuario...</span>
+        </div>
+
+        <!-- Sección para agregar nuevas notas -->
+        <div class="mb-10 p-6 bg-blue-50 rounded-lg shadow-md">
+            <h2 class="text-2xl font-semibold text-blue-600 mb-6 text-center">Agregar Nueva Nota</h2>
+            <form id="noteForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="category" class="block text-gray-700 text-sm font-bold mb-2">Categoría:</label>
+                    <input type="text" id="category" name="category" placeholder="Ej: SAP, Fortigate, Switch" required
+                           class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200">
+                </div>
+                <div>
+                    <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Nombre de la Nota:</label>
+                    <input type="text" id="name" name="name" placeholder="Ej: Crear política, Montar disco" required
+                           class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200">
+                </div>
+                <div class="md:col-span-2">
+                    <label for="solution" class="block text-gray-700 text-sm font-bold mb-2">Solución:</label>
+                    <textarea id="solution" name="solution" placeholder="Describe aquí la solución detallada..." rows="4" required
+                              class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"></textarea>
+                </div>
+                <div class="md:col-span-2">
+                    <label for="imageUpload" class="block text-gray-700 text-sm font-bold mb-2">Subir Imagen (Opcional):</label>
+                    <input type="file" id="imageUpload" name="imageUpload" accept="image/*"
+                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                    <p class="text-xs text-gray-500 mt-1">Se guardará como Data URL (Base64) en la base de datos.</p>
+                </div>
+                <div class="md:col-span-2 flex justify-center">
+                    <button type="submit"
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:scale-105">
+                        Agregar Nota
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sección para mostrar las notas existentes -->
+        <div class="p-6 bg-gray-50 rounded-lg shadow-md">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-6 text-center">Notas Existentes</h2>
+            <div class="flex justify-end gap-2 mb-4">
+                <button id="loadCsvBtn"
+                        class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:scale-105">
+                    Cargar desde CSV
+                </button>
+                <button id="exportCsvBtn"
+                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:scale-105">
+                    Exportar a CSV
+                </button>
+            </div>
+            <div id="notesContainer" class="overflow-x-auto">
+                <table class="min-w-full bg-white rounded-lg shadow-md">
+                    <thead>
+                        <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                            <th class="py-3 px-6 text-left rounded-tl-lg">Categoría</th>
+                            <th class="py-3 px-6 text-left">Nombre</th>
+                            <th class="py-3 px-6 text-left">Solución</th>
+                            <th class="py-3 px-6 text-center rounded-tr-lg">Imagen</th>
+                        </tr>
+                    </thead>
+                    <tbody id="notesTableBody" class="text-gray-600 text-sm font-light">
+                        <!-- Las notas se cargarán aquí con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <p id="noNotesMessage" class="text-center text-gray-500 mt-4 hidden">Aún no hay notas de soporte. ¡Agrega una!</p>
+        </div>
+    </div>
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+    </div>
+</body>
+</html>

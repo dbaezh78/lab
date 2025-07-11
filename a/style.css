@@ -1,0 +1,219 @@
+body {
+    font-family: 'Franklin Gothic Medium', Arial, sans-serif; /* Tipo de letra actualizado */
+    background-color: #f4f4f4;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.container {
+    background-color: #fff;
+    padding: 66px; /* Actualizado a 66px */
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    max-width: 800px; /* Ancho máximo para el contenido */
+    width: 100%;
+    text-align: center;
+}
+
+h1 {
+    color: #5a2d80;
+    margin-bottom: 30px;
+}
+
+.linea-canto {
+    position: relative; /* Contenedor para posicionar las notas de forma absoluta */
+    margin-bottom: 0px; /* Actualizado */
+    text-align: left; /* Alineamos la letra a la izquierda */
+    padding-top: 10px; /* Actualizado */
+    min-height: 35px; /* Actualizado */
+}
+
+.letra {
+    font-size: 1.3em; /* Tamaño base de la letra */
+    line-height: 1.6;
+    color: #2c3e50;
+    white-space: pre-wrap; /* Permite que el texto se envuelva y mantenga espacios */
+}
+
+/* Nuevas clases para el estilo del texto de la letra */
+.tx {
+    font-weight: normal;
+}
+
+.atx {
+    font-weight: bold;
+}
+
+
+.nota-posicionada {
+    position: absolute;
+    top: 0; /* Las notas estarán en la parte superior del contenedor de línea */
+    font-family: 'Franklin Gothic Medium', Arial, sans-serif; /* Tipo de letra actualizado */
+    font-weight: bold;
+    color: rgb(196 76 75); /* Color de texto actualizado */
+    background-color: transparent; /* Fondo transparente actualizado */
+    white-space: nowrap; /* Evita que las notas se rompan */
+    transform: translateX(-50%); /* Ajuste para centrar la nota en su posición */
+    font-size: 0.9em; /* Tamaño base de la nota */
+    z-index: 10; /* Asegura que las notas estén por encima de la letra si hay superposición */
+    cursor: pointer; /* Indica que es clickeable */
+    transition: background-color 0.2s ease, color 0.2s ease; /* Transición suave para el hover/seleccion */
+}
+
+.nota-posicionada:hover {
+    background-color: #e6e6e6;
+}
+
+/* Estilos para el modal */
+.modal-overlay {
+    display: none; /* Oculto por defecto, corregido para que no tenga 'flex' aquí */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Fondo semi-transparente */
+    justify-content: center; /* Se aplicará cuando JavaScript cambie display a 'flex' */
+    align-items: center; /* Se aplicará cuando JavaScript cambie display a 'flex' */
+    z-index: 1000; /* Asegura que esté por encima de todo */
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    position: relative;
+}
+
+.chord-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); /* Columnas responsivas */
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.chord-item {
+    background-color: #f0f0f0;
+    padding: 10px 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    border: 1px solid #ddd;
+    color: #333;
+}
+
+.chord-item:hover {
+    background-color: #e0e0e0;
+    transform: translateY(-2px);
+}
+
+.chord-item:active {
+    background-color: #d0d0d0;
+    transform: translateY(0);
+}
+
+/* Media queries para ajustar el tamaño de fuente según el ancho de la pantalla */
+@media (max-width: 383px) { /* Para pantallas más pequeñas que 384px */
+    .letra { font-size: 1.0em; }
+    .nota-posicionada { font-size: 0.75em; }
+    .modal-content { padding: 20px; }
+    .chord-list { grid-template-columns: repeat(auto-fit, minmax(50px, 1fr)); }
+}
+
+@media (min-width: 384px) and (max-width: 583px) {
+    .letra { font-size: 1.1em; }
+    .nota-posicionada { font-size: 0.8em; }
+}
+
+@media (min-width: 584px) and (max-width: 767px) {
+    .letra { font-size: 1.2em; }
+    .nota-posicionada { font-size: 1.1em; } /* Actualizado */
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .letra { font-size: 1.3em; }
+    .nota-posicionada { font-size: 0.9em; }
+}
+
+@media (min-width: 992px) { /* Para pantallas de 992px y más grandes */
+    .letra { font-size: 1.4em; }
+    .nota-posicionada { font-size: 0.95em; }
+}
+
+/* --- Nuevos estilos para etiquetas de sección --- */
+.ta, .tc, .ta1, .ta2, .ta3, .niño, .hombres, .mujeres, .melisma, .bis, .pa {
+    position: relative;
+    padding-left: 0em; /* Actualizado */
+    min-height: 1.5em; /* Asegurar altura para el div y su ::before */
+}
+
+/* Estilos COMPARTIDOS por todos los ::before */
+.ta::before, .tc::before, .ta1::before, .ta2::before, .ta3::before, .niño::before,
+.hombres::before, .mujeres::before, .melisma::before, .bis::before, .pa::before {
+    position: absolute;
+    left: 0; /* Posiciona a la izquierda del contenedor relativo */
+    top: 0px; /* Ajustar si es necesario */
+    font-family: Arial, sans-serif;
+    line-height: 1.3;
+    font-weight: bold;
+    white-space: nowrap; /* Evita que el contenido se rompa */
+}
+
+/* Media queries para los ::before */
+@media (min-width: 384px) {
+    .ta::before, .tc::before, .ta1::before, .ta2::before, .ta3::before, .niño::before,
+    .hombres::before, .mujeres::before, .melisma::before, .bis::before, .pa::before {
+        font-size: 1.1rem;
+        left: -1.5em; /* Ajuste para que sobresalga un poco a la izquierda del padding */
+        top: 2px;
+    }
+}
+
+@media (min-width: 768px) {
+    .ta::before, .tc::before, .ta1::before, .ta2::before, .ta3::before, .niño::before,
+    .hombres::before, .mujeres::before, .melisma::before, .bis::before, .pa::before {
+        font-size: 1.3rem;
+        left: -2em; /* Ajuste para que sobresalga un poco más */
+        top: 14px; /* Actualizado */
+    }
+}
+
+@media (min-width: 992px) {
+    .ta::before, .tc::before, .ta1::before, .ta2::before, .ta3::before, .niño::before,
+    .hombres::before, .mujeres::തിരെ, .melisma::before, .bis::before, .pa::before {
+        font-size: 1.23rem;
+        margin-top: 0%; /* Mantener si es necesario, pero 'top' es más directo con 'absolute' */
+        left: -2.5em; /* Ajuste para que sobresalga aún más */
+    }
+}
+
+/* Color GRIS para la mayoría */
+.ta::before, .tc::before, .ta1::before, .ta2::before, .ta3::before,
+.niño::before, .hombres::before, .mujeres::before, .bis::before,
+.pa::before {
+    color: #80808065; /* Gris semitransparente */
+}
+
+/* Contenido específico para cada ::before */
+.ta::before {content: "A.";}
+.tc::before {content: "C.";}
+.ta1::before {content: "A1.";}
+.ta2::before {content: "A2.";}
+.ta3::before {content: "A3.";}
+.niño::before {content: "Niños:";}
+.hombres::before {content: "Hombres:";}
+.mujeres::before {content: "Mujeres:";}
+.melisma::before {content: "[melisma]";}
+.bis::before {content: "BIS A.";}
+.pa::before {content: "P";}
