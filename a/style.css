@@ -11,27 +11,185 @@ body {
     box-sizing: border-box;
 }
 
+/* Estilo para el contenedor principal que envuelve todo */
+.main-wrapper {
+    width: 100%;
+    max-width: 1200px; /* Aumentar el ancho máximo para acomodar dos columnas */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.header-section {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.top-row-controls {
+    display: flex;
+    justify-content: space-between; /* Espacio entre el home y la barra de herramientas */
+    align-items: center;
+    width: 100%;
+    padding: 10px 0;
+}
+
+.home-icon-container {
+    /* Puedes añadir estilos específicos para el contenedor del icono de inicio si es necesario */
+}
+
+.icon-button {
+    display: inline-flex; /* Para alinear el icono y el texto si lo hubiera */
+    align-items: center;
+    justify-content: center;
+    width: 40px; /* Tamaño fijo para los iconos */
+    height: 40px;
+    border-radius: 50%; /* Hacerlos circulares */
+    color: #5f6368;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.icon-button:hover {
+    background-color: #e0e0e0;
+}
+
+.material-symbols-outlined {
+    font-size: 24px; /* Tamaño del icono */
+    line-height: 1; /* Asegura que el icono esté centrado verticalmente */
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Espacio entre los elementos de la barra de herramientas */
+}
+
+.toolbar-item {
+    vertical-align: middle; /* Alineación vertical para todos los elementos */
+}
+
+.toolbar select,
+.toolbar .search-input {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 0.9em;
+    background-color: #f9f9f9;
+    font-family: 'Franklin Gothic Medium', Arial, sans-serif;
+}
+
+.toolbar select:focus,
+.toolbar .search-input:focus {
+    outline: none;
+    border-color: #5a2d80;
+    box-shadow: 0 0 0 2px rgba(90, 45, 128, 0.2);
+}
+
+.search-input {
+    width: 150px; /* Ancho inicial para el campo de búsqueda */
+    transition: width 0.3s ease;
+}
+
+.search-input:focus {
+    width: 200px; /* Expandir al enfocar */
+}
+
+
+.dbt1 {
+    text-align: center;
+    font-size: xx-large;
+    color: rgb(196 76 75);
+    margin-top: 10px;
+    margin: 0px;
+}
+
+.dbs2 {
+    color: grey;
+    margin: 0px;
+    font-size: medium;
+    font-weight: bold;
+    text-align: center;
+}
+
 .container {
     background-color: #fff;
     padding: 66px; /* Actualizado a 66px */
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    max-width: 800px; /* Ancho máximo para el contenido */
-    width: 100%;
+    width: 100%; /* Ocupa el 100% del main-wrapper */
     text-align: center;
 }
 
-h1 {
-    color: #5a2d80;
-    margin-bottom: 30px;
+/* Estilos para el diseño de dos columnas */
+.canto-content-wrapper {
+    display: flex;
+    flex-direction: column; /* Por defecto, apilado en pantallas pequeñas */
+    gap: 20px; /* Espacio entre las columnas cuando están apiladas */
+    width: 100%;
 }
+
+.canto-column {
+    width: 100%; /* Ocupa todo el ancho cuando está apilado */
+    box-sizing: border-box; /* Incluir padding y borde en el ancho */
+}
+
+/* Media query para pantallas de escritorio (992px y más) */
+@media (min-width: 992px) {
+    .canto-content-wrapper {
+        flex-direction: row; /* Poner en línea (columnas) */
+        justify-content: space-between; /* Espacio entre las columnas */
+        gap: 40px; /* Espacio entre las columnas */
+    }
+    .canto-column {
+        width: calc(50% - 20px); /* 50% del ancho menos la mitad del gap */
+    }
+}
+
+
+/* Media query para el container en pantallas pequeñas */
+@media(max-width: 383px){ /* Ajustado a 383px para no solapar con 384px */
+    body {
+        padding: 3px;
+    }
+    .container {
+        box-shadow: none;
+        margin-left: 0; /* Eliminar margen para móviles */
+        padding: 4px;
+        font-size: 90%;
+    }
+    .toolbar {
+        flex-wrap: wrap; /* Permitir que los elementos se envuelvan en pantallas muy pequeñas */
+        justify-content: center;
+        gap: 10px;
+    }
+    .search-input {
+        width: 100%; /* Ocupar todo el ancho en móviles */
+        max-width: 250px; /* Limitar el ancho máximo */
+    }
+}
+
+/* Media query para 384px */
+@media(min-width: 384px){
+    body {
+        background-color: white;
+        padding: 3px;
+    }
+    .container {
+        box-shadow: none;
+        margin-left: 6%;
+        padding: 4px;
+        font-size: 90%;
+    }
+}
+
 
 .linea-canto {
     position: relative; /* Contenedor para posicionar las notas de forma absoluta */
     margin-bottom: 0px; /* Actualizado */
     text-align: left; /* Alineamos la letra a la izquierda */
     padding-top: 10px; /* Actualizado */
-    min-height: 35px; /* Actualizado */
+    min-height: 33px; /* Actualizado */
 }
 
 .letra {
@@ -174,9 +332,9 @@ h1 {
 @media (min-width: 384px) {
     .ta::before, .tc::before, .ta1::before, .ta2::before, .ta3::before, .niño::before,
     .hombres::before, .mujeres::before, .melisma::before, .bis::before, .pa::before {
-        font-size: 1.1rem;
+        font-size: 1.0rem;
         left: -1.5em; /* Ajuste para que sobresalga un poco a la izquierda del padding */
-        top: 2px;
+        top: 12px;
     }
 }
 

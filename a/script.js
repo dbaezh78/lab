@@ -1,22 +1,25 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Este array contiene las líneas de tu canto.
-    // Cada entrada es un objeto que puede incluir una clase de sección y un estilo de texto.
-    // 'tcss' se usa para estilos de texto (ej. "atx" para negrita). Si no está presente, el texto es normal.
-    const cantoData = [
-        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,5)(Re,m,360)", sC: "tc" },
+    // Datos del canto para la columna izquierda (lizq)
+    const cantoLizq = [
+        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,15)(Re,m,374)", sC: "tc" },
         { line: "hermanos, vivamos aceptando las tribulaciones, (Mi,,50)(La,m,363)" },
         { line: "el sacrificio de alabanza. (Mi,m,12)(Re,m,85)" },
         { line: "Asi habla el amen, el testigo fiel y veras (Do,,8)(Re,m,40)(Mi,7,80)(Do,,120)(Re,m,160)(Mi,7,190)(Sol,7,240)" },
-        { line: "HERMANOS, A NADIE DEMOS (Mi,m,12)(Re,m,85)", sC: "ta" },
-        { line: "OCASIÓN DE TROPIEZO (Mi,m,12)(Re,m,85)" },
-        { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,12)(Re,m,85)" },
-        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,5)(Re,m,360)", sC: "tc" }, // No tiene 'tcss', por defecto será normal
-        { line: "HERMANOS, VIVAMOS ACEPTANDO LAS TRIBULACIONES, (Mi,,50)(La,m,363)", sC: "ta", tcss: "atx" }, // Ejemplo con negrita
-        { line: "el sacrificio de alabanza. (Mi,m,12)(Re,m,85)" }, // No tiene 'tcss', por defecto será normal
-        { line: "Asi habla el amen, el testigo fiel y veras (Do,,8)(Re,m,40)(Mi,7,80)(Do,,120)(Re,m,160)(Mi,7,190)(Sol,7,240)" } // No tiene 'tcss', por defecto será normal
     ];
 
-    const cantoContainer = document.getElementById('canto-container');
+    // Datos del canto para la columna derecha (lder)
+    const cantoLder = [
+        { line: "HERMANOS, A NADIE DEMOS (Mi,m,12)(Re,m,85)", sC: "ta", tcss: "atx" },
+        { line: "OCASIÓN DE TROPIEZO (Mi,m,12)(Re,m,85)" },
+        { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,12)(Re,m,85)" },
+        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,5)(Re,m,360)", sC: "tc" },
+        { line: "HERMANOS, VIVAMOS ACEPTANDO LAS TRIBULACIONES, (Mi,,50)(La,m,363)", sC: "ta", tcss: "atx" },
+        { line: "el sacrificio de alabanza. (Mi,m,12)(Re,m,85)" },
+        { line: "Asi habla el amen, el testigo fiel y veras (Do,,8)(Re,m,40)(Mi,7,80)(Do,,120)(Re,m,160)(Mi,7,190)(Sol,7,240)" }
+    ];
+
+    const cantoLeftContainer = document.getElementById('canto-left-container');
+    const cantoRightContainer = document.getElementById('canto-right-container');
     const chordSelectionModal = document.getElementById('chordSelectionModal');
     const chordListContainer = document.getElementById('chordList');
 
@@ -33,18 +36,12 @@ document.addEventListener('DOMContentLoaded', () => {
         'mobile': { // Para anchos de pantalla <= 700px (aproximado)
             minWidth: 0, // Aplica desde 0px
             maxWidth: 700,
-            factor: 1.076, // Factor actualizado por el usuario
-            // Puedes definir sobrescrituras de posición específicas aquí.
-            // Por ejemplo: p5: 10 (si la unidad conceptual 5 debe ser 10px en móvil)
-            // p5: 10,
-            // p20: 30
+            factor: 0.786, // Factor actualizado por el usuario
         },
         'tablet': { // Para anchos de pantalla entre 768px y 1024px
             minWidth: 768,
             maxWidth: 1024,
-            factor: 1.272,
-            // p15: 40,
-            // p50: 100
+            factor: 0.957,
         },
         'desktop': { // Para anchos de pantalla > 1024px
             minWidth: 1025,
@@ -53,7 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    let parsedCantoData = [];
+    let parsedCantoLizqData = [];
+    let parsedCantoLderData = [];
     let currentKeyOffset = 0;
     let clickedDisplayedNoteSemitone = 0;
 
@@ -79,11 +77,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const parseCantoData = () => {
-        parsedCantoData = cantoData.map(entry => {
+    // Función para parsear una sección del canto (lizq o lder)
+    const parseCantoSectionData = (cantoSectionData, side) => {
+        return cantoSectionData.map(entry => {
             const lineContent = entry.line;
             const sectionClass = entry.sC || null;
-            const textStyleClass = entry.tcss || null; // <--- CAMBIO: Usar 'tcss'
+            const textStyleClass = entry.tcss || null;
 
             const firstParenIndex = lineContent.indexOf('(');
             let letra = '';
@@ -120,14 +119,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
             }
-            return { letra, notes, sectionClass, textStyleClass }; // <--- CAMBIO: Devolver 'textStyleClass'
+            return { letra, notes, sectionClass, textStyleClass, side };
         });
     };
 
-    const renderCanto = () => {
-        cantoContainer.innerHTML = '';
+    // Parsear ambos lados del canto al inicio
+    const parseAllCantoData = () => {
+        parsedCantoLizqData = parseCantoSectionData(cantoLizq, 'left');
+        parsedCantoLderData = parseCantoSectionData(cantoLder, 'right');
+    };
 
-        parsedCantoData.forEach(lineaParsed => {
+    // Función para renderizar una sección específica del canto
+    const renderCantoSection = (container, parsedData) => {
+        container.innerHTML = ''; // Limpiar contenido del contenedor
+
+        parsedData.forEach(lineaParsed => {
             const lineaDiv = document.createElement('div');
             lineaDiv.classList.add('linea-canto');
 
@@ -139,11 +145,9 @@ document.addEventListener('DOMContentLoaded', () => {
             letraSpan.classList.add('letra');
             letraSpan.textContent = lineaParsed.letra;
             
-            // Añadir la clase de estilo de texto SOLO si está definida
-            if (lineaParsed.textStyleClass) { // <--- CAMBIO: Comprobar si 'textStyleClass' existe
+            if (lineaParsed.textStyleClass) {
                 letraSpan.classList.add(lineaParsed.textStyleClass);
             }
-            // No se añade 'tx' por defecto si no se especifica, ya que el texto normal es el predeterminado del CSS
 
             lineaDiv.appendChild(letraSpan);
 
@@ -163,15 +167,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 lineaDiv.appendChild(noteSpan);
             });
-            cantoContainer.appendChild(lineaDiv);
+            container.appendChild(lineaDiv);
         });
-        adjustNotePositions();
+    };
+
+    // Función principal para renderizar todo el canto
+    const renderCanto = () => {
+        renderCantoSection(cantoLeftContainer, parsedCantoLizqData);
+        renderCantoSection(cantoRightContainer, parsedCantoLderData);
+        adjustNotePositions(); // Ajustar posiciones después de renderizar ambos lados
     };
 
     const adjustNotePositions = () => {
         const screenWidth = window.innerWidth;
         const currentConfig = getCurrentPositionConfig(screenWidth);
 
+        // Ajustar notas en ambos contenedores
         document.querySelectorAll('.linea-canto').forEach(lineaDiv => {
             lineaDiv.querySelectorAll('.nota-posicionada').forEach(notaSpan => {
                 const conceptualPositionUnit = parseFloat(notaSpan.dataset.conceptualPositionUnit);
@@ -201,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const selectedChordFromModalSemitone = noteToSemitone[chord];
                 const semitonesToShift = selectedChordFromModalSemitone - clickedDisplayedNoteSemitone;
 
-                currentKeyOffset = (currentKeyOffset + semitonesToShift) % cords.length; // Corregido a semitonesToShift
+                currentKeyOffset = (currentKeyOffset + semitonesToShift) % cords.length;
                 if (currentKeyOffset < 0) {
                     currentKeyOffset += cords.length;
                 }
@@ -220,6 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resizeTimeout = setTimeout(adjustNotePositions, 100);
     });
 
-    parseCantoData();
-    renderCanto();
+    // Ejecución inicial
+    parseAllCantoData(); // Parsear los datos de ambos cantos una vez al inicio
+    renderCanto(); // Renderizar ambos cantos inicialmente
 });
