@@ -1,13 +1,4 @@
-#CristoReydereyesYSeñordeseñores {
-    --CristoMiSeñor: white
-}
-
-:root {
-    --SangreDeCristo: #780606;
-}
-
 body {
-    width: 100%;
     font-family: 'Franklin Gothic Medium', Arial, sans-serif; /* Tipo de letra actualizado */
     background-color: #f4f4f4;
     color: #333;
@@ -19,188 +10,31 @@ body {
     padding: 20px;
     box-sizing: border-box;
 
-    @media(min-width: 384px){
-        background-color: white;
-        padding: 0px 0px 0px 0px; /* 0 0 0 23px */
+        @media(min-width: 384px){
+            background-color: white;
+            padding: 3px;
     }
-    @media(min-width: 768px){
-        padding: 0px 5px 5px 33px;
-        background-color: white;
-    }
-    @media(min-width: 992px){}
 }
-
-        /*????????? PENDIENTE*/
-      body:has(.precat) {background-color: #282828;}
-      body:has(.liturgia) {background-color: #ffffe4;}
-      body:has(.cat) {background-color: #ebf7fd;}
-      body:has(.eleccion) {background-color:#eaffea;}
-
 
 .container {
     background-color: #fff;
     padding: 66px; /* Actualizado a 66px */
-    border-radius: 1px;
+    border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    max-width: 800px; /* Ancho máximo para el contenido */
+    width: 100%;
     text-align: center;
-    /*width: 100%; /* Ocupa el 100% del main-wrapper */
 
     @media(min-width: 384px){
-        padding: 3px 3px 3px 20px; /*18px;*/
-        text-align: center;
-    }
-    @media(min-width: 768px){
-        padding: 66px;
-        text-align: center;
-    }
-    @media(min-width: 992px){}    
-}
-
-/*
-    .container {
         box-shadow: none;
         margin-left: 6%;
         padding: 4px;
         font-size: 90%;
     }
-*/
-
-/* Estilo para el contenedor principal que envuelve todo */
-.main-wrapper {
-    display: flex;
-    flex-direction: column;
-    /*align-items: center;*/
-    text-align: center;
-    /*max-width: 1200px; /* Aumentar el ancho máximo para acomodar dos columnas 
-    width: 100%;
-    */
-
-    @media(min-width: 384px){
-        align-items: center;
-        margin-left: 1px;
-        margin-right: 1px;
-        margin-top: 44px;
-
-    }
-    @media(min-width: 768px){
-    }
-    @media(min-width: 992px){}    
-
 }
-
-.header-section {
-    width: 100%;
-    text-align: center;
-    margin-bottom: 1px;
-}
-
-/*.top-row-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding: 10px 0;
-    background-color: var(--SangreDeCristo);
-}
-*/
-
-.top-row-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding: 10px 0;
-    background-color: var(--SangreDeCristo);
-    
-    /* Posicionamiento fijo */
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000; /* Para que esté por encima de otros elementos */
-    
-    /* Opcional: sombra para mejor visibilidad */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-.home-icon-container {
-    /* Puedes añadir estilos específicos para el contenedor del icono de inicio si es necesario */
-}
-
-.icon-button {
-    display: inline-flex; /* Para alinear el icono y el texto si lo hubiera */
-    align-items: center;
-    justify-content: center;
-    width: 40px; /* Tamaño fijo para los iconos */
-    height: 40px;
-    border-radius: 50%; /* Hacerlos circulares */
-    color: #5f6368;
-    text-decoration: none;
-    transition: background-color 0.2s ease;
-}
-
-.icon-button:hover {
-    background-color: white;
-}
-
-.material-symbols-outlined {
-    display: flex;
-    align-content: center;
-    font-size: 24px; /* Tamaño del icono */
-    line-height: 1; /* Asegura que el icono esté centrado verticalmente */
-    color: white;
-}
-
-.material-symbols-outlined:hover {
-    color: var(--SangreDeCristo);
-}
-
-.toolbar {
-    display: flex;
-    align-items: center;
-    gap: 15px; /* Espacio entre los elementos de la barra de herramientas */
-}
-
-.toolbar-item {
-    vertical-align: middle; /* Alineación vertical para todos los elementos */
-}
-
-.toolbar select,
-.toolbar .search-input {
-    padding: 5px 0px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    font-size: 0.9em;
-    background-color: #f9f9f9;
-    font-family: 'Franklin Gothic Medium', Arial, sans-serif;
-}
-
-.toolbar select:focus,
-.toolbar .search-input:focus {
-    outline: none;
-    border-color: goldenrod;
-    box-shadow: 0 0 0 2px rgba(90, 45, 128, 0.2);
-}
-
-.search-input {
-    width: 150px; /* Ancho inicial para el campo de búsqueda */
-    transition: width 0.5s ease;
-}
-
-.search-input:focus {
-    width: 200px; /* Expandir al enfocar */
-
-    @media(min-width: 384px){
-        width: 150px;
-    }
-
-    @media(min-width: 992px){
-        width: 200px;
-    }
-}
-
 
 .dbt1 {
-    text-align: center;
+    text-align:center;
     font-size: xx-large;
     color: rgb(196 76 75);
     margin-top: 10px;
@@ -212,39 +46,8 @@ body {
     margin: 0px;
     font-size: medium;
     font-weight: bold;
-    text-align: center;
-
-    @media (min-width: 384px) {
-        font-size: small;
-    }
-
+    text-align:center;
 }
-
-/* Estilos para el diseño de dos columnas */
-.canto-content-wrapper {
-    display: flex;
-    flex-direction: column; /* Por defecto, apilado en pantallas pequeñas */
-    gap: 20px; /* Espacio entre las columnas cuando están apiladas */
-    width: 100%;
-}
-
-.canto-column {
-    width: 100%; /* Ocupa todo el ancho cuando está apilado */
-    box-sizing: border-box; /* Incluir padding y borde en el ancho */
-}
-
-/* Media query para pantallas de escritorio (992px y más) */
-@media (min-width: 992px) {
-    .canto-content-wrapper {
-        flex-direction: row; /* Poner en línea (columnas) */
-        justify-content: space-between; /* Espacio entre las columnas */
-        gap: 40px; /* Espacio entre las columnas */
-    }
-    .canto-column {
-        width: calc(50% - 20px); /* 50% del ancho menos la mitad del gap */
-    }
-}
-
 
 .linea-canto {
     position: relative; /* Contenedor para posicionar las notas de forma absoluta */
@@ -395,8 +198,8 @@ body {
     .ta::before, .tc::before, .ta1::before, .ta2::before, .ta3::before, .niño::before,
     .hombres::before, .mujeres::before, .melisma::before, .bis::before, .pa::before {
         font-size: 1.0rem;
-        left: -17px;
-        top: 15px;
+        left: -1.5em; /* Ajuste para que sobresalga un poco a la izquierda del padding */
+        top: 12px;
     }
 }
 
