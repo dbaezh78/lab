@@ -5,18 +5,27 @@ document.addEventListener('DOMContentLoaded', () => {
         { line: "hermanos, vivamos aceptando las tribulaciones, (Mi,,50)(La,m,363)" },
         { line: "el sacrificio de alabanza. (Mi,m,12)(Re,m,85)" },
         { line: "Asi habla el amen, el testigo fiel y veras (Do,,8)(Re,m,40)(Mi,7,80)(Do,,120)(Re,m,160)(Mi,7,190)(Sol,7,240)" },
-        { line: "OCASIÓN DE TROPIEZO (Mi,m,12)(Re,m,85)" },
-        { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,12)(Re,m,85)" },
+        { line: "OCASIÓN DE TROPIEZO (Mi,m,12)(Re,m,85)", tcss: "atx" },
+        { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,12)(Re,m,85)", tcss: "atx" },
+        { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,12)(Re,m,85)", tcss: "atx" },
+        { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,12)(Re,m,85)", tcss: "atx" },
+        { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,12)(Re,m,85)", tcss: "atx" },
+        { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,12)(Re,m,85)", tcss: "atx" },
         { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,5)(Re,m,360)", sC: "tc" },
-        { line: "HERMANOS, VIVAMOS ACEPTANDO LAS TRIBULACIONES, (Mi,,50)(La,m,363)", sC: "ta", tcss: "atx" },
+        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,5)(Re,m,360)" },
+        { line: "Hermanos, vivamos aceptando las tribulaciones, (Mi,,50)(La,m,363)"  },
 
     ];
 
     // Datos del canto para la columna derecha (lder)
     const cantoLder = [
         { line: "HERMANOS, A NADIE DEMOS (Mi,m,12)(Re,m,85)", sC: "ta", tcss: "atx" },
-        { line: "OCASIÓN DE TROPIEZO (Mi,m,12)(Re,m,85)" },
-        { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,12)(Re,m,85)" },
+        { line: "OCASIÓN DE TROPIEZO (Mi,m,12)(Re,m,85)", sC: "r1" },
+        { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,12)(Re,m,85)", tcss: "atx" },
+        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,5)(Re,m,360)", sC: "tc" },
+        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,5)(Re,m,360)", sC: "tc" },
+        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,5)(Re,m,360)", sC: "tc" },
+        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,5)(Re,m,360)", sC: "tc" },
         { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,5)(Re,m,360)", sC: "tc" },
         { line: "HERMANOS, VIVAMOS ACEPTANDO LAS TRIBULACIONES, (Mi,,50)(La,m,363)", sC: "ta", tcss: "atx" },
         { line: "el sacrificio de alabanza. (Mi,m,12)(Re,m,85)" },
@@ -41,12 +50,12 @@ document.addEventListener('DOMContentLoaded', () => {
         'mobile': { // Para anchos de pantalla <= 700px (aproximado)
             minWidth: 0, // Aplica desde 0px
             maxWidth: 700,
-            factor: 0.786, // Factor actualizado por el usuario
+            factor: 0.734, // Factor actualizado por el usuario
         },
         'tablet': { // Para anchos de pantalla entre 768px y 1024px
             minWidth: 768,
             maxWidth: 1024,
-            factor: 0.957,
+            factor: 1.36,
         },
         'desktop': { // Para anchos de pantalla > 1024px
             minWidth: 1025,

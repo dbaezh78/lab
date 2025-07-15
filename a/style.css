@@ -21,11 +21,15 @@ body {
 
     @media(min-width: 384px){
         background-color: white;
-        padding: 0px 0px 0px 0px; /* 0 0 0 23px */
+        padding: 0px 0px 0px 0px;
     }
     @media(min-width: 768px){
-        padding: 0px 5px 5px 33px;
         background-color: white;
+        padding: 0px 0px 0px 0px;
+/*
+
+        padding: 0px 5px 5px 33px;
+        background-color: white;*/
     }
     @media(min-width: 992px){}
 }
@@ -46,11 +50,11 @@ body {
     /*width: 100%; /* Ocupa el 100% del main-wrapper */
 
     @media(min-width: 384px){
-        padding: 3px 3px 3px 20px; /*18px;*/
+        padding: 3px 3px 3px 20px;
         text-align: center;
     }
     @media(min-width: 768px){
-        padding: 66px;
+        padding: 3px 3px 3px 47px;
         text-align: center;
     }
     @media(min-width: 992px){}    
@@ -83,6 +87,11 @@ body {
 
     }
     @media(min-width: 768px){
+        align-items: center;
+        margin-left: 1px;
+        margin-right: 1px;
+        margin-top: 44px;
+
     }
     @media(min-width: 992px){}    
 
@@ -252,6 +261,11 @@ body {
     text-align: left; /* Alineamos la letra a la izquierda */
     padding-top: 10px; /* Actualizado */
     min-height: 33px; /* Actualizado */
+
+    @media (min-width: 768px) {
+        padding-top: 12px;
+    }
+
 }
 
 .letra {
@@ -352,7 +366,7 @@ body {
 }
 
 @media (min-width: 384px) and (max-width: 583px) {
-    .letra { font-size: 1.1em; }
+    .letra { font-size: 1em; }
     .nota-posicionada { font-size: 0.8em; }
 }
 
@@ -362,8 +376,8 @@ body {
 }
 
 @media (min-width: 768px) and (max-width: 991px) {
-    .letra { font-size: 1.3em; }
-    .nota-posicionada { font-size: 0.9em; }
+    .letra { font-size: 1.87em; }
+    .nota-posicionada { font-size: 1.2em; }
 }
 
 @media (min-width: 992px) { /* Para pantallas de 992px y más grandes */
@@ -391,32 +405,25 @@ body {
 }
 
 /* Media queries para los ::before */
-@media (min-width: 384px) {
-    .ta::before, .tc::before, .ta1::before, .ta2::before, .ta3::before, .niño::before,
-    .hombres::before, .mujeres::before, .melisma::before, .bis::before, .pa::before {
-        font-size: 1.0rem;
-        left: -17px;
-        top: 15px;
-    }
-}
 
-@media (min-width: 768px) {
-    .ta::before, .tc::before, .ta1::before, .ta2::before, .ta3::before, .niño::before,
-    .hombres::before, .mujeres::before, .melisma::before, .bis::before, .pa::before {
-        font-size: 1.3rem;
-        left: -2em; /* Ajuste para que sobresalga un poco más */
-        top: 14px; /* Actualizado */
+.ta::before, .tc::before, .ta1::before, .ta2::before, .ta3::before, .niño::before,
+.hombres::before, .mujeres::before, .melisma::before, .bis::before, .pa::before {
+        @media (min-width: 384px) {
+            font-size: 1.0rem;
+            left: -17px;
+            top: 15px;
+        }
+        @media (min-width: 768px) {
+            font-size: 1.6rem;
+            left: -36px;
+            top: 20px;
+        }
+        @media (min-width: 992px) {
+            font-size: 1.23rem;
+            margin-top: 0%;
+            left: -2.5em;
+        }
     }
-}
-
-@media (min-width: 992px) {
-    .ta::before, .tc::before, .ta1::before, .ta2::before, .ta3::before, .niño::before,
-    .hombres::before, .mujeres::തിരെ, .melisma::before, .bis::before, .pa::before {
-        font-size: 1.23rem;
-        margin-top: 0%; /* Mantener si es necesario, pero 'top' es más directo con 'absolute' */
-        left: -2.5em; /* Ajuste para que sobresalga aún más */
-    }
-}
 
 /* Color GRIS para la mayoría */
 .ta::before, .tc::before, .ta1::before, .ta2::before, .ta3::before,
@@ -437,3 +444,41 @@ body {
 .melisma::before {content: "[melisma]";}
 .bis::before {content: "BIS A.";}
 .pa::before {content: "P";}
+
+
+        .r1, .r2 {
+            position: relative;
+            min-height: 0px;
+        }
+
+        .r1::before, .r2::before {
+            content: "  BIS A.";
+            position: absolute;
+            align-content: center;
+            border-left: 2px solid #c6c5c59e;
+            color: #c6c5c59e;
+            width: max-content;
+            
+            /* Media queries para r1 */
+            @media (min-width: 384px) {
+                height: 40px;
+                margin-left: 85%;
+                margin-top: 0%;
+            }
+
+            @media (min-width: 768px) {
+              font-size: 1.5rem;
+              height: 80px;
+              margin-left: 88%;
+              margin-top: 0%;
+            }
+
+            @media (min-width: 992px) {
+              font-size: 1.3rem;
+              font-weight: bold;
+              height: 134px;
+              margin-left: 80%;
+              margin-top: 0%
+
+            }
+        }
