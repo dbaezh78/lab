@@ -20,14 +20,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Datos del canto para la columna derecha (lder)
     const cantoLder = [
         { line: "HERMANOS, A NADIE DEMOS (Mi,m,12)(Re,m,85)", sC: "ta", tcss: "atx" },
-        { line: "OCASIÓN DE TROPIEZO (Mi,m,12)(Re,m,85)", sC: "r1" },
+        { line: "OCASIÓN DE TROPIEZO (Mi,m,12)(Re,m,85)", sC: "r1", tcss: "atx" },
         { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,12)(Re,m,85)", tcss: "atx" },
         { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,5)(Re,m,360)", sC: "tc" },
         { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,5)(Re,m,360)", sC: "tc" },
         { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,5)(Re,m,360)", sC: "tc" },
         { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,5)(Re,m,360)", sC: "tc" },
         { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,5)(Re,m,360)", sC: "tc" },
-        { line: "HERMANOS, VIVAMOS ACEPTANDO LAS TRIBULACIONES, (Mi,,50)(La,m,363)", sC: "ta", tcss: "atx" },
+        { line: "HERMANOS, VIVAMOS ACEPTANDO LAS TRIBULACIONES, (Mi,,50)(La,m,363)", sC: "ta" },
         { line: "el sacrificio de alabanza. (Mi,m,12)(Re,m,85)" },
         { line: "Asi habla el amen, el testigo fiel y veras (Do,,8)(Re,m,40)(Mi,7,80)(Do,,120)(Re,m,160)(Mi,7,190)(Sol,7,240)" }
     ];
