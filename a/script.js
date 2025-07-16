@@ -3,33 +3,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const cantoLizq = [
         { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,15)(Re,m,416)", sC: "tc" },
         { line: "hermanos, vivamos aceptando las tribulaciones, (Mi,,50)(La,m,363)" },
-        { line: "el sacrificio de alabanza. (Mi,m,12)(Re,m,85)" },
-        { line: "Asi habla el amen, el testigo fiel y veras (Do,,8)(Re,m,40)(Mi,7,80)(Do,,120)(Re,m,160)(Mi,7,190)(Sol,7,240)" },
+        { line: "el sacrificio de alabanza. (Mi,m,15)(Re,m,85)" },
+        { line: "Asi habla el amen, el testigo fiel y veras (Do,,25)(Re,m,40)(Mi,7,80)(Do,,120)(Re,m,160)(Mi,7,190)(Sol,7,240)" },
         { line: "OCASIÓN DE TROPIEZO (Mi,m,12)(Re,m,85)", tcss: "atx" },
-        { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,18)(Re,m,85)", tcss: "atx" },
-        { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,18)(Re,m,85)", tcss: "atx" },
-        { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,18)(Re,m,85)", tcss: "atx" },
-        { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,18)(Re,m,85)", tcss: "atx" },
-        { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,18)(Re,m,85)", tcss: "atx" },
-        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,18)(Re,m,360)", sC: "tc" },
-        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,18)(Re,m,360)" },
+        { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,15)(Re,m,85)", tcss: "atx" },
+        { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,15)(Re,m,85)", tcss: "atx" },
+        { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,15)(Re,m,85)", tcss: "atx" },
+        { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,15)(Re,m,85)", tcss: "atx" },
+        { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,15)(Re,m,85)", tcss: "atx" },
+        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,15)(Re,m,360)", sC: "tc" },
+        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,15)(Re,m,360)" },
         { line: "Hermanos, vivamos aceptando las tribulaciones, (Mi,,50)(La,m,363)"  },
 
     ];
 
     // Datos del canto para la columna derecha (lder)
     const cantoLder = [
-        { line: "HERMANOS, A NADIE DEMOS (Mi,m,19)(Re,m,85)", sC: "ta", tcss: "atx" },
-        { line: "OCASIÓN DE TROPIEZO (Mi,m,19)(Re,m,85)", sC: "r1", tcss: "atx" },
-        { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,18)(Re,m,85)", tcss: "atx" },
-        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,18)(Re,m,360)", sC: "tc" },
-        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,18)(Re,m,360)", sC: "tc" },
-        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,18)(Re,m,360)", sC: "tc" },
-        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,18)(Re,m,360)", sC: "tc" },
-        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,18)(Re,m,360)", sC: "tc" },
-        { line: "hermanos, vivamos aceptando las tribulaciones, (Mi,,50)(La,m,363)", sC: "tc" },
-        { line: "el sacrificio de alabanza. (Mi,m,18)(Re,m,85)" },
-        { line: "Asi habla el amen, el testigo fiel y veras (Do,,18)(Re,m,40)(Mi,7,80)(Do,,120)(Re,m,160)(Mi,7,190)(Sol,7,240)" }
+        { line: "HERMANOS, A NADIE DEMOS (Mi,m,15)(Re,m,85)", sC: "ta", tcss: "atx" },
+        { line: "OCASIÓN DE TROPIEZO (Mi,m,15)(Re,m,85)", sC: "r1" },
+        { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,15)(Re,m,85)", tcss: "atx" },
+        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,15)(Re,m,160)", sC: "tc" },
+        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,15)(Re,m,360)", sC: "tc" },
+        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,15)(Re,m,260)", sC: "tc" },
+        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,15)(Re,m,400)", sC: "tc" },
+        { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,15)(Re,m,180)", sC: "tc" },
+        { line: "hermanos, vivamos aceptando las tribulaciones, (Mi,,50)(La,m,363)", sC: "ta", tcss: "atx" },
+        { line: "el sacrificio de alabanza. (Mi,m,12)(Re,m,85)" },
+        { line: "Asi habla el amen, el testigo fiel y veras (Do,,8)(Re,m,40)(Mi,7,80)(Do,,120)(Re,m,160)(Mi,7,190)(Sol,7,240)" }
     ];
 
     const cantoLeftContainer = document.getElementById('canto-left-container');

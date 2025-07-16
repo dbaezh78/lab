@@ -4,25 +4,7 @@
 
 :root {
     --SangreDeCristo: #780606;
-    --vblancas: white;
-    --precat: white;
-    --liturgia: #FFFFCB;
-    --cat: #bde9ff;
-    --eleccion: #CEFFCF;
-
 }
-/*
-
-    --precat: body:has(.precat) {background-color: white;}
-    --liturgia: body:has(.liturgia) {background-color: #FFFFCB;}
-    --cat: body:has(.cat) {background-color: #bde9ff;}
-    --eleccion: body:has(.eleccion) {background-color:#CEFFCF;}
-
-            .body:has(.precat) {background-color: white;}
-            .body:has(.liturgia) {background-color: #FFFFCB;}
-            .body:has(.cat) {background-color: #bde9ff;}
-            .body:has(.eleccion) {background-color:#CEFFCF;}
-*/
 
 body {
     width: 100%;
@@ -61,26 +43,25 @@ body {
 
 .container {
     background-color: #fff;
-    padding: 66px; /* Actualizado a 66px */
+    /*padding: 66px; /* Actualizado a 66px */
     border-radius: 1px;
+    /*box-shadow: 0 5px 11px 0px rgba(0, 0, 0, 0.1);*/
     text-align: center;
-    /*
-    box-shadow: 0px 20px 15px rgba(0, 0, 0, 0.1);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     width: 100%; /* Ocupa el 100% del main-wrapper */
+    /*
+
+    */
 
     @media(min-width: 384px){
-        padding: 0px 3px 20px 3px;
-        /*padding: 3px 3px 3px 20px;*/
+        padding: 3px 3px 3px 20px;
         text-align: center;
     }
     @media(min-width: 768px){
-        padding: 0px 1px 20px 0px;
-        /*padding: 3px 3px 3px 50px;*/
+        padding: 3px 3px 3px 47px;
         text-align: center;
     }
     @media(min-width: 992px){
-        padding: 0px 3px 50px 50px;
+        /*padding: 3px 3px 3px 20px;*/
         text-align: center;
         
     }
@@ -95,20 +76,61 @@ body {
     }
 */
 
+
+.main-wrapper {
+    margin-top: 44px;
+    margin: 0 2px; /* Margen fijo de 2px a izquierda y derecha */
+    width: calc(100% - 6px); /* Resta los 4px (2px + 2px) del ancho total */
+    box-sizing: border-box; /* Evita que paddings/bordes afecten el ancho */
+}
+
+/* Ajustes específicos para diferentes tamaños de pantalla */
+@media (max-width: 384px) {
+    .main-wrapper {
+        margin-top: 44px;
+        max-width: 378px; /* 384px - 6px (3px + 3px) */
+    }
+}
+
+@media (min-width: 385px) and (max-width: 800px) {
+    .main-wrapper {
+        margin-top: 44px;
+        max-width: 794px; /* 800px - 6px */
+    }
+}
+
+@media (min-width: 801px) and (max-width: 992px) {
+    .main-wrapper {
+        max-width: 986px; /* 992px - 6px */
+    }
+}
+
+@media (min-width: 993px) {
+    .main-wrapper {
+        margin-top: 50px;
+        max-width: calc(100% - 6px); /* Para pantallas más grandes */
+        margin-left: 18%;
+        margin-right: 18%;
+
+        box-shadow: 0 5px 11px 0px rgba(0, 0, 0, 0.1);
+    }
+}
+
+
 /* Estilo para el contenedor principal que envuelve todo */
+
+/*
+
 .main-wrapper {
     display: flex;
     flex-direction: column;
-    text-align: center;
-    box-shadow: 0px 20px 15px rgba(0, 0, 0, 0.1);
     /*align-items: center;*/
+/*---    text-align: center;
     /*max-width: 1200px; /* Aumentar el ancho máximo para acomodar dos columnas 
     width: 100%;
     */
-
+/*
     @media(min-width: 384px){
-        width: 98%;
-        padding: 0px 0px 0px 0px;
         align-items: center;
         margin-left: 1px;
         margin-right: 1px;
@@ -116,20 +138,13 @@ body {
 
     }
     @media(min-width: 768px){
-        width: 98%;
-        padding: 0px 0px 0px 0px;
         align-items: center;
         margin-left: 1px;
         margin-right: 1px;
         margin-top: 44px;
 
     }
-    @media(min-width: 992px){
-        background-color: var(--precat);
-        width: auto;
-        padding: 0px 20px 0px 20px;
-
-    }
+    @media(min-width: 992px){}    
 
 }
 
@@ -150,42 +165,21 @@ body {
 */
 
 .top-row-controls {
-    /*
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
     padding: 10px 0;
-    background-color: var(--SangreDeCristo);*/
-
-    display: flex;
-    width: 100%;
-    padding: 0px 0px;
     background-color: var(--SangreDeCristo);
-    position: relative;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    display: flex;
-    justify-content: space-between;
-
     
     /* Posicionamiento fijo */
     position: fixed;
-    top: 10;
+    top: 0;
     left: 0;
     z-index: 1000; /* Para que esté por encima de otros elementos */
     
     /* Opcional: sombra para mejor visibilidad */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-
-    @media (min-width: 992px) {
-        position: relative;
-        justify-content: space-between;
-        padding: 0px 40px 0px 0px;
-        left: -20px
-    }
 }
 
 .home-icon-container {
@@ -209,7 +203,7 @@ body {
 }
 
 .material-symbols-outlined {
-    display: flex;
+    display: flex !important;
     align-content: center;
     font-size: 24px; /* Tamaño del icono */
     line-height: 1; /* Asegura que el icono esté centrado verticalmente */
@@ -232,8 +226,8 @@ body {
 
 .toolbar select,
 .toolbar .search-input {
-    padding: 5px 7px;
-    border-radius: 20px;
+    padding: 5px 0px;
+    border-radius: 4px;
     border: 1px solid #ccc;
     font-size: 0.9em;
     background-color: #f9f9f9;
@@ -250,30 +244,13 @@ body {
 .search-input {
     width: 150px; /* Ancho inicial para el campo de búsqueda */
     transition: width 0.5s ease;
-    @media(min-width: 384px){
-        width: 80px;
-        margin-left: -3%;
-    }
-
-    @media (min-width: 768px) {
-        width: 80px;
-        margin-left: -1%;
-    }
-
-    @media (min-width: 992px) {
-        width: 100px;
-        margin-left: -1%;
-    }
 }
 
 .search-input:focus {
+    width: 200px; /* Expandir al enfocar */
 
     @media(min-width: 384px){
-        width: 40%;
-    }
-
-    @media(min-width: 768px){
-        width: 200px;
+        width: 150px;
     }
 
     @media(min-width: 992px){
@@ -322,6 +299,9 @@ body {
         flex-direction: row; /* Poner en línea (columnas) */
         justify-content: space-between; /* Espacio entre las columnas */
         gap: 40px; /* Espacio entre las columnas */
+        width: 992px;
+        margin: auto;
+        padding: 3px 3px 3px 20px;
     }
     .canto-column {
         width: calc(50% - 20px); /* 50% del ancho menos la mitad del gap */
@@ -483,19 +463,19 @@ body {
 .ta::before, .tc::before, .ta1::before, .ta2::before, .ta3::before, .niño::before,
 .hombres::before, .mujeres::before, .melisma::before, .bis::before, .pa::before {
         @media (min-width: 384px) {
-            font-size: 0.9rem;
+            font-size: 1.0rem;
             left: -17px;
-            top: 14px;
+            top: 15px;
         }
         @media (min-width: 768px) {
             font-size: 1.6rem;
-            left: -40px;
+            left: -36px;
             top: 20px;
         }
         @media (min-width: 992px) {
             font-size: 1.23rem;
             margin-top: 0%;
-            left: -34px;
+            left: -36.px;
         }
     }
 
@@ -543,7 +523,7 @@ body {
             @media (min-width: 768px) {
               font-size: 1.5rem;
               height: 80px;
-              margin-left: 80%;
+              margin-left: 88%;
               margin-top: 0%;
             }
 
@@ -556,17 +536,3 @@ body {
 
             }
         }
-
-        hr {
-            color: gray;
-            width: 100%;
-            padding: 0 20px 0 20px;
-            margin-left: -20px;
-        }
-
-.pie{
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    padding: 0px 0px 10px 0px;
-}
