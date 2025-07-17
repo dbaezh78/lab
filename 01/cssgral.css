@@ -129,7 +129,7 @@ body {
     .top-row-controls {
         position: relative; /* Relative for desktop */
         justify-content: space-between;
-        padding: 3px 40px 3px 0px;
+        padding: 0px 40px 0px 0px;
         left: -20px;
     }
 }
@@ -238,19 +238,10 @@ body {
 
 .dbt1 {
     text-align: center;
+    font-size: xx-large;
     color: rgb(196 76 75);
     margin-top: 10px;
     margin: 0px;
-
-    @media (min-width: 384px)  {
-        font-size: 1.2rem;
-    }
-    @media (min-width: 768px)  {
-        font-size: 2.5rem;
-    }
-    @media (min-width: 992px)  {
-        font-size: 2.5rem;
-    }
 }
 
 .dbs2 {
@@ -259,16 +250,11 @@ body {
     font-size: medium;
     font-weight: bold;
     text-align: center;
+}
 
-    @media (min-width: 384px) {
-        font-size: 0.9rem;
-        
-    }
-    @media (min-width: 768px) {
-        font-size: large;
-    }
-    @media (min-width: 992px) {
-        font-size: 1.2rem;
+@media (min-width: 384px) {
+    .dbs2 {
+        font-size: small;
     }
 }
 
@@ -288,7 +274,6 @@ body {
 /* Media query para pantallas de escritorio (992px y más) */
 @media (min-width: 992px) {
     .canto-content-wrapper {
-        width: 992px;
         flex-direction: row;
         justify-content: space-between;
         gap: 40px;
@@ -324,7 +309,7 @@ body {
     font-weight: normal;
 }
 
-.as {   /* as = asamblea*/
+.atx {
     font-weight: bold;
 }
 
@@ -466,7 +451,7 @@ body {
 }
 @media (min-width: 992px) {
     .ta::before, .tc::before, .ta1::before, .ta2::before, .ta3::before, .niño::before,
-    .hombres::before, .mujeres::before, .melisma::before, .bis::before, .pa::before {
+    .hombres::before, .mujeres::തിരെ, .melisma::before, .bis::before, .pa::before {
         font-size: 1.23rem;
         margin-top: 0%;
         left: -34px;
@@ -499,17 +484,16 @@ body {
     min-height: 0px;
 }
 
-/* Las propiedades comunes que no dependen de media queries van aquí */
 .r1::before, .r2::before {
-    content: " BIS A."; /* Movido aquí */
-    position: absolute; /* Movido aquí */
-    align-content: center; /* Movido aquí */
-    border-left: 2px solid #c6c5c59e; /* Movido aquí */
-    color: #c6c5c59e; /* Movido aquí */
-    width: max-content; /* Movido aquí */
+    content: " BIS A.";
+    position: absolute;
+    align-content: center;
+    border-left: 2px solid #c6c5c59e;
+    color: #c6c5c59e;
+    width: max-content;
 }
 
-/* Media queries para r1 y r2 */
+/* Media queries para r1 */
 @media (min-width: 384px) {
     .r1::before, .r2::before {
         height: 40px;
@@ -556,8 +540,8 @@ hr {
 }
 @media (min-width: 992px) {
     hr {
-        width: 992px;
-        margin-left: 0px;
+        width: 100%;
+        margin-left: -20px;
     }
 }
 
@@ -579,11 +563,13 @@ hr {
 
 .category-link {
     display: inline-block; /* Para que cada categoría ocupe su propio espacio */
-    background-color: var(--vblancas);
+    background-color: transparent;
     color: var(--SangreDeCristo);
-    padding: 5px 10px;
+    padding: 4px;
     border-radius: 0px;
     text-decoration: none;
+    /* margin-right: 8px; REMOVED as gap handles spacing */
+    /* margin-bottom: 5px; REMOVED as gap handles spacing */
     font-size: 0.9em;
     transition: background-color 0.2s ease;
 }
@@ -607,8 +593,3 @@ hr {
     }
 }
 @media (min-width: 992px){}
-
-
-.mt {
-    margin-top: 5%;
-}

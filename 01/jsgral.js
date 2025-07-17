@@ -116,15 +116,8 @@ const renderCantoSection = (container, parsedData) => {
         const lineaDiv = document.createElement('div');
         lineaDiv.classList.add('linea-canto');
 
-        // *** CORRECCIÓN AQUÍ ***
-        // Si sectionClass contiene múltiples clases separadas por espacios,
-        // las dividimos y las añadimos una por una.
         if (lineaParsed.sectionClass) {
-            lineaParsed.sectionClass.split(' ').forEach(cls => {
-                if (cls) { // Asegurarse de que no haya cadenas vacías si hay múltiples espacios
-                    lineaDiv.classList.add(cls);
-                }
-            });
+            lineaDiv.classList.add(lineaParsed.sectionClass);
         }
 
         const letraSpan = document.createElement('span');
@@ -159,11 +152,9 @@ const renderCantoSection = (container, parsedData) => {
 
 // Función principal para renderizar todo el canto
 const renderCanto = () => {
-    console.log("Rendering canto sections...");
     renderCantoSection(cantoLeftContainer, currentCantoData.lizq);
     renderCantoSection(cantoRightContainer, currentCantoData.lder);
     adjustNotePositions(); // Ajustar posiciones después de renderizar ambos lados
-    console.log("Canto rendering complete.");
 };
 
 const adjustNotePositions = () => {
@@ -222,10 +213,7 @@ window.addEventListener('resize', () => {
 // Función para renderizar las categorías como enlaces
 // Ahora espera un array de objetos { name: '...', url: '...' }
 const renderCategories = (categoriesWithUrls) => {
-    if (!cantoCategoriesContainer) {
-        console.error("Error: cantoCategoriesContainer no se encontró en el DOM.");
-        return; // Asegurarse de que el contenedor exista
-    }
+    if (!cantoCategoriesContainer) return; // Asegurarse de que el contenedor exista
     cantoCategoriesContainer.innerHTML = ''; // Limpiar categorías anteriores
 
     categoriesWithUrls.forEach(catInfo => { // Iterar sobre los objetos de categoría
@@ -235,14 +223,12 @@ const renderCategories = (categoriesWithUrls) => {
         categoryLink.classList.add('category-link'); // Clase para estilizar
         cantoCategoriesContainer.appendChild(categoryLink);
     });
-    console.log("Categories rendered:", categoriesWithUrls);
 };
 
 
 // Función de inicialización que será llamada desde cada archivo de canto
 // Ahora espera un objeto con las categorías ya procesadas con URLs
 const initializeCantoPage = (cantoSpecificData, processedCategories) => {
-    console.log("Initializing canto page with data:", cantoSpecificData);
     // Asignar referencias a los elementos del DOM
     cantoLeftContainer = document.getElementById('canto-left-container');
     cantoRightContainer = document.getElementById('canto-right-container');
@@ -250,50 +236,19 @@ const initializeCantoPage = (cantoSpecificData, processedCategories) => {
     chordListContainer = document.getElementById('chordList');
     cantoCategoriesContainer = document.getElementById('cantoCategories'); // Obtener el nuevo contenedor
 
-    // Verificar si los contenedores del canto se encontraron
-    if (!cantoLeftContainer) console.error("Error: #canto-left-container no encontrado.");
-    if (!cantoRightContainer) console.error("Error: #canto-right-container no encontrado.");
-    if (!chordSelectionModal) console.error("Error: #chordSelectionModal no encontrado.");
-    if (!chordListContainer) console.error("Error: #chordList no encontrado.");
-    if (!cantoCategoriesContainer) console.error("Error: #cantoCategories no encontrado.");
-
-
     // Actualizar los títulos y subtítulos del canto
-    const dbt1Element = document.querySelector('.dbt1');
-    const dbs2Element = document.querySelector('.dbs2');
-    const dbnoElement = document.getElementById('dbno');
-
-    if (dbt1Element) dbt1Element.textContent = cantoSpecificData.title;
-    else console.error("Error: Elemento con clase .dbt1 no encontrado.");
-
-    if (dbs2Element) dbs2Element.textContent = cantoSpecificData.subtitle;
-    else console.error("Error: Elemento con clase .dbs2 no encontrado.");
-
-    if (dbnoElement) dbnoElement.textContent = cantoSpecificData.dbno;
-    else console.error("Error: Elemento con ID #dbno no encontrado.");
-    
-    // Actualizar el título de la pestaña del navegador (la etiqueta <title>)
-    const pageTitleElement = document.getElementById('tt');
-    if (pageTitleElement && cantoSpecificData.tt) {
-        pageTitleElement.textContent = cantoSpecificData.tt;
-    } else if (!pageTitleElement) {
-        console.error("Error: Elemento con ID #tt no encontrado.");
-    }
-
+    document.querySelector('.dbt1').textContent = cantoSpecificData.title;
+    document.querySelector('.dbs2').textContent = cantoSpecificData.subtitle;
+    document.getElementById('dbno').textContent = cantoSpecificData.dbno; // Usar dbno para el número
 
     // Parsear y almacenar los datos del canto actual
     currentCantoData.lizq = parseCantoSectionData(cantoSpecificData.lizq);
     currentCantoData.lder = parseCantoSectionData(cantoSpecificData.lder);
-    console.log("Parsed canto data (lizq):", currentCantoData.lizq);
-    console.log("Parsed canto data (lder):", currentCantoData.lder);
-
 
     renderCanto(); // Renderizar el canto inicialmente
 
-    // Renderizar las categorías
+    // Renderizar las categorías usando el array procesado con URLs
     if (processedCategories && Array.isArray(processedCategories)) {
         renderCategories(processedCategories);
-    } else {
-        console.warn("Advertencia: No se proporcionaron categorías procesadas o no es un array.");
     }
 };

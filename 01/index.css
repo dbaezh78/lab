@@ -7,26 +7,18 @@
 
 /* Puedes mantener las media queries para .r1::before, .r2::before aquí si son específicas de este canto */
 .r1::before, .r2::before {
-    /* Las propiedades comunes que no dependen de media queries van aquí */
-}
-
-@media (min-width: 384px) {
-    .r1::before, .r2::before {
+    @media (min-width: 384px) {
         height: 93px;
         margin-left: 79%;
         margin-top: -10%;
     }
-}
-@media (min-width: 768px) {
-    .r1::before, .r2::before {
+    @media (min-width: 768px) {
         height: 153px;
         margin-left: 80%;
         margin-top: -9%;
     }
-}
 
-@media (min-width: 992px) {
-    .r1::before, .r2::before {
+    @media (min-width: 992px) {
         height: 125px;
         margin-left: 77%;
         margin-top: -9%;
