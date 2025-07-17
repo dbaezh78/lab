@@ -43,10 +43,6 @@ let cantoAudioPlayer;
 let audioControlBtn;
 let audioIcon;
 
-// Nuevo: Referencia para el botón "Mostrar toda la asamblea"
-let showAllAsambleaBtn;
-let showAllAsambleaIcon; // Icono dentro del botón
-
 // Nuevo: Mapa para almacenar el estado expandido/colapsado de los bloques
 const collapsibleStates = new Map();
 
@@ -238,7 +234,6 @@ const renderCantoSection = (container, parsedData) => {
                     triggerDiv.dataset.isExpanded = "true";
                     collapsibleStates.set(entry.id, true); // Guardar estado
                 }
-                updateShowAllAsambleaIcon(); // Actualizar el icono del botón de asamblea
             });
 
             blockContainer.appendChild(triggerDiv);
@@ -302,7 +297,6 @@ const openChordSelectionModal = (currentDisplayedNoteClicked) => {
 
             renderCanto(); // Esto ahora preservará el estado de los colapsables
             chordSelectionModal.style.display = 'none';
-            updateShowAllAsambleaIcon(); // Actualizar el icono del botón de asamblea
         });
         chordListContainer.appendChild(chordItem);
     });
@@ -333,32 +327,6 @@ const renderCategories = (categoriesWithUrls) => {
     console.log("Categories rendered:", categoriesWithUrls);
 };
 
-// Función para verificar si todos los bloques de asamblea están expandidos
-const areAllAssemblyBlocksExpanded = () => {
-    // Obtener todos los bloques colapsables que tienen un ID que comienza con "asamblea_"
-    const assemblyBlocks = document.querySelectorAll('.collapsible-block-container[data-block-id^="asamblea_"]');
-    if (assemblyBlocks.length === 0) return false; // Si no hay bloques de asamblea, consideramos que no todos están expandidos
-
-    for (const block of assemblyBlocks) {
-        const blockId = block.dataset.blockId;
-        // Si el estado del bloque no está en el mapa o es false (colapsado), entonces no todos están expandidos
-        if (!collapsibleStates.has(blockId) || !collapsibleStates.get(blockId)) {
-            return false;
-        }
-    }
-    return true; // Todos los bloques de asamblea están expandidos
-};
-
-// Función para actualizar el icono del botón "Mostrar toda la asamblea"
-const updateShowAllAsambleaIcon = () => {
-    if (showAllAsambleaIcon) {
-        const allExpanded = areAllAssemblyBlocksExpanded();
-        // Si todos están expandidos, el botón debería ofrecer la opción de colapsar (visibility_off)
-        // Si no todos están expandidos (alguno o todos colapsados), el botón debería ofrecer la opción de expandir (visibility)
-        showAllAsambleaIcon.textContent = allExpanded ? 'visibility_off' : 'visibility';
-    }
-};
-
 
 // Función de inicialización que será llamada desde cada archivo de canto
 const initializeCantoPage = (cantoSpecificData, processedCategories) => {
@@ -375,10 +343,6 @@ const initializeCantoPage = (cantoSpecificData, processedCategories) => {
     audioControlBtn = document.getElementById('audio-control-btn');
     audioIcon = audioControlBtn ? audioControlBtn.querySelector('.audio-icon') : null;
 
-    // Referencias para el nuevo botón de asamblea
-    showAllAsambleaBtn = document.getElementById('showAllAsambleaBtn');
-    showAllAsambleaIcon = showAllAsambleaBtn ? showAllAsambleaBtn.querySelector('.material-symbols-outlined') : null;
-
 
     // Verificar si los contenedores del canto se encontraron
     if (!cantoLeftContainer) console.error("Error: #canto-left-container no encontrado.");
@@ -389,8 +353,6 @@ const initializeCantoPage = (cantoSpecificData, processedCategories) => {
     if (!cantoAudioPlayer) console.error("Error: #cantoAudioPlayer no encontrado.");
     if (!audioControlBtn) console.error("Error: #audio-control-btn no encontrado.");
     if (!audioIcon) console.error("Error: .audio-icon no encontrado dentro de #audio-control-btn.");
-    if (!showAllAsambleaBtn) console.error("Error: #showAllAsambleaBtn no encontrado.");
-    if (!showAllAsambleaIcon) console.error("Error: .material-symbols-outlined no encontrado dentro de #showAllAsambleaBtn.");
 
 
     // Actualizar los títulos y subtítulos del canto
@@ -459,50 +421,6 @@ const initializeCantoPage = (cantoSpecificData, processedCategories) => {
         };
     }
 
-    // Lógica para el botón "Mostrar toda la asamblea"
-    if (showAllAsambleaBtn && showAllAsambleaIcon) {
-        showAllAsambleaBtn.onclick = (event) => {
-            event.preventDefault();
-            const allCurrentlyExpanded = areAllAssemblyBlocksExpanded();
-            const targetState = !allCurrentlyExpanded; // Si todos están expandidos, colapsar; si no, expandir
-
-            document.querySelectorAll('.collapsible-block-container[data-block-id^="asamblea_"]').forEach(blockContainer => {
-                const blockId = blockContainer.dataset.blockId;
-                const contentDiv = blockContainer.querySelector('.collapsible-content');
-                const triggerDiv = blockContainer.querySelector('.collapsible-trigger');
-                const triggerLetraSpan = triggerDiv.querySelector('.letra');
-
-                if (targetState) { // Expandir
-                    contentDiv.style.display = '';
-                    triggerLetraSpan.textContent = triggerLetraSpan.dataset.originalText;
-                    triggerDiv.dataset.isExpanded = "true";
-                    collapsibleStates.set(blockId, true);
-                } else { // Colapsar
-                    contentDiv.style.display = 'none';
-                    if (!triggerLetraSpan.textContent.endsWith(' ...')) {
-                        triggerLetraSpan.textContent += ' ...';
-                    }
-                    triggerDiv.dataset.isExpanded = "false";
-                    collapsibleStates.set(blockId, false);
-                }
-            });
-            // Actualizar el icono del botón principal después de la acción
-            updateShowAllAsambleaIcon();
-        };
-
-        // Efecto hover para el icono del ojo
-        showAllAsambleaBtn.addEventListener('mouseover', () => {
-            const allCurrentlyExpanded = areAllAssemblyBlocksExpanded();
-            // Si todos están expandidos, al pasar el ratón se sugiere "visibility" (para colapsar al hacer clic)
-            // Si no todos están expandidos, al pasar el ratón se sugiere "visibility_off" (para expandir al hacer clic)
-            showAllAsambleaIcon.textContent = allCurrentlyExpanded ? 'visibility' : 'visibility_off';
-        });
-
-        showAllAsambleaBtn.addEventListener('mouseout', () => {
-            // Al quitar el ratón, el icono vuelve a su estado normal (indicando la acción actual)
-            updateShowAllAsambleaIcon();
-        });
-    }
 
     // Parsear y almacenar los datos del canto actual
     currentCantoData.lizq = parseCantoSectionData(cantoSpecificData.lizq);
@@ -512,7 +430,6 @@ const initializeCantoPage = (cantoSpecificData, processedCategories) => {
 
 
     renderCanto(); // Renderizar el canto inicialmente
-    updateShowAllAsambleaIcon(); // Establecer el icono inicial del botón de asamblea
 
     // Renderizar las categorías
     if (processedCategories && Array.isArray(processedCategories)) {
