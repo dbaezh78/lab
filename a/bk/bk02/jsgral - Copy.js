@@ -43,9 +43,6 @@ let cantoAudioPlayer;
 let audioControlBtn;
 let audioIcon;
 
-// Nuevo: Mapa para almacenar el estado expandido/colapsado de los bloques
-const collapsibleStates = new Map();
-
 // Función para transponer una nota
 const transposeNote = (originalNote, semitoneDifference) => {
     const originalSemitone = noteToSemitone[originalNote];
@@ -191,6 +188,7 @@ const renderCantoSection = (container, parsedData) => {
             const triggerDiv = renderParsedLine(entry.triggerLine); // Renderizar el disparador
             triggerDiv.classList.add('collapsible-trigger');
             triggerDiv.dataset.blockId = entry.id; // Para referencia
+            triggerDiv.dataset.isExpanded = entry.initialState === "expanded" ? "true" : "false";
 
             const contentDiv = document.createElement('div');
             contentDiv.classList.add('collapsible-content');
@@ -203,36 +201,30 @@ const renderCantoSection = (container, parsedData) => {
 
             const triggerLetraSpan = triggerDiv.querySelector('.letra');
 
-            // Determinar el estado actual del bloque: si ya está en el mapa, usar ese estado; si no, usar el estado inicial
-            let isCurrentlyExpanded = collapsibleStates.has(entry.id) ? collapsibleStates.get(entry.id) : (entry.initialState === "expanded");
-            triggerDiv.dataset.isExpanded = isCurrentlyExpanded.toString();
-
-            // Aplicar el display y el texto del disparador según el estado
-            if (isCurrentlyExpanded) {
-                contentDiv.style.display = ''; // Mostrar
-                triggerLetraSpan.textContent = triggerLetraSpan.dataset.originalText; // Asegurarse de que no tenga "..."
-            } else {
-                contentDiv.style.display = 'none'; // Ocultar
+            // Establecer el estado inicial
+            if (entry.initialState === "collapsed") {
+                contentDiv.style.display = 'none';
+                // Añadir "..." solo si no está ya presente
                 if (!triggerLetraSpan.textContent.endsWith(' ...')) {
-                    triggerLetraSpan.textContent += ' ...'; // Añadir "..."
+                    triggerLetraSpan.textContent += ' ...';
                 }
             }
 
             // Lógica para el toggle
             triggerDiv.addEventListener('click', () => {
-                const wasExpanded = contentDiv.style.display !== 'none';
-                if (wasExpanded) {
+                const isExpanded = contentDiv.style.display !== 'none';
+                if (isExpanded) {
                     contentDiv.style.display = 'none';
+                    // Añadir "..." cuando se colapsa
                     if (!triggerLetraSpan.textContent.endsWith(' ...')) {
                         triggerLetraSpan.textContent += ' ...';
                     }
                     triggerDiv.dataset.isExpanded = "false";
-                    collapsibleStates.set(entry.id, false); // Guardar estado
                 } else {
-                    contentDiv.style.display = ''; // Mostrar
-                    triggerLetraSpan.textContent = triggerLetraSpan.dataset.originalText; // Restaurar texto original
+                    contentDiv.style.display = ''; // O 'block' o 'flex' según el diseño
+                    // Restaurar el texto original (sin "...") cuando se expande
+                    triggerLetraSpan.textContent = triggerLetraSpan.dataset.originalText;
                     triggerDiv.dataset.isExpanded = "true";
-                    collapsibleStates.set(entry.id, true); // Guardar estado
                 }
             });
 
@@ -295,7 +287,7 @@ const openChordSelectionModal = (currentDisplayedNoteClicked) => {
                 currentKeyOffset += cords.length;
             }
 
-            renderCanto(); // Esto ahora preservará el estado de los colapsables
+            renderCanto();
             chordSelectionModal.style.display = 'none';
         });
         chordListContainer.appendChild(chordItem);

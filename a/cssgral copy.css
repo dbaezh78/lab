@@ -444,7 +444,7 @@ body {
 
 @media (min-width: 768px) and (max-width: 991px) {
     .letra { font-size: 1.87em; }
-    .nota-posicionada { font-size: 1.2em; }
+    .nota-posicionada { font-size: 1.32em; }
 }
 
 @media (min-width: 992px) {
@@ -518,14 +518,14 @@ body {
 .pa::before {content: "P";}
 
 
-.r1, .r2 {
+.r1, .r2, .b1-1 {
     position: relative;
     min-height: 0px;
 }
 
 /* Las propiedades comunes que no dependen de media queries van aquí */
-.r1::before, .r2::before {
-    content: " BIS A."; /* Movido aquí */
+.r1::before, .r2::before, .b1-1::before {
+    content: " BIS A."; /* Movido aquí */
     position: absolute; /* Movido aquí */
     align-content: center; /* Movido aquí */
     border-left: 2px solid #c6c5c59e; /* Movido aquí */
@@ -580,8 +580,8 @@ hr {
 }
 @media (min-width: 992px) {
     hr {
-        width: 100%;
-        margin-left: -20px;
+        width: 992px;
+        margin-left: 0px;
     }
 }
 
@@ -596,7 +596,7 @@ hr {
 #cantoCategories {
     display: flex; /* Usar flexbox para que los enlaces se alineen en fila */
     flex-wrap: wrap; /* Permitir que los enlaces se envuelvan a la siguiente línea si no caben */
-    gap: 8px; /* Espacio entre los elementos de categoría */
+    /*gap: 8px; /* Espacio entre los elementos de categoría */
     justify-content: flex-start; /* Alinear al inicio */
     align-items: center;
 }
@@ -665,17 +665,11 @@ hr {
     outline: none;
     border-radius: 0px 0px 0px 0px;
     display: none; /* Oculto por defecto */
-}
 
-@media (min-width: 384px) {
-    .saudio { margin-left: 0%; width: 100%; }
-}
-@media (min-width: 768px) {
-    .saudio { margin-left: 0%; width: 100%; }
-}
-@media (min-width: 992px) {
-    .saudio { margin-left: -2%; width: 104%; }
-}
+    @media (min-width: 384px) { margin-left: 0%; width: 100%; }
+    @media (min-width: 768px) { margin-left: 0%; width: 100%; }
+    @media (min-width: 992px) { margin-left: -2%; width: 104%; }
+}   
 
 .material-symbols-outlined.hover-effect {
     transition: transform 0.2s ease-in-out;
@@ -693,14 +687,4 @@ hr {
 #showAllAsambleaBtn .material-symbols-outlined:hover {
     transform: scale(1.1); /* Ligeramente más grande al pasar el ratón */
 }
-
-.mgap {
-    display: flex;
-    gap: 15px; /* Valor por defecto para pantallas grandes */
-}
-
-@media (min-width: 384px) {
-    .mgap {
-        gap: 5px; /* Gap más pequeño para pantallas pequeñas */
-    }
 }

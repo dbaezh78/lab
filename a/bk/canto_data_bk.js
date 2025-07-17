@@ -3,7 +3,7 @@
 
 const allCantosData = [
     {
-        id: "alavictimapascual", // Un ID único para el canto
+        id: "victima_pascual", // Un ID único para el canto
         tt: "A la Víctima Pascual",
         title: "A la Víctima Pascual",
         subtitle: "Secuencia de Pascua - Himno lat. «Victimae paschall laudes»",
@@ -11,7 +11,6 @@ const allCantosData = [
         nCan: "Notas del canto, ej: * Se repite todo el canto en un tono más alto",
         dbno: "1",
         notes: "Este canto se usa en la liturgia de Pascua.",
-        audioSrc: "/audio/alavictimapascual.mp3", // <-- Nueva propiedad para el audio
         // Datos específicos del canto, ahora referenciados aquí
         lizq: [
             { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,15)(Re,m,400)", sC: "tc" },
@@ -41,11 +40,11 @@ const allCantosData = [
                 initialState: "collapsed",
                 triggerLine: "HERMANOS, A NADIE DEMOS (La,m,15)", // Texto del disparador sin "..."
                 lines: [
-                    { line: "HERMANOS, A NADIE DEMOS (La,m,15)", sC: "as" },
-                    { line: "OCASIÓN DE TROPIEZO, (Re,m,15)", sC: "as" },
-                    { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,,65)", sC: "as" },
-                    { line: "LAS TRIBULACIONES, (La,m,15)", sC: "as" },
-                    { line: "NECESIDADES, ANGUSTIAS Y FATIGAS. (Re,m,15) (Mi,,65)", sC: "as" },
+                    { line: "HERMANOS, A NADIE DEMOS (La,m,15)", tcss: "atx" },
+                    { line: "OCASIÓN DE TROPIEZO, (Re,m,15)" },
+                    { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,,65)" },
+                    { line: "LAS TRIBULACIONES, (La,m,15)" },
+                    { line: "NECESIDADES, ANGUSTIAS Y FATIGAS. (Re,m,15) (Mi,,65)" }
                 ]
             },
             { line: "Hermanos, vivamos aceptando las tribulaciones, (Mi,,50)(La,m,363)"  },
@@ -55,7 +54,7 @@ const allCantosData = [
             { line: "Hermanos, vivamos aceptando las tribulaciones, (Mi,,50)(La,m,363)"  },
         ],
         lder: [
-            { line: "HERMANOS, A NADIE DEMOS (Mi,m,15)(Re,m,85)", sC: "ta as b1-1" }, // Nota: sC corregido
+            { line: "HERMANOS, A NADIE DEMOS (Mi,m,15)(Re,m,85)", sC: "ta", sC: "as b1-1" }, // Nota: sC duplicado, solo se usará el último
             { line: "OCASIÓN DE TROPIEZO (Mi,m,15)(Re,m,85)", sC: "as" },
             { line: "HERMANOS, VIVAMOS ACEPTANDO (Mi,m,15)(Re,m,85)", sC: "as" },
             { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,15)(Re,m,160)", sC: "tc clase1 clase2 clase3" },
@@ -78,7 +77,7 @@ const allCantosData = [
         nCan: "Notas",
         dbno: "2",
         notes: "Este canto se usa en la liturgia de Pascua.",
-        audioSrc: "/audio/anadiedemosocasiondetropiezo.mp3", // <-- Nueva propiedad para el audio
+
         lizq: [
             { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,16)(Re,m,416)", sC: "tc" },
             { line: "hermanos, vivamos aceptando las tribulaciones, (Mi,,61) (La,m,418)" },

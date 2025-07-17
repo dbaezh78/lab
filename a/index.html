@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="index.css">
     <!-- Enlace para Material Symbols Outlined -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
-    <title id="tt"></title> <!-- El texto ha sido eliminado, JavaScript lo llenará -->
+    <title id="tt"></title> <!-- El título de la pestaña se llenará con JavaScript desde canto_data.js -->
 </head>
 <body>
 
@@ -25,7 +25,7 @@
                     
                 </home>
 
-                <div class="toolbar">
+                <div class="toolbar mgap"> <!-- Añadida clase mgap aquí -->
 
                     <!-- Selector para cejilla/traste -->
                     <select id="cejillaSelect" class="toolbar-item" data-default="5ᵒ traste">
@@ -40,8 +40,17 @@
                     </select>
 
                     <!-- Icono de libro/vista -->
+                     <a href="#" id="CallNotas" class="toolbar-item icon-button">
+                        <span class="material-symbols-outlined">music_note</span>
+                    </a>
+                    
                     <a href="#" id="toggleVista" class="toolbar-item icon-button">
                         <span class="material-symbols-outlined">menu_book</span>
+                    </a>
+                    
+                    <!-- Nuevo botón para mostrar/ocultar toda la asamblea -->
+                    <a href="#" id="showAllAsambleaBtn" class="toolbar-item icon-button">
+                        <span class="material-symbols-outlined">visibility</span>
                     </a>
 
                     <!-- Icono de control de audio -->
@@ -58,11 +67,18 @@
                     <input type="search" id="searchInput" placeholder="Buscar..." class="toolbar-item search-input">
                 </div>
             </div>
+            
+        <div>
+        <audio id="cantoAudioPlayer" class="saudio" controls="" controlslist="download" preload="metadata" loop="">
+        <source src="" type="audio/mpeg"></audio> <!-- La fuente se establecerá con JS -->
+        </div>
+
         </div>
 
             <h1>
-                <div class="dbt1">A la Víctima Pascual</div>
-                <div class="dbs2">Secuencia de Pascua - Himno lat. «Victimae paschall laudes»</div>
+                <!-- Los títulos del canto se llenarán con JavaScript desde canto_data.js -->
+                <div class="dbt1"></div>
+                <div class="dbs2"></div>
             </h1>
 
         <div class="container">
@@ -75,13 +91,10 @@
                 </div>
             </div>
         </div>
-        <hr>
-        <div class="pie">
-            <div id="cantoCategories">
-                <!-- Las categorías se cargarán aquí dinámicamente -->
-            </div>
-            <div >Notas</div>
-            <div ><div class="cno" id="dbno">1 </div></div>
+        <div class="pie dbr">
+            <div id="cantoCategories"></div>
+            <div class="nCanto" id="nCan"  ></div>
+            <div ><div class="cno" id="dbno"></div></div>
         
         </div>
     </div>

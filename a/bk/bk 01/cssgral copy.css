@@ -129,7 +129,7 @@ body {
     .top-row-controls {
         position: relative; /* Relative for desktop */
         justify-content: space-between;
-        padding: 0px 40px 0px 0px;
+        padding: 3px 40px 3px 0px;
         left: -20px;
     }
 }
@@ -169,19 +169,8 @@ body {
 .toolbar {
     display: flex;
     align-items: center;
-    /* Elimina el 'gap' aquí si ya lo estás manejando con .mgap */
+    gap: 15px;
 }
-
-.mgap { /* Nueva clase para controlar el gap */
-    gap: 15px; /* Valor por defecto para pantallas grandes */
-}
-
-@media(min-width: 384px){
-    .mgap {
-        gap: 5px; /* Gap más pequeño para pantallas pequeñas */
-    }
-}
-
 
 .toolbar-item {
     vertical-align: middle;
@@ -253,20 +242,14 @@ body {
     color: rgb(196 76 75);
     margin-top: 10px;
     margin: 0px;
-}
 
-@media (min-width: 384px)  {
-    .dbt1 {
+    @media (min-width: 384px)  {
         font-size: 1.2rem;
     }
-}
-@media (min-width: 768px)  {
-    .dbt1 {
+    @media (min-width: 768px)  {
         font-size: 2.5rem;
     }
-}
-@media (min-width: 992px)  {
-    .dbt1 {
+    @media (min-width: 992px)  {
         font-size: 2.5rem;
     }
 }
@@ -277,21 +260,15 @@ body {
     font-size: medium;
     font-weight: bold;
     text-align: center;
-}
 
-@media (min-width: 384px) {
-    .dbs2 {
+    @media (min-width: 384px) {
         font-size: 0.9rem;
         
     }
-}
-@media (min-width: 768px) {
-    .dbs2 {
+    @media (min-width: 768px) {
         font-size: large;
     }
-}
-@media (min-width: 992px) {
-    .dbs2 {
+    @media (min-width: 992px) {
         font-size: 1.2rem;
     }
 }
@@ -518,14 +495,14 @@ body {
 .pa::before {content: "P";}
 
 
-.r1, .r2 {
+.r1, .r2, .b1-1 {
     position: relative;
     min-height: 0px;
 }
 
 /* Las propiedades comunes que no dependen de media queries van aquí */
-.r1::before, .r2::before {
-    content: " BIS A."; /* Movido aquí */
+.r1::before, .r2::before, .b1-1::before {
+    content: " BIS A."; /* Movido aquí */
     position: absolute; /* Movido aquí */
     align-content: center; /* Movido aquí */
     border-left: 2px solid #c6c5c59e; /* Movido aquí */
@@ -580,8 +557,8 @@ hr {
 }
 @media (min-width: 992px) {
     hr {
-        width: 100%;
-        margin-left: -20px;
+        width: 992px;
+        margin-left: 0px;
     }
 }
 
@@ -596,7 +573,7 @@ hr {
 #cantoCategories {
     display: flex; /* Usar flexbox para que los enlaces se alineen en fila */
     flex-wrap: wrap; /* Permitir que los enlaces se envuelvan a la siguiente línea si no caben */
-    gap: 8px; /* Espacio entre los elementos de categoría */
+    /*gap: 8px; /* Espacio entre los elementos de categoría */
     justify-content: flex-start; /* Alinear al inicio */
     align-items: center;
 }
@@ -643,64 +620,11 @@ hr {
     border-bottom: none;
     border-left: none;
     border-right: none;
-}
 
-@media (min-width: 992px) {
-    .dbr {
+    @media (min-width: 992px) {
         padding: 10px 20px 10px 20px;
     }
 }
 
 .cno {padding: 10px 20px 0px 20px;   }
 .nCanto {font-family: monospace;}
-
-.collapsible-trigger {
-    cursor: pointer;
-}
-
-.saudio {
-    width: -webkit-fill-available;
-    /* display: table-cell; */ /* Removido, ahora controlado por JS */
-    background-color: #f1f3f4;
-    outline: none;
-    border-radius: 0px 0px 0px 0px;
-    display: none; /* Oculto por defecto */
-}
-
-@media (min-width: 384px) {
-    .saudio { margin-left: 0%; width: 100%; }
-}
-@media (min-width: 768px) {
-    .saudio { margin-left: 0%; width: 100%; }
-}
-@media (min-width: 992px) {
-    .saudio { margin-left: -2%; width: 104%; }
-}
-
-.material-symbols-outlined.hover-effect {
-    transition: transform 0.2s ease-in-out;
-}
-
-.material-symbols-outlined.hover-effect:hover {
-    transform: scale(1.2); /* Ejemplo de efecto de escala */
-}
-
-/* Estilo para el icono del ojo al pasar el ratón */
-#showAllAsambleaBtn .material-symbols-outlined {
-    transition: transform 0.2s ease-in-out; /* Transición suave para el efecto */
-}
-
-#showAllAsambleaBtn .material-symbols-outlined:hover {
-    transform: scale(1.1); /* Ligeramente más grande al pasar el ratón */
-}
-
-.mgap {
-    display: flex;
-    gap: 15px; /* Valor por defecto para pantallas grandes */
-}
-
-@media (min-width: 384px) {
-    .mgap {
-        gap: 5px; /* Gap más pequeño para pantallas pequeñas */
-    }
-}
