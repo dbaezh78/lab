@@ -45,7 +45,7 @@
 .r1::before, .r2::before, .b1-1::before, .b1-2::before,
 .b3::before, .b12-1::before, .b12-2::before
 {
-    content: " BIS A."; /* Movido aquí */
+    content: " BIS A."; /* Movido aquí */
     position: absolute; /* Movido aquí */
     align-content: center; /* Movido aquí */
     border-left: 2px solid #c6c5c59e; /* Movido aquí */

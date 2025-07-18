@@ -133,15 +133,6 @@ const chordImageFilenames = [
 ];
 const IMAGE_BASE_PATH = "/cantos/src/ima/";
 
-// Variables para el scroll automático
-let scrollSpeed = 200; // Velocidad de desplazamiento en píxeles por segundo
-let scrollIncrement = 1; // Cantidad de píxeles a desplazar en cada paso
-let isScrolling = false;
-let scrollInterval;
-let startScrollBtn; // Referencia al botón de scroll
-let scrollIcon; // Referencia al icono del botón de scroll
-
-
 // Función para obtener el nombre legible del acorde a partir del nombre del archivo
 const getDisplayNameFromFilename = (filename) => {
     let name = filename.split('.')[0];
@@ -598,10 +589,6 @@ const initializeCantoPage = (cantoSpecificData, processedCategories) => {
     largeImageModal = document.getElementById('largeImageModal');
     largeChordImage = document.getElementById('largeChordImage');
 
-    // Referencias para el scroll automático
-    startScrollBtn = document.getElementById('startScroll');
-    scrollIcon = startScrollBtn ? startScrollBtn.querySelector('.scroll-icon') : null;
-
 
     // Verificar si los contenedores del canto se encontraron
     if (!cantoLeftContainer) console.error("Error: #canto-left-container no encontrado.");
@@ -622,8 +609,6 @@ const initializeCantoPage = (cantoSpecificData, processedCategories) => {
     if (!chordImagesContainer) console.error("Error: #chordImageList no encontrado.");
     if (!largeImageModal) console.error("Error: #largeImageModal no encontrado.");
     if (!largeChordImage) console.error("Error: #largeChordImage no encontrado.");
-    if (!startScrollBtn) console.error("Error: #startScroll no encontrado.");
-    if (!scrollIcon) console.error("Error: .scroll-icon no encontrado dentro de #startScroll.");
 
 
     // Actualizar los títulos y subtítulos del canto
@@ -788,51 +773,6 @@ const initializeCantoPage = (cantoSpecificData, processedCategories) => {
             }
         });
     }
-
-    // Lógica para el scroll automático
-    if (startScrollBtn && scrollIcon) {
-        // Leer la velocidad y el incremento desde los atributos de datos
-        scrollSpeed = parseInt(startScrollBtn.dataset.velocidad) || 200;
-        scrollIncrement = parseInt(startScrollBtn.dataset.incremento) || 1;
-
-        startScrollBtn.onclick = (event) => {
-            event.preventDefault();
-            if (isScrolling) {
-                stopAutoScroll();
-            } else {
-                startAutoScroll();
-            }
-        };
-    }
-
-    // Función para iniciar el scroll automático
-    const startAutoScroll = () => {
-        if (isScrolling) return; // Evitar iniciar múltiples intervalos
-
-        isScrolling = true;
-        scrollIcon.textContent = 'pause'; // Cambiar icono a pausa
-        
-        // Calcular el tiempo de intervalo para la velocidad deseada
-        // (1000 ms / scrollSpeed pixels/sec) * scrollIncrement pixels/step
-        const intervalTime = (1000 / scrollSpeed) * scrollIncrement; 
-
-        scrollInterval = setInterval(() => {
-            window.scrollBy(0, scrollIncrement); // Desplazar hacia abajo
-            // Detener el scroll si llegamos al final de la página
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-                stopAutoScroll();
-            }
-        }, intervalTime);
-    };
-
-    // Función para detener el scroll automático
-    const stopAutoScroll = () => {
-        if (!isScrolling) return; // No hay scroll para detener
-
-        isScrolling = false;
-        scrollIcon.textContent = 'south'; // Cambiar icono a flecha abajo
-        clearInterval(scrollInterval);
-    };
 
 
     // Parsear y almacenar los datos del canto actual
