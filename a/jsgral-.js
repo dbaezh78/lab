@@ -37,6 +37,7 @@ let chordSelectionModal;
 let chordListContainer;
 let cantoCategoriesContainer; // Nueva referencia para el contenedor de categorías
 let cantoContentWrapper; // Nueva referencia para el contenedor principal de las columnas
+let headerSection; // Nueva referencia para la sección del encabezado
 
 // Referencias para el control de audio
 let cantoAudioPlayer;
@@ -133,6 +134,19 @@ const chordImageFilenames = [
 ];
 const IMAGE_BASE_PATH = "/cantos/src/ima/";
 
+// Variables para el scroll automático
+let scrollSpeed = 200; // Velocidad de desplazamiento en píxeles por segundo
+let scrollIncrement = 1; // Cantidad de píxeles a desplazar en cada paso
+let isScrolling = false;
+let scrollInterval;
+let startScrollBtn; // Referencia al botón de scroll
+let scrollIcon; // Referencia al icono del botón de scroll
+
+// Nuevo: Referencias para la barra de progreso de audio
+let audioProgressBar;
+let audioProgressPoint;
+
+
 // Función para obtener el nombre legible del acorde a partir del nombre del archivo
 const getDisplayNameFromFilename = (filename) => {
     let name = filename.split('.')[0];
@@ -215,7 +229,8 @@ const parseSingleLineData = (lineContent, sectionClass = null, textStyleClass = 
             noteBlockMatches.forEach(noteBlock => {
                 const content = noteBlock.substring(1, noteBlock.length - 1);
                 const parts = content.split(',');
-                const noteName = parts[0].trim();
+                // CORRECCIÓN: Cambiado 'Ttrim()' a 'trim()'
+                const noteName = parts[0].trim(); 
                 const noteType = parts[1] ? parts[1].trim() : '';
                 const conceptualPositionUnit = parseFloat(parts[2]);
                 notes.push({
@@ -566,6 +581,7 @@ const initializeCantoPage = (cantoSpecificData, processedCategories) => {
     chordListContainer = document.getElementById('chordList');
     cantoCategoriesContainer = document.getElementById('cantoCategories');
     cantoContentWrapper = document.querySelector('.canto-content-wrapper'); // Obtener el wrapper
+    headerSection = document.querySelector('.header-section'); // Obtener la sección del encabezado
 
     // Referencias para el control de audio
     cantoAudioPlayer = document.getElementById('cantoAudioPlayer');
@@ -589,6 +605,14 @@ const initializeCantoPage = (cantoSpecificData, processedCategories) => {
     largeImageModal = document.getElementById('largeImageModal');
     largeChordImage = document.getElementById('largeChordImage');
 
+    // Referencias para el scroll automático
+    startScrollBtn = document.getElementById('startScroll');
+    scrollIcon = startScrollBtn ? startScrollBtn.querySelector('.scroll-icon') : null;
+
+    // Nuevo: Referencias para la barra de progreso de audio
+    audioProgressBar = document.getElementById('audioProgressBar');
+    audioProgressPoint = audioProgressBar ? audioProgressBar.querySelector('.audio-progress-point') : null;
+
 
     // Verificar si los contenedores del canto se encontraron
     if (!cantoLeftContainer) console.error("Error: #canto-left-container no encontrado.");
@@ -604,11 +628,16 @@ const initializeCantoPage = (cantoSpecificData, processedCategories) => {
     if (!toggleVistaBtn) console.error("Error: #toggleVista no encontrado.");
     if (!toggleVistaIcon) console.error("Error: .material-symbols-outlined no encontrado dentro de #toggleVista.");
     if (!cantoContentWrapper) console.error("Error: .canto-content-wrapper no encontrado.");
+    if (!headerSection) console.error("Error: .header-section no encontrado."); // Verificar headerSection
     if (!callNotasBtn) console.error("Error: #CallNotas no encontrado.");
     if (!chordImagesModal) console.error("Error: #chordImagesModal no encontrado.");
     if (!chordImagesContainer) console.error("Error: #chordImageList no encontrado.");
     if (!largeImageModal) console.error("Error: #largeImageModal no encontrado.");
     if (!largeChordImage) console.error("Error: #largeChordImage no encontrado.");
+    if (!startScrollBtn) console.error("Error: #startScroll no encontrado.");
+    if (!scrollIcon) console.error("Error: .scroll-icon no encontrado dentro de #startScroll.");
+    if (!audioProgressBar) console.error("Error: #audioProgressBar no encontrado.");
+    if (!audioProgressPoint) console.error("Error: .audio-progress-point no encontrado dentro de #audioProgressBar.");
 
 
     // Actualizar los títulos y subtítulos del canto
@@ -641,7 +670,7 @@ const initializeCantoPage = (cantoSpecificData, processedCategories) => {
     if (cantoAudioPlayer && cantoSpecificData.audioSrc) {
         cantoAudioPlayer.src = cantoSpecificData.audioSrc;
         cantoAudioPlayer.load(); // Cargar el nuevo audio
-        cantoAudioPlayer.style.display = 'none'; // Asegurarse de que esté oculto al inicio
+        // cantoAudioPlayer.style.display = 'block'; // Ya está en CSS, no es necesario aquí
         if (audioIcon) {
             audioIcon.textContent = 'play_circle'; // Asegurarse de que el icono sea de reproducción
         }
@@ -661,20 +690,38 @@ const initializeCantoPage = (cantoSpecificData, processedCategories) => {
             event.preventDefault(); // Evitar el comportamiento por defecto del enlace
             if (cantoAudioPlayer.paused) {
                 cantoAudioPlayer.play();
-                cantoAudioPlayer.style.display = 'block'; // Mostrar el reproductor
                 if (audioIcon) audioIcon.textContent = 'pause_circle'; // Cambiar a icono de pausa
+                // La barra de progreso se mostrará/ocultará con el evento de scroll
             } else {
                 cantoAudioPlayer.pause();
-                cantoAudioPlayer.style.display = 'none'; // Ocultar el reproductor
                 if (audioIcon) audioIcon.textContent = 'play_circle'; // Cambiar a icono de reproducción
+                // La barra de progreso se mostrará/ocultará con el evento de scroll
             }
         };
 
         // Event listener para cuando el audio termina
         cantoAudioPlayer.onended = () => {
-            cantoAudioPlayer.style.display = 'none'; // Ocultar el reproductor
             if (audioIcon) audioIcon.textContent = 'play_circle'; // Cambiar a icono de reproducción
+            if (audioProgressBar) audioProgressBar.style.display = 'none'; // Ocultar la barra de progreso
         };
+
+        // Event listener para actualizar la barra de progreso
+        cantoAudioPlayer.ontimeupdate = () => {
+            if (cantoAudioPlayer.duration > 0 && audioProgressPoint) {
+                const progress = (cantoAudioPlayer.currentTime / cantoAudioPlayer.duration) * 100;
+                audioProgressPoint.style.left = `${progress}%`;
+            }
+        };
+
+        // Event listener para permitir al usuario hacer clic en la barra de progreso
+        if (audioProgressBar) {
+            audioProgressBar.addEventListener('click', (event) => {
+                const progressBarRect = audioProgressBar.getBoundingClientRect();
+                const clickX = event.clientX - progressBarRect.left;
+                const newTime = (clickX / progressBarRect.width) * cantoAudioPlayer.duration;
+                cantoAudioPlayer.currentTime = newTime;
+            });
+        }
     }
 
     // Lógica para el botón "Mostrar toda la asamblea"
@@ -773,6 +820,80 @@ const initializeCantoPage = (cantoSpecificData, processedCategories) => {
             }
         });
     }
+
+    // Lógica para el scroll automático
+    if (startScrollBtn && scrollIcon) {
+        // Leer la velocidad y el incremento desde los atributos de datos
+        scrollSpeed = parseInt(startScrollBtn.dataset.velocidad) || 200;
+        scrollIncrement = parseInt(startScrollBtn.dataset.incremento) || 1;
+
+        startScrollBtn.onclick = (event) => {
+            event.preventDefault();
+            if (isScrolling) {
+                stopAutoScroll();
+            } else {
+                startAutoScroll();
+            }
+        };
+    }
+
+    // Función para iniciar el scroll automático
+    const startAutoScroll = () => {
+        if (isScrolling) return; // Evitar iniciar múltiples intervalos
+
+        isScrolling = true;
+        scrollIcon.textContent = 'pause'; // Cambiar icono a pausa
+        
+        // Calcular el tiempo de intervalo para la velocidad deseada
+        // (1000 ms / scrollSpeed pixels/sec) * scrollIncrement pixels/step
+        const intervalTime = (1000 / scrollSpeed) * scrollIncrement; 
+
+        scrollInterval = setInterval(() => {
+            window.scrollBy(0, scrollIncrement); // Desplazar hacia abajo
+            // Detener el scroll si llegamos al final de la página
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+                stopAutoScroll();
+            }
+        }, intervalTime);
+    };
+
+    // Función para detener el scroll automático
+    const stopAutoScroll = () => {
+        if (!isScrolling) return; // No hay scroll para detener
+
+        isScrolling = false;
+        scrollIcon.textContent = 'south'; // Cambiar icono a flecha abajo
+        clearInterval(scrollInterval);
+    };
+
+    // Lógica para alternar la visibilidad del reproductor de audio al hacer scroll
+    const handleAudioPlayerVisibilityOnScroll = () => {
+        if (!cantoAudioPlayer || !audioProgressBar || !headerSection) {
+            console.warn("Elementos de audio o encabezado no encontrados para el control de scroll.");
+            return;
+        }
+
+        const headerHeight = headerSection.offsetHeight; // Altura del encabezado
+        const scrollThreshold = headerHeight; // El umbral es la altura del encabezado
+
+        if (window.scrollY > scrollThreshold) {
+            // Si se ha hecho scroll hacia abajo
+            cantoAudioPlayer.style.display = 'none'; // Ocultar el reproductor convencional
+            // Mostrar la barra de progreso solo si el audio está reproduciéndose
+            if (!cantoAudioPlayer.paused) {
+                audioProgressBar.style.display = 'block';
+            }
+        } else {
+            // Si se ha hecho scroll hacia arriba o está en la parte superior
+            cantoAudioPlayer.style.display = 'block'; // Mostrar el reproductor convencional
+            audioProgressBar.style.display = 'none'; // Ocultar la barra de progreso
+        }
+    };
+
+    // Añadir el event listener de scroll
+    window.addEventListener('scroll', handleAudioPlayerVisibilityOnScroll);
+    // Ejecutar una vez al cargar para establecer el estado inicial
+    handleAudioPlayerVisibilityOnScroll();
 
 
     // Parsear y almacenar los datos del canto actual

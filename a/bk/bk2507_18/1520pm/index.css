@@ -1,0 +1,75 @@
+/* Este archivo contendrá estilos específicos para el canto actual (ej. A la Víctima Pascual) */
+/* Puedes añadir sobrescrituras o estilos únicos aquí */
+
+/* Ejemplo: Si quieres un color de fondo diferente solo para este canto */
+/* body { background-color: #f0f8ff; } */
+
+
+/* Puedes mantener las media queries para .r1::before, .r2::before aquí si son específicas de este canto */
+.r1::before, .r2::before {
+    /* Las propiedades comunes que no dependen de media queries van aquí */
+}
+
+@media (min-width: 384px) {
+    .r1::before, .r2::before {
+        height: 93px;
+        margin-left: 79%;
+        margin-top: -10%;
+    }
+}
+@media (min-width: 768px) {
+    .r1::before, .r2::before {
+        height: 153px;
+        margin-left: 80%;
+        margin-top: -9%;
+    }
+}
+
+@media (min-width: 992px) {
+    .r1::before, .r2::before {
+        height: 125px;
+        margin-left: 77%;
+        margin-top: -9%;
+    }
+}
+
+/* ESTRUCTURA DE BIS*/
+
+.r1, .r2, .b1-1, .b1-2, .b3, .b12-1, .b12-2, .b14, .b18, .b1
+ {
+    position: relative;
+    min-height: 0px;
+}
+
+/* Las propiedades comunes que no dependen de media queries van aquí */
+.r1::before, .r2::before, .b1-1::before, .b1-2::before,
+.b3::before, .b12-1::before, .b12-2::before
+{
+    content: " BIS A."; /* Movido aquí */
+    position: absolute; /* Movido aquí */
+    align-content: center; /* Movido aquí */
+    border-left: 2px solid #c6c5c59e; /* Movido aquí */
+    color: #c6c5c59e; /* Movido aquí */
+    width: max-content; /* Movido aquí */
+    font: icon;
+    font-weight: bold;
+}
+
+/* Media queries para r1 y r2 */
+@media (min-width: 384px) {
+    .r1::before, .r2::before {height: 40px;margin-left: 85%;margin-top: 0%;}
+    .b1-1::before{height: 100px;margin-left: 85%;margin-top: 0%;}
+    .b1-2::before{height: 60px;margin-left: 88%;margin-top: 0%;}
+}
+@media (min-width: 768px) {
+    .r1::before {font-size: 1.5rem;height: 80px;margin-left: 80%;margin-top: 0%;}
+    .r2::before {font-size: 1.5rem;height: 80px;margin-left: 80%;margin-top: 0%;}
+    .b1-1::before{height: 79px;margin-left: 85%;margin-top: 0%;}
+    .b1-2::before{height: 60px;margin-left: 88%;margin-top: 0%;}
+}
+@media (min-width: 992px) {
+    .r1::before {font-size: 1.3rem;font-weight: bold;height: 134px;margin-left: 80%;margin-top: 0%;}
+    .r2::before {font-size: 1.3rem;font-weight: bold;height: 134px;margin-left: 80%;margin-top: 0%;}
+    .b1-1::before{height: 127px;margin-left: 76%;margin-top: 0%;}
+    .b1-2::before{height: 80px;margin-left: 88%;margin-top: 0%;}
+}

@@ -748,8 +748,8 @@ hr {
 
 .chord-image-item span {
     font-weight: bold;
-    color: var(--chord-color-default-text); /* Color de texto blanco */
-    font-size: 1.3em;
+    color: var(--chord-color-default-text); /* Color de texto blanco por defecto */
+    font-size: 0.9em;
 }
 
 /* Clases para los colores de fondo de los acordes */
@@ -758,6 +758,7 @@ hr {
 .chord-image-item.chord-color-mi { background-color: var(--chord-color-mi); }
 .chord-image-item.chord-color-mi6 { background-color: var(--chord-color-mi); }
 .chord-image-item.chord-color-miaj { background-color: var(--chord-color-mi); }
+.chord-image-item.chord-color-mimaj7 { background-color: var(--chord-color-mi); }
 .chord-image-item.chord-color-fa { background-color: var(--chord-color-fa); }
 .chord-image-item.chord-color-faaj { background-color: var(--chord-color-fa); }
 .chord-image-item.chord-color-faaj13 { background-color: var(--chord-color-fa); }
@@ -766,6 +767,14 @@ hr {
 .chord-image-item.chord-color-la { background-color: var(--chord-color-la); }
 .chord-image-item.chord-color-la6 { background-color: var(--chord-color-la); }
 .chord-image-item.chord-color-si { background-color: var(--chord-color-si); }
+
+/* Sobrescribir el color del texto para los acordes de Mi a negro */
+
+.chord-image-item.chord-color-mi span {color: black;}
+.chord-image-item.chord-color-mi6 span {color: black;}
+.chord-image-item.chord-color-mia span {color: black;}
+.chord-image-item.chord-color-miaj span {color: black;}
+
 
 /* Estilos para la nueva modal de imagen grande */
 .modal-content.large-image-content {
