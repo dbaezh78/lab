@@ -95,7 +95,7 @@ const allCantosData = [
             { line: "NECESIDADES, ANGUSTIAS Y FATIGAS. (Re,m,18)(Mi,,328)", sC: "as" },
 
             { line: "En calumnias y en buena fama, (Re,m,15) (Mi,,65)", sC: "mt tc" },
-            { line: "en gloria e igno(Mi,,65)nia, (Re,m,15) (Mi,,65)" },
+            { line: "en gloria e ignominia(Mi,,65)nia, (Re,m,15) (Mi,,65)" },
             { line: "como pobres, aunque enriqueciendo a muchos; (Fa,,15)" },
             { line: "como quienes nada tienen, (Mi,,65)" },
             { line: "aunque lo poseemos todo. "},

@@ -40,7 +40,11 @@ body {
     margin: 0;
     padding: 20px;
     box-sizing: border-box;
+
 }
+
+body::-webkit-scrollbar {
+display: none;}
 
 @media(min-width: 384px){
     body {
@@ -265,8 +269,8 @@ body {
     text-transform: uppercase;  /* Convierte cualquier texto a Mayuscula*/
     text-align: center;
     color: rgb(196 76 75);
-    margin-top: 10px;
-    margin: 0px;
+    margin-top: 30px;
+    /*margin: 0px;*/
 }
 
 @media (min-width: 384px)  {
@@ -681,13 +685,14 @@ hr {
     background-color: #f1f3f4;
     outline: none;
     border-radius: 0px 0px 0px 0px;
-    display: none; /* Oculto por defecto */
-    position: fixed;
+    display: none; 
+    z-index: 9999;
     
 }
 
 @media (min-width: 384px) {
-    .saudio { 
+    .saudio {
+        position: fixed; 
         width: 376px; 
         margin-left: 0px;
         margin-top: -5px;
@@ -696,13 +701,16 @@ hr {
 }
 @media (min-width: 768px) {
     .saudio { 
+        
+        position: fixed;
         margin-left: 0px; 
-        width: 768px;
+        width: 784px;
         height: 28px;
     }
 }
 @media (min-width: 992px) {
     .saudio { 
+        position: absolute;
         margin-left: -20px; 
         width: 1085px;
         height: 35px;
