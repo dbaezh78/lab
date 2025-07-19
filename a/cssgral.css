@@ -682,16 +682,31 @@ hr {
     outline: none;
     border-radius: 0px 0px 0px 0px;
     display: none; /* Oculto por defecto */
+    position: fixed;
+    
 }
 
 @media (min-width: 384px) {
-    .saudio { margin-left: 0%; width: 100%; }
+    .saudio { 
+        width: 376px; 
+        margin-left: 0px;
+        margin-top: -5px;
+        height: 22px;
+    }
 }
 @media (min-width: 768px) {
-    .saudio { margin-left: 0%; width: 100%; }
+    .saudio { 
+        margin-left: 0px; 
+        width: 768px;
+        height: 28px;
+    }
 }
 @media (min-width: 992px) {
-    .saudio { margin-left: -2%; width: 104%; }
+    .saudio { 
+        margin-left: -20px; 
+        width: 1085px;
+        height: 35px;
+     }
 }
 
 /* Estilo para el icono del ojo al pasar el ratón */
