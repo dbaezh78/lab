@@ -15,8 +15,8 @@ const positionConfigs = {
         maxWidth: 700,
         factor: 0.734, // Factor actualizado por el usuario
     },
-    'tablet': { // Para anchos de pantalla entre 768px y 1024px
-        minWidth: 768,
+    'tablet': { // Para anchos de pantalla entre 701px y 1024px (ajustado para cubrir el rango)
+        minWidth: 701, // Cambiado de 768px para no dejar un hueco
         maxWidth: 1024,
         factor: 1.36,
     },
@@ -134,8 +134,8 @@ const chordImageFilenames = [
 const IMAGE_BASE_PATH = "/cantos/src/ima/";
 
 // Variables para el scroll automático
-let scrollSpeed = 200; // Velocidad de desplazamiento en píxeles por segundo
-let scrollIncrement = 1; // Cantidad de píxeles a desplazar en cada paso
+let scrollSpeed = 200; // Velocidad de desplazamiento en píxeles por segundo (valor por defecto)
+let scrollIncrement = 1; // Cantidad de píxeles a desplazar en cada paso (valor por defecto)
 let isScrolling = false;
 let scrollInterval;
 let startScrollBtn; // Referencia al botón de scroll
@@ -193,6 +193,17 @@ const getCurrentPositionConfig = (screenWidth) => {
         return positionConfigs.tablet;
     } else {
         return positionConfigs.desktop;
+    }
+};
+
+// Función para obtener el tipo de dispositivo basado en el ancho de la pantalla
+const getDeviceType = (screenWidth) => {
+    if (screenWidth <= positionConfigs.mobile.maxWidth) {
+        return 'mobile';
+    } else if (screenWidth >= positionConfigs.tablet.minWidth && screenWidth <= positionConfigs.tablet.maxWidth) {
+        return 'tablet';
+    } else {
+        return 'desktop'; // Podrías considerar un valor por defecto o 'desktop' para otros casos
     }
 };
 
@@ -791,9 +802,21 @@ const initializeCantoPage = (cantoSpecificData, processedCategories) => {
 
     // Lógica para el scroll automático
     if (startScrollBtn && scrollIcon) {
-        // Leer la velocidad y el incremento desde los atributos de datos
-        scrollSpeed = parseInt(startScrollBtn.dataset.velocidad) || 200;
-        scrollIncrement = parseInt(startScrollBtn.dataset.incremento) || 1;
+        // Determinar el tipo de dispositivo actual
+        const deviceType = getDeviceType(window.innerWidth);
+        let selectedScrollConfig = null;
+
+        if (cantoSpecificData.scrollConfig) {
+            selectedScrollConfig = cantoSpecificData.scrollConfig[deviceType];
+        }
+
+        if (selectedScrollConfig) {
+            scrollSpeed = selectedScrollConfig.velocidad;
+            scrollIncrement = selectedScrollConfig.incremento;
+        } else {
+            console.warn(`No se encontró configuración de scroll para ${deviceType}. Usando valores por defecto.`);
+            // scrollSpeed y scrollIncrement ya tienen valores por defecto definidos globalmente.
+        }
 
         startScrollBtn.onclick = (event) => {
             event.preventDefault();

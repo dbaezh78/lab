@@ -12,6 +12,11 @@ const allCantosData = [
         dbno: "1",
         notes: "Este canto se usa en la liturgia de Pascua.",
         audioSrc: "/audio/alavictimapascual.mp3", // <-- Nueva propiedad para el audio
+        // Nueva propiedad para la velocidad de desplazamiento
+        scrollConfig: {
+            mobile: { velocidad: 6, incremento: 3 }, // Para celular
+            tablet: { velocidad: 7, incremento: 1 }  // Para tablet
+        },
         // Datos específicos del canto, ahora referenciados aquí
         lizq: [
             { line: "Hermanos, a nadie demos ocasión de tropiezo, (La,m,15)(Re,m,400)", sC: "tc" },
@@ -75,6 +80,11 @@ const allCantosData = [
         title: "A NADIE DEMOS OCASIÓN DE TROPIEZO",
         subtitle: "2ª Corintios 6,3ss",
         category: ["PreCatecumenado", "Pascua", "Pentecostés", "Comunión"], // Sigue siendo un array de nombres de categorías
+        // Nueva propiedad para la velocidad de desplazamiento
+        scrollConfig: {
+            mobile: { velocidad: 6, incremento: 3 },
+            tablet: { velocidad: 7, incremento: 1 }
+        },
         nCan: "Notas",
         dbno: "2",
         notes: "Este canto se usa en la liturgia de Pascua.",
@@ -94,11 +104,11 @@ const allCantosData = [
             { line: "LAS TRIBULACIONES,  (La,m,154)", sC: "as" },
             { line: "NECESIDADES, ANGUSTIAS Y FATIGAS. (Re,m,18)(Mi,,328)", sC: "as" },
 
-            { line: "En calumnias y en buena fama, (Re,m,15) (Mi,,65)", sC: "mt tc" },
-            { line: "en gloria e ignominia(Mi,,65)nia, (Re,m,15) (Mi,,65)" },
-            { line: "como pobres, aunque enriqueciendo a muchos; (Fa,,15)" },
-            { line: "como quienes nada tienen, (Mi,,65)" },
-            { line: "aunque lo poseemos todo. "},
+            { line: "En calumnias y en buena fama, (Re,m,15)(Mi,,263)", sC: "mt tc" },
+            { line: "en gloria e ignominia, (Re,m,15) (Mi,,175)" },
+            { line: "como pobres, aunque enriqueciendo a muchos; (Re,m,72) (Mi,,300)" },
+            { line: "como quienes nada tienen, (Fa,,211)" },
+            { line: "aunque lo poseemos todo. (Mi,,218)" },
 
             {   type: "collapsible-block",
                 id: "asamblea_anadie_1",
@@ -112,13 +122,13 @@ const allCantosData = [
                 ]},
         ],
         lder: [
-            { line: "Hermanos, os hemos hablado con franqueza, (Mi,,65)", sC: "tc" },
-            { line: "os hemos hablado en toda verdad. (Re,m,15) (Mi,,65)", sC: "" },
-            { line: "No unciros al yugo desigual con los paganos. (Re,m,15) (Mi,,205)" },
-            { line: "¿Qué participación hay entre el fiel y el infiel? (Fa,,205)" },
-            { line: "¿Qué unión entre el santuario de Dios (Mi,,65) " },
-            { line: "y el santuario de los ídolos? (Re,m,15) (Mi,,65)" },
-            { line: "Porque somos el santuario de Dios. " },
+            { line: "Hermanos, os hemos hablado con franqueza, (La,7,13)(Re,m,398)", sC: "tc" },
+            { line: "os hemos hablado en toda verdad. (Mi,,307)", sC: "" },
+            { line: "No unciros al yugo desigual con los paganos. (Re,m,15) (Mi,,391)" },
+            { line: "¿Qué participación hay entre el fiel y el infiel? (Re,m,15) (Mi,,420)" },
+            { line: "¿Qué unión entre el santuario de Dios (Fa,,348) " },
+            { line: "y el santuario de los ídolos? (Mi,,208)" },
+            { line: "Porque somos el santuario de Dios. (Re,m,15) (Mi,,320) " },
             // Bloque de asamblea colapsado en lder
             
             {
@@ -133,12 +143,12 @@ const allCantosData = [
                     { line: "NECESIDADES, ANGUSTIAS Y FATIGAS. (Re,m,18)(Mi,,328)", sC: "as" },
                 ]},
 
-            { line: "Tengo plena confianza en el hablaros, (Mi,,65)", sC: "mt tc" },
-            { line: "porque estoy orgulloso de vosotros. (Re,m,15) (Mi,,65)" },
-            { line: "No unciros al yugo desigual con los paganos. (Re,m,15) (Mi,,65)" },
-            { line: "¿Qué participación hay entre el fiel y el infiel? (Fa,,15)" },
-            { line: "¿Qué unión entre el santuario de Dios (Mi,,65)" },
-            { line: "y el santuario de los ídolos?" },
+            { line: "Tengo plena confianza en el hablaros, (La,7,15) (Re,m,313)", sC: "mt tc" },
+            { line: "porque estoy orgulloso de vosotros. (Mi,,289)" },
+            { line: "No unciros al yugo desigual con los paganos. (Re,m,15) (Mi,,388)" },
+            { line: "¿Qué participación hay entre el fiel y el infiel? (Re,m,15) (Mi,,421)" },
+            { line: "¿Qué unión entre el santuario de Dios (Fa,,349)" },
+            { line: "y el santuario de los ídolos? (Mi,,207)"  },
 
             {   type: "collapsible-block",
                 id: "asamblea_anadie_2",
@@ -151,8 +161,8 @@ const allCantosData = [
                     { line: "NECESIDADES, ANGUSTIAS Y FATIGAS. (Re,m,18)(Mi,,328)", sC: "as" },
                 ]},
 
-            { line: "En pureza, paciencia y bondad, (Fa,,15) (Mi,,65)", sC: "mt tc" },
-            { line: "en el Espíritu Santo, y en el poder de Dios." },
+            { line: "En pureza, paciencia y bondad, (Re,m,15) (Mi,,277)", sC: "mt tc" },
+            { line: "en el Espíritu Santo, y en el poder de Dios. (Fa,,147) (Mi,,381)" },
         ]
 
     }
