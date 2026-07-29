@@ -54,12 +54,21 @@ const chordModal = document.getElementById('chord-modal');
 const chordModalTitle = document.getElementById('chord-modal-title');
 const chordModalClose = document.getElementById('chord-modal-close');
 const chordDiagramImg = document.getElementById('chord-diagram-img');
+const modalChordNotePicker = document.getElementById('modal-chord-note-picker');
+const modalChordTypePicker = document.getElementById('modal-chord-type-picker');
 
 const settingsModal = document.getElementById('settings-modal');
 const settingsModalClose = document.getElementById('settings-modal-close');
 const capoSelect = document.getElementById('capo-select');
+const settingsZoomOutBtn = document.getElementById('settings-zoom-out-btn');
+const settingsZoomInBtn = document.getElementById('settings-zoom-in-btn');
+const settingsZoomBadge = document.getElementById('settings-zoom-badge');
 const exportNotesBtn = document.getElementById('export-notes-btn');
 const importNotesBtn = document.getElementById('import-notes-btn');
+
+// Estado interno para el prontuario de acordes activo
+let selectedModalNote = 'La';
+let selectedModalType = 'm';
 
 // --- Inicialización ---
 document.addEventListener('DOMContentLoaded', async () => {
@@ -342,9 +351,23 @@ function shiftKey(semitones) {
 }
 
 // --- Diagramas de Acordes ---
-function showChordDiagram(noteName, noteType) {
+function updateModalChordDiagram() {
+  const noteName = selectedModalNote;
+  const noteType = selectedModalType;
+  
+  // Resaltar botón de Nota
+  modalChordNotePicker.querySelectorAll('.btn-picker').forEach(btn => {
+    const btnNote = btn.dataset.note;
+    btn.classList.toggle('active', btnNote.toLowerCase() === noteName.toLowerCase());
+  });
+  
+  // Resaltar botón de Tipo
+  modalChordTypePicker.querySelectorAll('.btn-picker').forEach(btn => {
+    const btnType = btn.dataset.type;
+    btn.classList.toggle('active', btnType === noteType);
+  });
+  
   // Mapear el acorde a su correspondiente nombre de imagen
-  // ej: La + m -> lam.jpg, Do# + 7 -> dos7.jpg
   const normalizedBase = noteName.toLowerCase()
     .replace('do#', 'dos')
     .replace('re#', 'res')
@@ -358,11 +381,8 @@ function showChordDiagram(noteName, noteType) {
     .replace('7', '7')
     .replace('m', 'm');
   
-  // Excepciones y variaciones en nombres de ficheros
   let filename = `${normalizedBase}${typeSuffix}.jpg`;
   
-  // Verificar si la imagen existe en el prontuario (de lo contrario usa el acorde base)
-  // Usaremos un try/catch virtual al cargar la imagen, si da error cargamos el acorde base
   chordModalTitle.textContent = `Acorde: ${noteName}${noteType ? ' ' : ''}${noteType}`;
   chordDiagramImg.src = `ima/${filename}`;
   chordDiagramImg.onerror = () => {
@@ -373,7 +393,13 @@ function showChordDiagram(noteName, noteType) {
       chordDiagramImg.src = 'img/ico.ico';
     };
   };
+}
+
+function showChordDiagram(noteName, noteType) {
+  selectedModalNote = noteName;
+  selectedModalType = noteType;
   
+  updateModalChordDiagram();
   chordModal.style.display = 'flex';
 }
 
@@ -604,15 +630,10 @@ function setupEventListeners() {
   transposeDownBtn.addEventListener('click', () => shiftKey(-1));
   transposeUpBtn.addEventListener('click', () => shiftKey(1));
   
-  zoomOutBtn.addEventListener('click', () => {
-    zoomFactor = Math.max(0.6, zoomFactor - 0.1);
-    document.documentElement.style.setProperty('--font-zoom', zoomFactor);
-  });
-  
-  zoomInBtn.addEventListener('click', () => {
-    zoomFactor = Math.min(2.0, zoomFactor + 0.1);
-    document.documentElement.style.setProperty('--font-zoom', zoomFactor);
-  });
+  zoomOutBtn.addEventListener('click', () => updateZoom(zoomFactor - 0.1));
+  zoomInBtn.addEventListener('click', () => updateZoom(zoomFactor + 0.1));
+  settingsZoomOutBtn.addEventListener('click', () => updateZoom(zoomFactor - 0.1));
+  settingsZoomInBtn.addEventListener('click', () => updateZoom(zoomFactor + 0.1));
   
   scrollPlayBtn.addEventListener('click', toggleAutoScroll);
   
@@ -703,6 +724,21 @@ function setupEventListeners() {
     if (e.target === settingsModal) settingsModal.style.display = 'none';
   });
   
+  // Click listeners para el prontuario de acordes interactivo
+  modalChordNotePicker.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-picker');
+    if (!btn) return;
+    selectedModalNote = btn.dataset.note;
+    updateModalChordDiagram();
+  });
+  
+  modalChordTypePicker.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-picker');
+    if (!btn) return;
+    selectedModalType = btn.dataset.type;
+    updateModalChordDiagram();
+  });
+  
   // Selección de temas
   document.querySelectorAll('.theme-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -731,6 +767,14 @@ function setupEventListeners() {
       if (currentCanto) renderSongContent();
     }, 150);
   });
+}
+
+function updateZoom(factor) {
+  zoomFactor = Math.max(0.6, Math.min(2.0, factor));
+  document.documentElement.style.setProperty('--font-zoom', zoomFactor);
+  if (settingsZoomBadge) {
+    settingsZoomBadge.textContent = `${Math.round(zoomFactor * 100)}%`;
+  }
 }
 
 // --- Ajustes Visuales y Preferencias ---
