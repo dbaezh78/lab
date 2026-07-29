@@ -55,7 +55,6 @@ const chordModalTitle = document.getElementById('chord-modal-title');
 const chordModalClose = document.getElementById('chord-modal-close');
 const chordDiagramImg = document.getElementById('chord-diagram-img');
 const modalChordNotePicker = document.getElementById('modal-chord-note-picker');
-const modalChordTypePicker = document.getElementById('modal-chord-type-picker');
 
 const settingsModal = document.getElementById('settings-modal');
 const settingsModalClose = document.getElementById('settings-modal-close');
@@ -361,11 +360,21 @@ function updateModalChordDiagram() {
     btn.classList.toggle('active', btnNote.toLowerCase() === noteName.toLowerCase());
   });
   
-  // Resaltar botón de Tipo
-  modalChordTypePicker.querySelectorAll('.btn-picker').forEach(btn => {
-    const btnType = btn.dataset.type;
-    btn.classList.toggle('active', btnType === noteType);
-  });
+  // Actualizar textos informativos en el modal
+  const subtitle = document.getElementById('chord-modal-subtitle');
+  if (subtitle) {
+    subtitle.innerHTML = `Selecciona el nuevo acorde para reemplazar a <strong>[${noteName}${noteType ? ' ' : ''}${noteType}]</strong> y transportar todo el canto completo:`;
+  }
+  
+  const label = document.getElementById('chord-picker-label');
+  if (label) {
+    label.innerHTML = `Cambiar acorde <strong>[${noteName}${noteType ? ' ' : ''}${noteType}]</strong> a:`;
+  }
+  
+  const diagTitle = document.getElementById('chord-diagram-title');
+  if (diagTitle) {
+    diagTitle.innerHTML = `Digitación del acorde <strong>${noteName}${noteType ? ' ' : ''}${noteType}</strong>:`;
+  }
   
   // Mapear el acorde a su correspondiente nombre de imagen
   const normalizedBase = noteName.toLowerCase()
@@ -383,7 +392,6 @@ function updateModalChordDiagram() {
   
   let filename = `${normalizedBase}${typeSuffix}.jpg`;
   
-  chordModalTitle.textContent = `Acorde: ${noteName}${noteType ? ' ' : ''}${noteType}`;
   chordDiagramImg.src = `ima/${filename}`;
   chordDiagramImg.onerror = () => {
     // Fallback a acorde base
@@ -728,15 +736,19 @@ function setupEventListeners() {
   modalChordNotePicker.addEventListener('click', (e) => {
     const btn = e.target.closest('.btn-picker');
     if (!btn) return;
-    selectedModalNote = btn.dataset.note;
-    updateModalChordDiagram();
-  });
-  
-  modalChordTypePicker.addEventListener('click', (e) => {
-    const btn = e.target.closest('.btn-picker');
-    if (!btn) return;
-    selectedModalType = btn.dataset.type;
-    updateModalChordDiagram();
+    
+    const chosenNote = btn.dataset.note;
+    const fromIdx = CHROMATIC_SCALE.indexOf(normalizeChord(selectedModalNote));
+    const toIdx = CHROMATIC_SCALE.indexOf(normalizeChord(chosenNote));
+    
+    if (fromIdx !== -1 && toIdx !== -1) {
+      let diff = toIdx - fromIdx;
+      if (diff !== 0) {
+        shiftKey(diff);
+        selectedModalNote = chosenNote;
+        updateModalChordDiagram();
+      }
+    }
   });
   
   // Selección de temas
