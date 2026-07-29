@@ -175,24 +175,22 @@
 
   <!-- MODAL: DIAGRAMA DE ACORDE -->
   <div id="chord-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-content" style="max-width: 500px;">
-      <div class="modal-header">
-        <h2 id="chord-modal-title">Transportar Tono</h2>
-        <button id="chord-modal-close" class="btn btn-icon">
+    <div class="modal-content" style="max-width: 440px; padding: 24px; border-radius: 18px; text-align: center;">
+      <div class="modal-header" style="justify-content: center; border: none; padding: 0; margin-bottom: 15px;">
+        <h2 id="chord-modal-title" style="font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.4rem; color: var(--text-color); margin: 0;">Transportar Acorde</h2>
+        <button id="chord-modal-close" class="btn btn-icon" style="display: none;">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
       
-      <p id="chord-modal-subtitle" style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px; line-height: 1.4;">
-        Selecciona el nuevo acorde para reemplazar a este acorde y transportar todo el canto completo:
-      </p>
+      <p id="chord-modal-subtitle" style="display: none;"></p>
 
       <!-- Selector de Nota Base -->
       <div class="chord-picker-row">
-        <label id="chord-picker-label" style="font-weight: 700;">Cambiar acorde a:</label>
+        <label id="chord-picker-label" style="display: none;"></label>
         <div class="chord-picker-grid" id="modal-chord-note-picker">
           <button class="btn btn-picker" data-note="Do">Do</button>
-          <button class="btn btn-picker" data-note="Do#">Do#</button>
+          <button class="btn btn-picker" data-note="Do#"></button> <!-- Vacío como la imagen -->
           <button class="btn btn-picker" data-note="Re">Re</button>
           <button class="btn btn-picker" data-note="Re#">Re#</button>
           <button class="btn btn-picker" data-note="Mi">Mi</button>
@@ -206,9 +204,9 @@
         </div>
       </div>
       
-      <div class="chord-diagram-view" style="margin-top: 15px; border-top: 1px solid var(--panel-border); padding-top: 15px;">
-        <h4 id="chord-diagram-title" style="font-size: 0.9rem; margin-bottom: 10px; text-align: center; color: var(--accent-color);">Digitación del acorde:</h4>
-        <img id="chord-diagram-img" src="" alt="Cargando diagrama..." style="max-height: 240px; display: block; margin: 0 auto; border-radius: 8px;">
+      <div class="chord-diagram-view" style="display: none;">
+        <h4 id="chord-diagram-title" style="display: none;"></h4>
+        <img id="chord-diagram-img" src="" alt="Cargando diagrama..." style="display: none;">
       </div>
     </div>
   </div>

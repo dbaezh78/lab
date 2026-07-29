@@ -318,7 +318,8 @@ function renderLine(lineItem, factor) {
           // Abrir modal de digitación al hacer clic
           chordSpan.addEventListener('click', (e) => {
             e.stopPropagation();
-            showChordDiagram(transposedNote, noteType);
+            const currentTransposedNote = transposeNote(chordSpan.dataset.originalNote, currentKeyOffset);
+            showChordDiagram(currentTransposedNote, chordSpan.dataset.noteType);
           });
           
           lineDiv.appendChild(chordSpan);
@@ -748,6 +749,8 @@ function setupEventListeners() {
         selectedModalNote = chosenNote;
         updateModalChordDiagram();
       }
+      // Cerrar el modal al realizar la selección
+      chordModal.style.display = 'none';
     }
   });
   

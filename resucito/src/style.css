@@ -880,41 +880,55 @@ footer {
   flex-direction: column;
   gap: 6px;
   width: 100%;
-  margin-bottom: 12px;
-}
-
-.chord-picker-row label {
-  font-weight: bold;
-  font-size: 0.85rem;
-  color: var(--text-muted);
 }
 
 .chord-picker-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  width: 100%;
 }
 
 .btn-picker {
-  padding: 6px 12px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  border-radius: 6px;
-  background-color: hsla(0, 0%, 50%, 0.05);
+  padding: 12px 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: 8px;
+  background-color: var(--card-bg);
   border: 1px solid var(--panel-border);
   color: var(--text-color);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s ease-in-out;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-picker:hover {
-  background-color: hsla(0, 0%, 50%, 0.12);
+  background-color: hsla(0, 0%, 50%, 0.08);
   border-color: var(--accent-color);
+  transform: translateY(-1px);
 }
 
-.btn-picker.active {
-  background-color: var(--accent-color);
-  color: white;
-  border-color: var(--accent-color);
-  box-shadow: 0 0 8px var(--accent-glow);
+/* En tema claro para que quede idéntico a la imagen */
+.theme-light .btn-picker {
+  background-color: #ffffff;
+  border: 1px solid #d3d3d3;
+  color: #202020;
+}
+
+.theme-light .btn-picker:hover {
+  background-color: #f7f7f7;
+  border-color: #999999;
+}
+
+/* El botón vacío de Do# no recibe clics */
+.btn-picker[data-note="Do#"] {
+  cursor: default;
+  pointer-events: none;
+  background-color: var(--card-bg) !important;
+}
+
+.theme-light .btn-picker[data-note="Do#"] {
+  background-color: #ffffff !important;
+  border-color: #d3d3d3 !important;
 }
