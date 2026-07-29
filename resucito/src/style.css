@@ -921,14 +921,3 @@ footer {
   border-color: #999999;
 }
 
-/* El botón vacío de Do# no recibe clics */
-.btn-picker[data-note="Do#"] {
-  cursor: default;
-  pointer-events: none;
-  background-color: var(--card-bg) !important;
-}
-
-.theme-light .btn-picker[data-note="Do#"] {
-  background-color: #ffffff !important;
-  border-color: #d3d3d3 !important;
-}
