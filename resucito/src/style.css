@@ -1,0 +1,875 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+
+/* --- variables del sistema de diseño --- */
+:root {
+  /* Tema Oscuro (Defecto) */
+  --bg-color: hsl(220, 20%, 10%);
+  --text-color: hsl(220, 20%, 95%);
+  --text-muted: hsl(220, 10%, 65%);
+  --accent-color: hsl(210, 100%, 60%);
+  --accent-glow: hsla(210, 100%, 60%, 0.35);
+  
+  --panel-bg: hsla(220, 20%, 15%, 0.65);
+  --panel-border: hsla(220, 20%, 25%, 0.5);
+  --panel-hover-border: hsla(210, 100%, 60%, 0.4);
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+  
+  --chord-color: hsl(35, 100%, 60%);
+  --font-zoom: 1;
+  --font-family-lyrics: 'Inter', sans-serif;
+}
+
+/* --- Variantes de Temas --- */
+.theme-light {
+  --bg-color: hsl(210, 20%, 97%);
+  --text-color: hsl(220, 25%, 15%);
+  --text-muted: hsl(220, 15%, 45%);
+  --accent-color: hsl(210, 95%, 45%);
+  --accent-glow: hsla(210, 95%, 45%, 0.2);
+  
+  --panel-bg: rgba(255, 255, 255, 0.7);
+  --panel-border: rgba(0, 0, 0, 0.08);
+  --panel-hover-border: rgba(210, 95%, 45%, 0.3);
+  
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.12);
+  
+  --chord-color: hsl(25, 95%, 45%);
+}
+
+.theme-sepia {
+  --bg-color: hsl(35, 35%, 90%);
+  --text-color: hsl(35, 40%, 15%);
+  --text-muted: hsl(35, 20%, 40%);
+  --accent-color: hsl(25, 80%, 40%);
+  --accent-glow: hsla(25, 80%, 40%, 0.2);
+  
+  --panel-bg: rgba(244, 230, 210, 0.75);
+  --panel-border: rgba(139, 90, 43, 0.15);
+  --panel-hover-border: rgba(25, 80%, 40%, 0.35);
+  
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.1);
+  
+  --chord-color: hsl(15, 80%, 45%);
+}
+
+/* Colores de categorías litúrgicas */
+.badge-precatecumenado { background-color: #6c757d; color: white; }
+.badge-catecumenado { background-color: #0d6efd; color: white; }
+.badge-eleccion { background-color: #198754; color: white; }
+.badge-liturgia { background-color: #ffc107; color: #212529; }
+.badge-catolicos { background-color: #6f42c1; color: white; }
+.badge-otros { background-color: #20c997; color: white; }
+
+/* Reset de estilos */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  overflow-x: hidden;
+}
+
+/* Botones con micro-animaciones */
+button, .btn {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  gap: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:active, .btn:active {
+  transform: scale(0.96);
+}
+
+/* --- Layout de la SPA --- */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+header {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.title-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.title-banner img.logo-app {
+  height: 56px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.title-banner h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 2.2rem;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--text-color) 0%, var(--accent-color) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.marquee-banner {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  padding: 6px 12px;
+  border-radius: 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.marquee-content {
+  display: inline-block;
+  animation: marquee-scroll 45s linear infinite;
+  padding-left: 100%;
+}
+
+@keyframes marquee-scroll {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-100%, 0, 0); }
+}
+
+/* --- Dashboard / Buscador --- */
+.dashboard-view {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.search-box-container {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.search-input {
+  width: 100%;
+  padding: 14px 16px 14px 44px;
+  font-size: 1.1rem;
+  border-radius: 14px;
+  border: 1.5px solid var(--panel-border);
+  background-color: var(--panel-bg);
+  color: var(--text-color);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-sm);
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.search-input:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.search-icon-btn {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+/* Panel de filtros */
+.filters-toggle-section {
+  display: flex;
+  justify-content: center;
+  margin-top: -10px;
+}
+
+.btn-filter-toggle {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+.btn-filter-toggle.active {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.filters-panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  padding: 16px;
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: slide-down 0.25s ease-out;
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.filter-section h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  color: var(--text-muted);
+}
+
+.filter-buttons-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-pill {
+  padding: 6px 14px;
+  border-radius: 18px;
+  font-size: 0.85rem;
+  border: 1px solid var(--panel-border);
+  background-color: hsla(0, 0%, 50%, 0.05);
+  color: var(--text-color);
+}
+
+.filter-pill.active {
+  background-color: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Listado de cantos */
+.songs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.song-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--panel-bg);
+  border: 1.5px solid var(--panel-border);
+  border-radius: 14px;
+  padding: 16px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  text-decoration: none;
+  color: inherit;
+}
+
+.song-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--panel-hover-border);
+  box-shadow: var(--shadow-md), 0 0 12px var(--accent-glow);
+}
+
+.song-card-number {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.song-card-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  line-height: 1.25;
+}
+
+.song-card-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  flex-grow: 1;
+}
+
+.song-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+.badge-audio {
+  background-color: var(--accent-glow);
+  color: var(--accent-color);
+  border: 1px solid var(--accent-color);
+}
+
+.badge-capo {
+  background-color: hsla(0, 0%, 50%, 0.15);
+  color: var(--text-color);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* --- Visualizador del Canto (Song Viewer) --- */
+.song-viewer-view {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: fade-in 0.3s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Toolbar superior del visor */
+.viewer-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  padding: 10px 16px;
+  backdrop-filter: blur(10px);
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 8px;
+  z-index: 50;
+}
+
+.toolbar-left, .toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar-center {
+  flex-grow: 1;
+  text-align: center;
+}
+
+.toolbar-center h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.toolbar-center p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 10px;
+  background-color: hsla(0, 0%, 50%, 0.05);
+  border: 1px solid var(--panel-border);
+  color: var(--text-color);
+}
+
+.btn-icon:hover {
+  background-color: hsla(0, 0%, 50%, 0.15);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.btn-icon.active {
+  background-color: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+}
+
+/* Barra de transposición */
+.transpose-controls {
+  display: flex;
+  align-items: center;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  padding: 2px;
+  gap: 4px;
+}
+
+.key-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  min-width: 48px;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+/* Control de scroll */
+.scroll-speed-panel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.scroll-slider {
+  width: 80px;
+  height: 4px;
+  border-radius: 2px;
+  outline: none;
+  accent-color: var(--accent-color);
+}
+
+/* Contenido del Canto (Letras y Acordes) */
+.canto-columns-container {
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+  margin-top: 16px;
+  width: 100%;
+}
+
+.canto-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* previene desbordamiento flex */
+}
+
+/* Ajustes de columnas responsivas */
+@media (max-width: 768px) {
+  .canto-columns-container {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+.linea-canto {
+  position: relative;
+  font-family: var(--font-family-lyrics);
+  font-size: calc(1.1rem * var(--font-zoom));
+  line-height: 2.1; /* Amplio espacio para acordes */
+  min-height: 2rem;
+  white-space: pre-wrap;
+  padding-left: 2px;
+}
+
+.linea-canto .letra {
+  display: inline-block;
+  vertical-align: bottom;
+  position: relative;
+  z-index: 5;
+}
+
+/* Bloques colapsables de asamblea */
+.collapsible-block-container {
+  border-left: 3px solid var(--accent-color);
+  padding-left: 12px;
+  margin: 12px 0;
+  background-color: hsla(0, 0%, 50%, 0.02);
+  border-radius: 0 8px 8px 0;
+}
+
+.collapsible-trigger {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--accent-color);
+}
+
+.collapsible-content {
+  margin-top: 8px;
+  transition: max-height 0.25s ease-out;
+}
+
+/* Acordes posicionados */
+.nota-posicionada {
+  position: absolute;
+  top: -1.25rem;
+  transform: translate(-10%, 0);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: calc(0.9rem * var(--font-zoom));
+  color: var(--chord-color);
+  cursor: pointer;
+  user-select: none;
+  z-index: 10;
+  background-color: var(--bg-color); /* previene traslape visual con letras */
+  padding: 0 4px;
+  border-radius: 4px;
+  transition: left 0.15s ease, font-size 0.2s ease, transform 0.15s ease;
+}
+
+.nota-posicionada:hover {
+  transform: translate(-10%, -2px) scale(1.1);
+  box-shadow: var(--shadow-sm);
+  color: var(--accent-color);
+}
+
+/* Línea de imagen (para cantos escaneados o especiales) */
+.linea-imagen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 12px 0;
+}
+
+.linea-imagen img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--panel-border);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Audio Player */
+.audio-player-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.audio-player-container audio {
+  width: 100%;
+  max-width: 500px;
+  height: 40px;
+}
+
+/* --- Panel de Notas del Cantor --- */
+.notes-cantor-section {
+  margin-top: 24px;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  padding: 16px;
+  backdrop-filter: blur(10px);
+}
+
+.notes-cantor-section h3 {
+  font-size: 1rem;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notes-textarea {
+  width: 100%;
+  height: 80px;
+  background-color: hsla(0, 0%, 50%, 0.05);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 10px;
+  color: var(--text-color);
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+}
+
+.notes-textarea:focus {
+  border-color: var(--accent-color);
+}
+
+/* --- Modales --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fade-in 0.2s ease-out;
+}
+
+.modal-content {
+  background-color: var(--bg-color);
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  padding: 24px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: scale-up 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes scale-up {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.modal-header h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.chord-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.chord-select-btn {
+  border: 1px solid var(--panel-border);
+  background-color: var(--panel-bg);
+  color: var(--text-color);
+  padding: 10px;
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+}
+
+.chord-select-btn:hover {
+  background-color: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+}
+
+.chord-diagram-view {
+  text-align: center;
+}
+
+.chord-diagram-view img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--panel-border);
+  margin-top: 12px;
+}
+
+/* --- Ajustes Panel --- */
+.settings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--panel-border);
+  padding-bottom: 12px;
+}
+
+.setting-label h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.setting-label p {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.setting-control {
+  display: flex;
+  gap: 8px;
+}
+
+/* --- Impresión --- */
+@media print {
+  body {
+    background-color: white !important;
+    color: black !important;
+    --bg-color: white;
+    --text-color: black;
+    --chord-color: black;
+  }
+  
+  .app-container {
+    padding: 0;
+    max-width: 100%;
+  }
+  
+  header, .viewer-toolbar, .notes-cantor-section, .audio-player-container, footer {
+    display: none !important;
+  }
+  
+  .canto-columns-container {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 40px !important;
+  }
+  
+  .canto-column {
+    flex: 1 !important;
+  }
+  
+  .nota-posicionada {
+    background-color: white !important;
+    color: black !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Pie de página */
+footer {
+  margin-top: 48px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  padding: 16px 0;
+  border-top: 1px solid var(--panel-border);
+}
+
+/* --- Pestañas de Libros (Book Tabs) --- */
+.book-tabs {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 24px;
+  width: 100%;
+  border-bottom: 1px solid var(--panel-border);
+  padding-bottom: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.book-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.book-tab {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  background: none;
+  border: none;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.book-tab:hover {
+  color: var(--text-color);
+  background-color: hsla(0, 0%, 50%, 0.08);
+}
+
+.book-tab.active {
+  color: white;
+  background-color: var(--accent-color);
+  box-shadow: var(--shadow-sm), 0 0 10px var(--accent-glow);
+}
+
+/* --- Vista de Catequesis --- */
+.catequesis-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  grid-column: 1 / -1;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.catequesis-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  padding: 20px;
+  backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.catequesis-card h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--accent-color);
+}
+
+.catequesis-card p {
+  line-height: 1.6;
+  font-size: 0.98rem;
+  text-align: justify;
+  margin-bottom: 12px;
+}
+
+.catequesis-card blockquote {
+  border-left: 3.5px solid var(--accent-color);
+  padding-left: 12px;
+  margin: 12px 0;
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+.btn-icon.active-star span {
+  font-variation-settings: 'FILL' 1;
+  color: #ffc107 !important;
+}
