@@ -1445,3 +1445,37 @@ footer {
   transform: scale(1.1);
 }
 
+.color-picker-label-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0, 0, 0, 0.15);
+  background-color: var(--panel-bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s, outline 0.15s, background-color 0.15s;
+  box-sizing: border-box;
+}
+
+.color-picker-label-btn:hover {
+  transform: scale(1.15);
+}
+
+.color-picker-label-btn.active {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+  transform: scale(1.1);
+}
+
+.color-picker-label-btn span {
+  font-size: 1.1rem;
+  color: var(--text-color);
+  pointer-events: none;
+}
+
+.color-picker-label-btn input[type="color"] {
+  display: none !important;
+}
+

@@ -1078,6 +1078,24 @@ function setupEventListeners() {
       }
     });
   });
+
+  // Selección de color personalizado mediante color picker
+  document.querySelectorAll('.stage-color-input').forEach(input => {
+    input.addEventListener('input', (e) => {
+      const stage = input.dataset.stage;
+      const color = e.target.value;
+      
+      localStorage.setItem(`stage-color-${stage}`, color);
+      applyStageColors();
+      
+      // Forzar renderizado para recalcular los bordes del color de etapa al instante
+      if (filteredSongs && filteredSongs.length > 0) {
+        renderSongsList(filteredSongs);
+      } else {
+        renderSongsList(allSongs);
+      }
+    });
+  });
   
   // Exportar / Importar notas
   exportNotesBtn.addEventListener('click', exportNotes);
@@ -1158,9 +1176,35 @@ function applyStageColors() {
     if (stage === 'ele') activeColor = eleColor;
     if (stage === 'lit') activeColor = litColor;
 
+    // Buscar si coincide con algún predeterminado
+    let presetMatched = false;
     container.querySelectorAll('.color-swatch-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.color.toLowerCase() === activeColor.toLowerCase());
+      const btnColor = btn.dataset.color.toLowerCase();
+      const isMatched = btnColor === activeColor.toLowerCase();
+      btn.classList.toggle('active', isMatched);
+      if (isMatched) presetMatched = true;
     });
+
+    // Manejar el botón de color personalizado
+    const labelBtn = container.querySelector('.color-picker-label-btn');
+    const inputPicker = container.querySelector('.stage-color-input');
+    if (inputPicker) {
+      inputPicker.value = activeColor.startsWith('#') ? activeColor : '#6c757d';
+    }
+    
+    if (labelBtn) {
+      if (!presetMatched) {
+        labelBtn.classList.add('active');
+        labelBtn.style.backgroundColor = activeColor;
+        // Contraste básico del icono
+        const isLight = activeColor.toLowerCase() === '#eeeeee' || activeColor.toLowerCase() === '#ffffff' || activeColor.toLowerCase() === '#ffeb3b';
+        labelBtn.querySelector('span').style.color = isLight ? '#212529' : '#ffffff';
+      } else {
+        labelBtn.classList.remove('active');
+        labelBtn.style.backgroundColor = 'var(--panel-bg)';
+        labelBtn.querySelector('span').style.color = 'var(--text-color)';
+      }
+    }
   });
 }
 
