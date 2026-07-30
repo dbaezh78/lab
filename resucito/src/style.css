@@ -7,12 +7,12 @@
   --bg-color: hsl(220, 20%, 10%);
   --text-color: hsl(220, 20%, 95%);
   --text-muted: hsl(220, 10%, 65%);
-  --accent-color: hsl(210, 100%, 60%);
-  --accent-glow: hsla(210, 100%, 60%, 0.35);
+  --accent-color: #d01212;
+  --accent-glow: rgba(208, 18, 18, 0.35);
   
   --panel-bg: hsla(220, 20%, 15%, 0.65);
   --panel-border: hsla(220, 20%, 25%, 0.5);
-  --panel-hover-border: hsla(210, 100%, 60%, 0.4);
+  --panel-hover-border: rgba(208, 18, 18, 0.4);
   
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
   --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.3);
@@ -28,12 +28,12 @@
   --bg-color: hsl(210, 20%, 97%);
   --text-color: hsl(220, 25%, 15%);
   --text-muted: hsl(220, 15%, 45%);
-  --accent-color: hsl(210, 95%, 45%);
-  --accent-glow: hsla(210, 95%, 45%, 0.2);
+  --accent-color: #d01212;
+  --accent-glow: rgba(208, 18, 18, 0.2);
   
   --panel-bg: rgba(255, 255, 255, 0.7);
   --panel-border: rgba(0, 0, 0, 0.08);
-  --panel-hover-border: rgba(210, 95%, 45%, 0.3);
+  --panel-hover-border: rgba(208, 18, 18, 0.3);
   
   --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
@@ -46,12 +46,12 @@
   --bg-color: hsl(35, 35%, 90%);
   --text-color: hsl(35, 40%, 15%);
   --text-muted: hsl(35, 20%, 40%);
-  --accent-color: hsl(25, 80%, 40%);
-  --accent-glow: hsla(25, 80%, 40%, 0.2);
+  --accent-color: #d01212;
+  --accent-glow: rgba(208, 18, 18, 0.2);
   
   --panel-bg: rgba(244, 230, 210, 0.75);
   --panel-border: rgba(139, 90, 43, 0.15);
-  --panel-hover-border: rgba(25, 80%, 40%, 0.35);
+  --panel-hover-border: rgba(208, 18, 18, 0.3);
   
   --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
@@ -61,7 +61,7 @@
 
   /* Colores de etapas configurables */
   --color-pre: #6c757d;
-  --color-cate: #0d6efd;
+  --color-cate: #2196f3;
   --color-ele: #8bc34a;
   --color-lit: #FFEB3B;
 }
@@ -149,10 +149,12 @@ header {
 }
 
 .marquee-banner {
+  /* HE SUPRIMIDO ESTO 
   background: var(--panel-bg);
   border: 1px solid var(--panel-border);
-  padding: 6px 12px;
   border-radius: 8px;
+  */
+  padding: 6px 12px;
   overflow: hidden;
   white-space: nowrap;
   font-size: 0.85rem;
@@ -313,18 +315,26 @@ header {
 .filter-buttons-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 4px;
 }
 
 .filter-pill {
   padding: 6px 14px;
-  border-radius: 20px;
+  border-radius: 1px;
   font-size: 0.85rem;
   font-weight: 500;
   border: 2px solid transparent;
   background-color: hsla(0, 0%, 50%, 0.08);
   color: var(--text-color);
-  transition: background-color 0s, color 0s, border-color 0s, box-shadow 0s, transform 0.1s;
+  transition: all 0.15s ease-in-out;
+}
+
+.filter-pill:hover {
+  background-color: var(--accent-color) !important;
+  color: white !important;
+  border-color: var(--accent-color) !important;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Botones de etapa coloreados por defecto */
@@ -342,15 +352,15 @@ header {
 }
 
 .stage-pill-cate {
-  background-color: var(--color-cate, #0d6efd);
+  background-color: var(--color-cate, #2196f3);
   color: var(--text-cate, #fff);
-  border-color: var(--color-cate, #0d6efd);
+  border-color: var(--color-cate, #2196f3);
 }
 .stage-pill-cate.active {
-  background-color: var(--color-cate-active, #0a58ca) !important;
-  border-color: var(--color-cate-active, #0a58ca) !important;
+  background-color: var(--color-cate-active, #1976d2) !important;
+  border-color: var(--color-cate-active, #1976d2) !important;
   color: var(--text-cate, #fff) !important;
-  box-shadow: 0 0 0 3px rgba(13,110,253,0.35), var(--shadow-sm);
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.35), var(--shadow-sm);
   transform: scale(1.04);
 }
 
@@ -461,7 +471,7 @@ header {
 .songs-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  gap: 1px;
   margin-top: 10px;
 }
 
@@ -475,7 +485,7 @@ header {
   cursor: pointer;
   backdrop-filter: blur(8px);
   box-shadow: var(--shadow-sm);
-  transition: none;
+  transition: transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.2s ease, background-color 0.2s ease;
   text-decoration: none;
   color: inherit;
   position: relative;
@@ -483,10 +493,19 @@ header {
 }
 
 .song-card:hover {
-  transform: translateY(-2px); /* Elevado suave */
+  transform: translateY(-3px); /* Elevado suave */
   border-color: var(--stage-color, var(--accent-color)) !important; /* Borde completo del color de la etapa */
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 0 15px var(--stage-color); /* Iluminación / resplandor del color de la etapa */
   z-index: 10; /* Eleva el elemento por encima de sus vecinos para que se dibuje encima del resto */
+}
+
+/* Canto seleccionado en la lista (activo) */
+.song-card.active {
+  border-color: var(--stage-color, var(--accent-color)) !important;
+  border-bottom: 4px solid var(--stage-color, var(--accent-color)) !important;
+  box-shadow: 0 16px 36px -8px var(--stage-color, var(--accent-glow)) !important;
+  transform: translateY(-8px); /* Levantado más pronunciado */
+  z-index: 15; /* Asegura estar arriba de todos */
 }
 
 .song-card-number {
@@ -546,7 +565,7 @@ header {
 .song-viewer-view {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 4px;
   animation: fade-in 0.3s ease;
 }
 
@@ -674,8 +693,8 @@ header {
   gap: 16px;
 }
 
-/* Ajustes de columnas responsivas */
-@media (max-width: 768px) {
+/* Ajustes de columnas responsivas (Móviles y Tablets) */
+@media (max-width: 1024px) {
   #split-layout-btn {
     display: none !important;
   }
@@ -692,7 +711,37 @@ header {
   line-height: 2.3; /* Espacio vertical ampliado para acordes */
   min-height: 2.2rem;
   white-space: pre-wrap;
-  padding-left: 2px;
+  padding-left: 40px; /* Espacio para marcadores A. y C. a la izquierda */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Negrita para las partes de la asamblea */
+.linea-canto.as {
+  font-weight: 700;
+}
+
+/* Marcador A. para la asamblea */
+.linea-canto.ta::before {
+  content: "A.";
+  position: absolute;
+  left: 4px;
+  top: 0;
+  font-weight: 700;
+  color: var(--text-muted);
+  opacity: 0.65;
+}
+
+/* Marcador C. para el cantor */
+.linea-canto.tc::before {
+  content: "C.";
+  position: absolute;
+  left: 4px;
+  top: 0;
+  font-weight: 700;
+  color: var(--text-muted);
+  opacity: 0.65;
 }
 
 .chord-anchor-wrapper {
@@ -725,7 +774,7 @@ header {
   position: absolute;
   top: -1.35rem; /* Ajustado para quedar encima */
   left: 0;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: sans-serif, cursive, 'system-ui', 'Franklin Gothic Medium', Arial;
   font-weight: 700;
   font-size: calc(0.9rem * var(--font-zoom));
   color: var(--chord-color);
@@ -997,6 +1046,63 @@ footer {
   border-top: 1px solid var(--panel-border);
 }
 
+/* --- Contenedor Flex Superior del Dashboard (Imagen de Cristo y Controles) --- */
+.dashboard-top-flex {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.dashboard-left-image-container {
+  flex-shrink: 0;
+  width: 130px;
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboard-christ-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.95;
+  transition: transform 0.3s ease;
+}
+
+.dashboard-christ-img:hover {
+  transform: scale(1.05);
+}
+
+/* Invertir colores en modo oscuro o sepia para que se integre perfectamente */
+.theme-dark .dashboard-christ-img,
+.theme-sepia .dashboard-christ-img {
+  filter: invert(1) brightness(0.95) contrast(1.1);
+}
+
+.dashboard-right-controls {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 768px) {
+  .dashboard-top-flex {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .dashboard-left-image-container {
+    width: 100px;
+    height: 100px;
+  }
+}
+
 /* --- Pestañas de Libros (Book Tabs) --- */
 .book-tabs {
   display: flex;
@@ -1149,7 +1255,7 @@ footer {
   background: #3d0706 !important; /* Color vino oscuro */
   color: #ffffff !important;
   border-bottom: 2px solid #2e0505;
-  padding: 8px 16px;
+  padding: 1px 2px;
   position: sticky;
   top: 0;
   left: 0;
@@ -1247,7 +1353,7 @@ footer {
 }
 
 .toolbar-search-input:focus {
-  width: 160px;
+  width: 130px;
   box-shadow: 0 0 0 2px var(--accent-color);
 }
 
@@ -1305,10 +1411,13 @@ footer {
   display: grid;
   grid-template-columns: 100px 1fr 100px;
   align-items: center;
-  margin-top: 20px;
-  margin-bottom: 24px;
-  padding: 16px 32px;
-  border-bottom: 1px solid var(--panel-border);
+  margin-top: 2px;
+  margin-bottom: 12px;
+  padding: 8px 32px;
+  border-bottom: 4px solid var(--current-stage-color, var(--panel-border));
+  box-shadow: 0 10px 20px -10px var(--current-stage-color, rgba(0, 0, 0, 0.1));
+  background-color: var(--panel-bg);
+  backdrop-filter: blur(8px);
   width: 100%;
   box-sizing: border-box;
 }
@@ -1395,8 +1504,24 @@ footer {
   }
   
   .canto-header-block {
-    grid-template-columns: 60px 1fr 60px;
-    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 8px 12px;
+  }
+  
+  .canto-header-left {
+    flex-shrink: 0;
+  }
+  
+  .canto-header-center {
+    flex-grow: 1;
+    text-align: left;
+  }
+  
+  .canto-header-right {
+    display: none;
   }
   
   .canto-header-img {
@@ -1405,7 +1530,8 @@ footer {
   }
   
   .canto-header-title {
-    font-size: 1.3rem;
+    font-size: 1.25rem;
+    line-height: 1.2;
   }
 }
 
@@ -1451,12 +1577,13 @@ footer {
   align-items: center;
   justify-content: flex-start;
   padding: 14px 20px;
-  border: 1.5px solid transparent;
-  border-bottom: 1px solid var(--panel-border);
+  border: 1px solid var(--stage-color, var(--panel-border));
   border-left: 8px solid var(--stage-color, var(--panel-border));
   border-radius: 0;
-  box-shadow: none;
+  /*box-shadow: none;  HE QUITADO ESTO, NO PONER */
   backdrop-filter: none;
+  margin-bottom: -1px;
+  transition: transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.2s ease, background-color 0.2s ease;
 }
 .songs-grid.style-simple .song-card:first-child {
   border-top-left-radius: 7px;
@@ -1465,13 +1592,22 @@ footer {
 .songs-grid.style-simple .song-card:last-child {
   border-bottom-left-radius: 7px;
   border-bottom-right-radius: 7px;
-  border-bottom: none;
+  margin-bottom: 0;
 }
 .songs-grid.style-simple .song-card:hover {
-  border: 1.5px solid var(--stage-color) !important;
+  border-color: var(--stage-color) !important;
   border-left: 8px solid var(--stage-color) !important;
-  margin-top: -1.5px;
-  margin-bottom: -1.5px;
+  transform: translateY(-3px);
+  /*box-shadow: 0 6px 16px -6px var(--stage-color) !important;*/
+  z-index: 10;
+}
+.songs-grid.style-simple .song-card.active {
+  border-color: var(--stage-color) !important;
+  border-left: 8px solid var(--stage-color) !important;
+  border-bottom: 4px solid var(--stage-color) !important;
+  box-shadow: 0 16px 36px -8px var(--stage-color) !important;
+  transform: translateY(-8px); /* Levantado activo de 8px */
+  z-index: 15;
 }
 .songs-grid.style-simple .song-card-subtitle,
 .songs-grid.style-simple .song-card-badges,
@@ -1543,22 +1679,55 @@ footer {
 
 /* --- Personalización de Colores de Etapa --- */
 .stage-colors-customizer {
-  margin-top: 16px;
+  margin-top: 14px;
   border-top: 1.5px dashed var(--panel-border);
-  padding-top: 16px;
+  padding-top: 14px;
 }
 
-.stage-colors-header h4 {
+.collapsible-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  padding: 4px 0;
+}
+
+.collapsible-header:hover {
+  opacity: 0.85;
+}
+
+.collapsible-header h4 {
   font-family: 'Montserrat', sans-serif;
-  font-size: 1rem;
+  font-size: 0.98rem;
   font-weight: 700;
-  margin-bottom: 4px;
+  margin-bottom: 0;
+  color: var(--text-color);
 }
 
-.stage-colors-header p {
-  font-size: 0.85rem;
+.collapsible-header .toggle-icon {
+  font-size: 1.3rem;
   color: var(--text-muted);
-  margin-bottom: 16px;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.collapsible-content {
+  margin-top: 12px;
+  max-height: 1000px;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, margin-top 0.3s ease;
+  opacity: 1;
+}
+
+.stage-colors-customizer.collapsed .collapsible-content {
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0;
+  pointer-events: none;
+}
+
+.stage-colors-customizer.collapsed .toggle-icon {
+  transform: rotate(-90deg);
 }
 
 .stage-color-row {

@@ -151,6 +151,28 @@ async function loadSongView(songId) {
     
     currentCanto = await response.json();
     
+    // Configurar zoom por defecto según el dispositivo (Tablet vs Móvil/PC) y canto específico
+    const isTablet = window.innerWidth >= 768 && window.innerWidth <= 1024;
+    if (isTablet) {
+      if (songId === 'atilevantomisojos') {
+        updateZoom(1.5);
+      } else {
+        updateZoom(1.6);
+      }
+    } else {
+      updateZoom(1.0);
+    }
+    
+    // Asignar el color de etapa actual a nivel de body para la cabecera y el sombreado
+    const stageColor = getStageColor(currentCanto.catCanto || currentCanto.stage);
+    document.body.style.setProperty('--current-stage-color', stageColor);
+    
+    // Actualizar estado activo en las tarjetas del índice
+    document.querySelectorAll('.song-card').forEach(card => {
+      const isCurrent = card.getAttribute('href') === `#canto=${songId}`;
+      card.classList.toggle('active', isCurrent);
+    });
+    
     // Configurar cabecera del visor (Christ block y título de libro)
     if (cantoHeaderBlock) {
       const stage = (currentCanto.catCanto || '').toUpperCase();
@@ -375,7 +397,17 @@ function renderLine(lineItem) {
         const noteType = parts[1] ? parts[1].trim() : '';
         const rawPosition = parseFloat(parts[2]) || 0;
         if (noteName) {
-          matches.push({ noteName, noteType, position: Math.round(rawPosition) });
+          let pos = Math.round(rawPosition);
+          // Corregir escala mixta (algunos índices vienen multiplicados por 10 en la base de datos)
+          if (cleanLetra.length > 0 && pos >= cleanLetra.length) {
+            const scaled = Math.round(pos / 10);
+            if (scaled < cleanLetra.length) {
+              pos = scaled;
+            } else {
+              pos = cleanLetra.length - 1; // Forzar al último carácter para que no se desborde
+            }
+          }
+          matches.push({ noteName, noteType, position: pos });
         }
       });
     }
@@ -565,10 +597,10 @@ function stopAutoScroll() {
 
 function getStageColor(stageName) {
   const clean = (stageName || '').toLowerCase();
-  if (clean.includes('pre')) return getComputedStyle(document.documentElement).getPropertyValue('--color-pre').trim() || '#6c757d';
-  if (clean.includes('cate')) return getComputedStyle(document.documentElement).getPropertyValue('--color-cate').trim() || '#0d6efd';
-  if (clean.includes('ele')) return getComputedStyle(document.documentElement).getPropertyValue('--color-ele').trim() || '#8bc34a';
-  if (clean.includes('lit')) return getComputedStyle(document.documentElement).getPropertyValue('--color-lit').trim() || '#FFEB3B';
+  if (clean.includes('pre')) return getComputedStyle(document.body).getPropertyValue('--color-pre').trim() || '#6c757d';
+  if (clean.includes('cate')) return getComputedStyle(document.body).getPropertyValue('--color-cate').trim() || '#2196f3';
+  if (clean.includes('ele')) return getComputedStyle(document.body).getPropertyValue('--color-ele').trim() || '#8bc34a';
+  if (clean.includes('lit')) return getComputedStyle(document.body).getPropertyValue('--color-lit').trim() || '#FFEB3B';
   if (clean.includes('cat') || clean.includes('can') || clean.includes('ot')) return '#6f42c1';
   return '#20c997';
 }
@@ -586,6 +618,9 @@ function renderSongsList(songsList) {
   songsList.forEach(song => {
     const card = document.createElement('a');
     card.className = 'song-card';
+    if (currentCanto && song.id === currentCanto.id) {
+      card.classList.add('active');
+    }
     card.href = `#canto=${song.id}`;
     
     // Obtener color/estilo de la etapa
@@ -1134,6 +1169,54 @@ function setupEventListeners() {
     });
   });
   
+  // Personalizar colores del Tema de Libro de Canto
+  document.querySelectorAll('.book-theme-input').forEach(input => {
+    input.addEventListener('input', (e) => {
+      const suffix = localStorage.getItem('theme') || 'light'; // 'dark' | 'light' | 'sepia'
+      const type = input.dataset.type; // 'bg' | 'accent'
+      const color = e.target.value;
+      
+      localStorage.setItem(`book-theme-${type}-${suffix}`, color);
+      applyBookTheme();
+    });
+  });
+
+  const resetBookThemeBtn = document.getElementById('reset-book-theme-btn');
+  if (resetBookThemeBtn) {
+    resetBookThemeBtn.addEventListener('click', () => {
+      // Limpiar todas las configuraciones personalizadas de todos los temas a la vez
+      const suffixes = ['dark', 'light', 'sepia'];
+      suffixes.forEach(suffix => {
+        localStorage.removeItem(`book-theme-bg-${suffix}`);
+        localStorage.removeItem(`book-theme-accent-${suffix}`);
+        localStorage.removeItem(`book-theme-text-${suffix}`);
+      });
+      // Limpiar claves heredadas antiguas
+      localStorage.removeItem('book-theme-bg');
+      localStorage.removeItem('book-theme-accent');
+      localStorage.removeItem('book-theme-text');
+      
+      // Limpiar inline style overrides de body y documentElement para forzar recálculo
+      const props = ['--bg-color', '--accent-color', '--text-color', '--accent-glow'];
+      props.forEach(p => {
+        document.body.style.removeProperty(p);
+        document.documentElement.style.removeProperty(p);
+      });
+      
+      applyBookTheme();
+    });
+  }
+
+  // Manejo de secciones colapsables en Ajustes
+  document.querySelectorAll('.collapsible-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const parent = header.closest('.stage-colors-customizer');
+      if (parent) {
+        parent.classList.toggle('collapsed');
+      }
+    });
+  });
+
   // Exportar / Importar notas
   exportNotesBtn.addEventListener('click', exportNotes);
   importNotesBtn.addEventListener('click', importNotes);
@@ -1189,20 +1272,21 @@ function initPreferences() {
   // Inicializar estilo visual de la lista de cantos
   setListStyle(songListStyle);
 
-  // Inicializar colores personalizados de etapas
+  // Inicializar colores personalizados de etapas y tema del libro
   applyStageColors();
+  applyBookTheme();
 }
 
 function applyStageColors() {
   const preColor  = localStorage.getItem('stage-color-pre')  || '#ffffff';
-  const cateColor = localStorage.getItem('stage-color-cate') || '#0d6efd';
+  const cateColor = localStorage.getItem('stage-color-cate') || '#2196f3';
   const eleColor  = localStorage.getItem('stage-color-ele')  || '#8bc34a';
   const litColor  = localStorage.getItem('stage-color-lit')  || '#FFEB3B';
   const catColor  = localStorage.getItem('stage-color-cat')  || '#6f42c1';
 
   // Colores de estado activo para los botones de etapa
   const preActive  = localStorage.getItem('btn-color-pre-active')  || '#495057';
-  const cateActive = localStorage.getItem('btn-color-cate-active') || '#0a58ca';
+  const cateActive = localStorage.getItem('btn-color-cate-active') || '#1976d2';
   const eleActive  = localStorage.getItem('btn-color-ele-active')  || '#558b2f';
   const litActive  = localStorage.getItem('btn-color-lit-active')  || '#f9a825';
   const catActive  = localStorage.getItem('btn-color-cat-active')  || '#4a1d96';
@@ -1215,25 +1299,25 @@ function applyStageColors() {
   const catText  = localStorage.getItem('btn-color-cat-text')  || '#ffffff';
 
   // Aplicar variables CSS de color por defecto
-  document.documentElement.style.setProperty('--color-pre', preColor);
-  document.documentElement.style.setProperty('--color-cate', cateColor);
-  document.documentElement.style.setProperty('--color-ele', eleColor);
-  document.documentElement.style.setProperty('--color-lit', litColor);
-  document.documentElement.style.setProperty('--color-cat', catColor);
+  document.body.style.setProperty('--color-pre', preColor);
+  document.body.style.setProperty('--color-cate', cateColor);
+  document.body.style.setProperty('--color-ele', eleColor);
+  document.body.style.setProperty('--color-lit', litColor);
+  document.body.style.setProperty('--color-cat', catColor);
 
   // Aplicar variables CSS de color activo
-  document.documentElement.style.setProperty('--color-pre-active', preActive);
-  document.documentElement.style.setProperty('--color-cate-active', cateActive);
-  document.documentElement.style.setProperty('--color-ele-active', eleActive);
-  document.documentElement.style.setProperty('--color-lit-active', litActive);
-  document.documentElement.style.setProperty('--color-cat-active', catActive);
+  document.body.style.setProperty('--color-pre-active', preActive);
+  document.body.style.setProperty('--color-cate-active', cateActive);
+  document.body.style.setProperty('--color-ele-active', eleActive);
+  document.body.style.setProperty('--color-lit-active', litActive);
+  document.body.style.setProperty('--color-cat-active', catActive);
 
   // Aplicar variables CSS de color de texto
-  document.documentElement.style.setProperty('--text-pre', preText);
-  document.documentElement.style.setProperty('--text-cate', cateText);
-  document.documentElement.style.setProperty('--text-ele', eleText);
-  document.documentElement.style.setProperty('--text-lit', litText);
-  document.documentElement.style.setProperty('--text-cat', catText);
+  document.body.style.setProperty('--text-pre', preText);
+  document.body.style.setProperty('--text-cate', cateText);
+  document.body.style.setProperty('--text-ele', eleText);
+  document.body.style.setProperty('--text-lit', litText);
+  document.body.style.setProperty('--text-cat', catText);
 
   // Actualizar los preview labels de Personalizar Botones
   const updatePreview = (id, color) => {
@@ -1302,6 +1386,118 @@ function applyStageColors() {
   });
 }
 
+function applyBookTheme() {
+  const suffix = localStorage.getItem('theme') || 'light'; // 'dark' | 'light' | 'sepia'
+  
+  const customBg = localStorage.getItem('book-theme-bg-' + suffix);
+  const customAccent = localStorage.getItem('book-theme-accent-' + suffix);
+  const customText = localStorage.getItem('book-theme-text-' + suffix);
+  
+  if (customBg) {
+    document.body.style.setProperty('--bg-color', customBg);
+  } else {
+    document.body.style.removeProperty('--bg-color');
+  }
+  
+  if (customAccent) {
+    document.body.style.setProperty('--accent-color', customAccent);
+    let glow = customAccent;
+    if (customAccent.startsWith('#')) {
+      const r = parseInt(customAccent.slice(1, 3), 16);
+      const g = parseInt(customAccent.slice(3, 5), 16);
+      const b = parseInt(customAccent.slice(5, 7), 16);
+      if (!isNaN(r) && !isNaN(g) && !isNaN(b)) {
+        glow = `rgba(${r}, ${g}, ${b}, 0.35)`;
+      }
+    }
+    document.body.style.setProperty('--accent-glow', glow);
+  } else {
+    document.body.style.removeProperty('--accent-color');
+    document.body.style.removeProperty('--accent-glow');
+  }
+
+  if (customText) {
+    document.body.style.setProperty('--text-color', customText);
+  } else {
+    document.body.style.removeProperty('--text-color');
+  }
+  
+  // Actualizar los inputs en el customizer de tema del libro
+  const bgInput = document.querySelector('.book-theme-input[data-type="bg"]');
+  const accentInput = document.querySelector('.book-theme-input[data-type="accent"]');
+  const textInput = document.querySelector('.book-theme-input[data-type="text"]');
+  
+  requestAnimationFrame(() => {
+    const computedStyle = getComputedStyle(document.body);
+    const currentBg = computedStyle.getPropertyValue('--bg-color').trim();
+    const currentAccent = computedStyle.getPropertyValue('--accent-color').trim();
+    const currentText = computedStyle.getPropertyValue('--text-color').trim();
+    
+    if (bgInput) {
+      const hex = formatColorToHex(currentBg) || '#0a0a0a';
+      bgInput.value = hex;
+      const preview = bgInput.closest('.btn-pill-preview');
+      if (preview) {
+        preview.style.backgroundColor = hex;
+        const icon = preview.querySelector('span');
+        if (icon) {
+          const isLight = /ffeb3b|ffffff|eeeeee|fafafa|fff9c4|f0f4c3/i.test(hex.replace('#',''));
+          icon.style.color = isLight ? '#212529' : '#ffffff';
+        }
+      }
+    }
+    
+    if (accentInput) {
+      const hex = formatColorToHex(currentAccent) || '#d01212';
+      accentInput.value = hex;
+      const preview = accentInput.closest('.btn-pill-preview');
+      if (preview) {
+        preview.style.backgroundColor = hex;
+        const icon = preview.querySelector('span');
+        if (icon) {
+          const isLight = /ffeb3b|ffffff|eeeeee|fafafa|fff9c4|f0f4c3/i.test(hex.replace('#',''));
+          icon.style.color = isLight ? '#212529' : '#ffffff';
+        }
+      }
+    }
+
+    if (textInput) {
+      const hex = formatColorToHex(currentText) || '#ffffff';
+      textInput.value = hex;
+      const preview = textInput.closest('.btn-pill-preview');
+      if (preview) {
+        preview.style.backgroundColor = hex;
+        const icon = preview.querySelector('span');
+        if (icon) {
+          const isLight = /ffeb3b|ffffff|eeeeee|fafafa|fff9c4|f0f4c3/i.test(hex.replace('#',''));
+          icon.style.color = isLight ? '#212529' : '#ffffff';
+        }
+      }
+    }
+  });
+}
+
+function formatColorToHex(colorStr) {
+  if (!colorStr) return '';
+  colorStr = colorStr.trim();
+  if (colorStr.startsWith('#')) return colorStr;
+  
+  const temp = document.createElement('div');
+  temp.style.color = colorStr;
+  document.body.appendChild(temp);
+  const resolved = getComputedStyle(temp).color;
+  document.body.removeChild(temp);
+  
+  const match = resolved.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  if (match) {
+    const r = parseInt(match[1], 10);
+    const g = parseInt(match[2], 10);
+    const b = parseInt(match[3], 10);
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  }
+  return '';
+}
+
 function setListStyle(style) {
   songListStyle = style;
   localStorage.setItem('song-list-style', style);
@@ -1326,6 +1522,7 @@ function setTheme(theme) {
   document.querySelectorAll('.theme-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.theme === theme);
   });
+  applyBookTheme();
 }
 
 // --- Exportar/Importar Anotaciones locales ---
