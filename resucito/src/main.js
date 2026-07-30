@@ -1115,6 +1115,22 @@ function setupEventListeners() {
       }
     });
   });
+
+  // Personalizar colores de botones de etapa (default y active)
+  document.querySelectorAll('.btn-color-input').forEach(input => {
+    input.addEventListener('input', (e) => {
+      const stage = input.dataset.stage;
+      const mode = input.dataset.mode; // 'default' | 'active'
+      const color = e.target.value;
+      
+      if (mode === 'default') {
+        localStorage.setItem(`stage-color-${stage}`, color);
+      } else {
+        localStorage.setItem(`btn-color-${stage}-active`, color);
+      }
+      applyStageColors();
+    });
+  });
   
   // Exportar / Importar notas
   exportNotesBtn.addEventListener('click', exportNotes);
@@ -1180,13 +1196,55 @@ function applyStageColors() {
   const cateColor = localStorage.getItem('stage-color-cate') || '#0d6efd';
   const eleColor = localStorage.getItem('stage-color-ele') || '#8bc34a';
   const litColor = localStorage.getItem('stage-color-lit') || '#FFEB3B';
+  const catColor = localStorage.getItem('stage-color-cat') || '#6f42c1';
 
+  // Colores de estado activo para los botones de etapa
+  const preActive = localStorage.getItem('btn-color-pre-active') || '#495057';
+  const cateActive = localStorage.getItem('btn-color-cate-active') || '#0a58ca';
+  const eleActive = localStorage.getItem('btn-color-ele-active') || '#558b2f';
+  const litActive = localStorage.getItem('btn-color-lit-active') || '#f9a825';
+  const catActive = localStorage.getItem('btn-color-cat-active') || '#4a1d96';
+
+  // Aplicar variables CSS de color por defecto
   document.documentElement.style.setProperty('--color-pre', preColor);
   document.documentElement.style.setProperty('--color-cate', cateColor);
   document.documentElement.style.setProperty('--color-ele', eleColor);
   document.documentElement.style.setProperty('--color-lit', litColor);
+  document.documentElement.style.setProperty('--color-cat', catColor);
 
-  // Resaltar los botones correspondientes
+  // Aplicar variables CSS de color activo
+  document.documentElement.style.setProperty('--color-pre-active', preActive);
+  document.documentElement.style.setProperty('--color-cate-active', cateActive);
+  document.documentElement.style.setProperty('--color-ele-active', eleActive);
+  document.documentElement.style.setProperty('--color-lit-active', litActive);
+  document.documentElement.style.setProperty('--color-cat-active', catActive);
+
+  // Actualizar los preview labels de Personalizar Botones
+  const updatePreview = (id, color) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.backgroundColor = color;
+      const icon = el.querySelector('span');
+      if (icon) {
+        const isLight = /ffeb3b|ffffff|eeeeee|fafafa|fff9c4|f0f4c3/i.test(color.replace('#',''));
+        icon.style.color = isLight ? '#212529' : '#ffffff';
+      }
+      const input = el.querySelector('input');
+      if (input) input.value = color;
+    }
+  };
+  updatePreview('preview-pre-default', preColor);
+  updatePreview('preview-pre-active', preActive);
+  updatePreview('preview-cate-default', cateColor);
+  updatePreview('preview-cate-active', cateActive);
+  updatePreview('preview-ele-default', eleColor);
+  updatePreview('preview-ele-active', eleActive);
+  updatePreview('preview-lit-default', litColor);
+  updatePreview('preview-lit-active', litActive);
+  updatePreview('preview-cat-default', catColor);
+  updatePreview('preview-cat-active', catActive);
+
+  // Resaltar los botones de los circulitos de color correspondientes
   document.querySelectorAll('.color-swatches').forEach(container => {
     const stage = container.dataset.stage;
     let activeColor = '#6c757d';
@@ -1195,7 +1253,6 @@ function applyStageColors() {
     if (stage === 'ele') activeColor = eleColor;
     if (stage === 'lit') activeColor = litColor;
 
-    // Buscar si coincide con algún predeterminado
     let presetMatched = false;
     container.querySelectorAll('.color-swatch-btn').forEach(btn => {
       const btnColor = btn.dataset.color.toLowerCase();
@@ -1204,18 +1261,15 @@ function applyStageColors() {
       if (isMatched) presetMatched = true;
     });
 
-    // Manejar el botón de color personalizado
     const labelBtn = container.querySelector('.color-picker-label-btn');
     const inputPicker = container.querySelector('.stage-color-input');
     if (inputPicker) {
       inputPicker.value = activeColor.startsWith('#') ? activeColor : '#6c757d';
     }
-    
     if (labelBtn) {
       if (!presetMatched) {
         labelBtn.classList.add('active');
         labelBtn.style.backgroundColor = activeColor;
-        // Contraste básico del icono
         const isLight = activeColor.toLowerCase() === '#eeeeee' || activeColor.toLowerCase() === '#ffffff' || activeColor.toLowerCase() === '#ffeb3b';
         labelBtn.querySelector('span').style.color = isLight ? '#212529' : '#ffffff';
       } else {

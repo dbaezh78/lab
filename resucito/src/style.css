@@ -318,14 +318,83 @@ header {
 
 .filter-pill {
   padding: 6px 14px;
-  border-radius: 1px;
+  border-radius: 20px;
   font-size: 0.85rem;
-  border: 1px solid var(--panel-border);
-  background-color: hsla(0, 0%, 50%, 0.05);
+  font-weight: 500;
+  border: 2px solid transparent;
+  background-color: hsla(0, 0%, 50%, 0.08);
   color: var(--text-color);
+  transition: background-color 0s, color 0s, border-color 0s, box-shadow 0s, transform 0.1s;
 }
 
-.filter-pill.active {
+/* Botones de etapa coloreados por defecto */
+.stage-pill-pre {
+  background-color: var(--color-pre);
+  color: #fff;
+  border-color: var(--color-pre);
+}
+.stage-pill-pre.active {
+  background-color: var(--color-pre-active, #495057) !important;
+  border-color: var(--color-pre-active, #495057) !important;
+  color: #fff !important;
+  box-shadow: 0 0 0 3px rgba(108,117,125,0.35), var(--shadow-sm);
+  transform: scale(1.04);
+}
+
+.stage-pill-cate {
+  background-color: var(--color-cate);
+  color: #fff;
+  border-color: var(--color-cate);
+}
+.stage-pill-cate.active {
+  background-color: var(--color-cate-active, #0a58ca) !important;
+  border-color: var(--color-cate-active, #0a58ca) !important;
+  color: #fff !important;
+  box-shadow: 0 0 0 3px rgba(13,110,253,0.35), var(--shadow-sm);
+  transform: scale(1.04);
+}
+
+.stage-pill-ele {
+  background-color: var(--color-ele);
+  color: #fff;
+  border-color: var(--color-ele);
+}
+.stage-pill-ele.active {
+  background-color: var(--color-ele-active, #558b2f) !important;
+  border-color: var(--color-ele-active, #558b2f) !important;
+  color: #fff !important;
+  box-shadow: 0 0 0 3px rgba(139,195,74,0.35), var(--shadow-sm);
+  transform: scale(1.04);
+}
+
+.stage-pill-lit {
+  background-color: var(--color-lit);
+  color: #212529;
+  border-color: var(--color-lit);
+}
+.stage-pill-lit.active {
+  background-color: var(--color-lit-active, #f9a825) !important;
+  border-color: var(--color-lit-active, #f9a825) !important;
+  color: #212529 !important;
+  box-shadow: 0 0 0 3px rgba(255,235,59,0.45), var(--shadow-sm);
+  transform: scale(1.04);
+}
+
+.stage-pill-cat {
+  background-color: var(--color-cat, #6f42c1);
+  color: #fff;
+  border-color: var(--color-cat, #6f42c1);
+}
+.stage-pill-cat.active {
+  background-color: var(--color-cat-active, #4a1d96) !important;
+  border-color: var(--color-cat-active, #4a1d96) !important;
+  color: #fff !important;
+  box-shadow: 0 0 0 3px rgba(111,66,193,0.35), var(--shadow-sm);
+  transform: scale(1.04);
+}
+
+/* Override del .filter-pill.active genérico para que no sobreescriba las pill de etapa */
+.filter-pill.active:not(.stage-pill-pre):not(.stage-pill-cate):not(.stage-pill-ele):not(.stage-pill-lit):not(.stage-pill-cat) {
   background-color: var(--accent-color);
   color: white;
   border-color: var(--accent-color);
@@ -336,6 +405,38 @@ header {
   background-color: #b71c1c !important;
   border-color: #b71c1c !important;
   color: white !important;
+}
+
+/* --- Sección Personalizar Botones --- */
+.btn-color-pair {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.btn-color-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-color-slot-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.btn-pill-preview {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid rgba(128, 128, 128, 0.4) !important;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-pill-preview span {
+  font-size: 0.95rem !important;
 }
 
 /* Listado de cantos */
