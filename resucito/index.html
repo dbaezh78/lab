@@ -37,19 +37,24 @@
         <button class="book-tab" data-book="favoritos">Favoritos</button>
       </div>
 
-      <!-- Buscador -->
-      <div class="search-box-container">
-        <span class="material-symbols-outlined search-icon-btn">search</span>
-        <input type="search" id="search-input" class="search-input" placeholder="Buscar canto..." autocomplete="off">
-        <span class="material-symbols-outlined clear-search-btn" id="clear-search-btn" style="display: none;">close</span>
-      </div>
-
-      <!-- Toggle de Filtros -->
-      <div class="filters-toggle-section">
-        <button id="toggle-filters-btn" class="btn btn-filter-toggle">
-          <span class="material-symbols-outlined">filter_list</span>
-          Filtros de Búsqueda
+      <!-- Buscador y Configuración -->
+      <div class="search-and-settings-row">
+        <!-- Botón de ajustes en la página principal -->
+        <button id="dashboard-settings-btn" class="dashboard-settings-btn" title="Opciones de configuración">
+          <span class="material-symbols-outlined">settings</span>
         </button>
+
+        <!-- Contenedor del Buscador -->
+        <div class="search-box-container">
+          <!-- Botón de Toggle Filtros (dentro del buscador) -->
+          <button id="toggle-filters-btn" class="btn-inside-search" title="Filtros de Búsqueda">
+            <span class="material-symbols-outlined">filter_list</span>
+          </button>
+          
+          <input type="search" id="search-input" class="search-input" placeholder="Buscar canto..." autocomplete="off">
+          
+          <span class="material-symbols-outlined clear-search-btn" id="clear-search-btn" style="display: none;">close</span>
+        </div>
       </div>
 
       <!-- Panel de Filtros -->
@@ -255,6 +260,19 @@
             <button class="btn theme-btn" data-theme="dark">Oscuro</button>
             <button class="btn theme-btn" data-theme="light">Claro</button>
             <button class="btn theme-btn" data-theme="sepia">Sepia</button>
+          </div>
+        </div>
+
+        <!-- Fila Estilo de Lista -->
+        <div class="setting-row">
+          <div class="setting-label">
+            <h4>Estilo de Lista</h4>
+            <p>Elige el formato de la lista de cantos</p>
+          </div>
+          <div class="setting-control">
+            <button class="btn list-style-btn" data-style="cards">Tarjetas</button>
+            <button class="btn list-style-btn" data-style="detailed">Detallada</button>
+            <button class="btn list-style-btn" data-style="simple">Simple</button>
           </div>
         </div>
 

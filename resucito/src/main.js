@@ -78,12 +78,15 @@ const settingsZoomInBtn = document.getElementById('settings-zoom-in-btn');
 const settingsZoomBadge = document.getElementById('settings-zoom-badge');
 const exportNotesBtn = document.getElementById('export-notes-btn');
 const importNotesBtn = document.getElementById('import-notes-btn');
+const dashboardSettingsBtn = document.getElementById('dashboard-settings-btn');
+const listStyleBtns = document.querySelectorAll('.list-style-btn');
 
 // Estado interno para el prontuario de acordes activo
 let selectedModalNote = 'La';
 let selectedModalType = 'm';
 let isSplitLayout = localStorage.getItem('split-layout') !== 'false';
 let activeSongsPlaylist = []; // Almacena el listado activo de cantos en pantalla para navegar
+let songListStyle = localStorage.getItem('song-list-style') || 'cards'; // Estilo visual de la lista: cards, detailed, simple
 
 // --- Inicialización ---
 document.addEventListener('DOMContentLoaded', async () => {
@@ -560,6 +563,16 @@ function stopAutoScroll() {
   }
 }
 
+function getStageColor(stageName) {
+  const clean = (stageName || '').toLowerCase();
+  if (clean.includes('pre')) return '#9e9e9e'; // Gris
+  if (clean.includes('cate')) return '#1976d2'; // Azul
+  if (clean.includes('ele')) return '#4caf50'; // Verde
+  if (clean.includes('lit')) return '#ff9800'; // Naranja/Amarillo
+  if (clean.includes('cat') || clean.includes('can') || clean.includes('ot')) return '#9c27b0'; // Púrpura
+  return '#757575'; // Gris oscuro
+}
+
 // --- Buscador y Renderizado de Lista ---
 function renderSongsList(songsList) {
   activeSongsPlaylist = songsList;
@@ -583,6 +596,9 @@ function renderSongsList(songsList) {
     else if (cleanStage.includes('ele')) stageClass = 'badge-eleccion';
     else if (cleanStage.includes('lit')) stageClass = 'badge-liturgia';
     else if (cleanStage.includes('cat')) stageClass = 'badge-catolicos';
+    
+    // Asignar el color de etapa como variable de CSS
+    card.style.setProperty('--stage-color', getStageColor(song.stage));
     
     card.innerHTML = `
       <div class="song-card-number">
@@ -988,6 +1004,21 @@ function setupEventListeners() {
       setTheme(theme);
     });
   });
+
+  // Selección de estilo de lista
+  listStyleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const style = btn.dataset.style;
+      setListStyle(style);
+    });
+  });
+
+  // Botón de ajustes en la página principal
+  if (dashboardSettingsBtn) {
+    dashboardSettingsBtn.addEventListener('click', () => {
+      settingsModal.style.display = 'flex';
+    });
+  }
   
   // Exportar / Importar notas
   exportNotesBtn.addEventListener('click', exportNotes);
@@ -1040,6 +1071,24 @@ function initPreferences() {
   if (splitLayoutBtn) {
     splitLayoutBtn.classList.toggle('active', isSplitLayout);
   }
+
+  // Inicializar estilo visual de la lista de cantos
+  setListStyle(songListStyle);
+}
+
+function setListStyle(style) {
+  songListStyle = style;
+  localStorage.setItem('song-list-style', style);
+  
+  if (songsGrid) {
+    // Aplicar clase correspondiente a la cuadrícula
+    songsGrid.className = `songs-grid style-${style}`;
+  }
+  
+  // Resaltar botón activo en ajustes
+  listStyleBtns.forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.style === style);
+  });
 }
 
 function setTheme(theme) {

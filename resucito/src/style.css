@@ -171,48 +171,90 @@ header {
   gap: 20px;
 }
 
-.search-box-container {
-  position: relative;
+.search-and-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
 }
 
-.search-input {
-  width: 100%;
-  padding: 14px 16px 14px 44px;
-  font-size: 1.1rem;
-  border-radius: 14px;
-  border: 1.5px solid var(--panel-border);
-  background-color: var(--panel-bg);
+.dashboard-settings-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
   color: var(--text-color);
-  backdrop-filter: blur(10px);
-  box-shadow: var(--shadow-sm);
-  outline: none;
-  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s, transform 0.3s;
 }
 
-.search-input:focus {
-  border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px var(--accent-glow);
+.dashboard-settings-btn:hover {
+  background-color: var(--panel-border);
+  transform: rotate(30deg);
 }
 
-.search-icon-btn {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-muted);
-  pointer-events: none;
+.search-box-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  background-color: var(--panel-bg);
+  border: 2px solid var(--panel-border);
+  border-radius: 24px;
+  padding: 2px 14px;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.search-box-container:focus-within {
+  border-color: #3b82f6; /* Borde azul de foco */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.btn-inside-search {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  padding-left: 0;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.btn-inside-search:hover {
+  opacity: 1;
+}
+
+.search-input {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+  padding: 10px 0 !important;
+  font-size: 1.05rem;
+  color: var(--text-color);
+  width: 100%;
 }
 
 .clear-search-btn {
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-muted);
   cursor: pointer;
+  color: var(--text-muted);
+  padding: 4px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.clear-search-btn:hover {
+  opacity: 1;
 }
 
 /* Panel de filtros */
@@ -1201,5 +1243,95 @@ footer {
   .canto-header-title {
     font-size: 1.3rem;
   }
+}
+
+/* --- Modos de visualización de la lista de cantos (Página Principal) --- */
+
+/* 1. Modo Tarjetas (cards) */
+.songs-grid.style-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.songs-grid.style-cards .song-card {
+  border-left: 6px solid var(--stage-color, var(--panel-border));
+}
+
+/* 2. Modo Lista Detallada (detailed) */
+.songs-grid.style-detailed {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.songs-grid.style-detailed .song-card {
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  box-sizing: border-box;
+  border-left: 8px solid var(--stage-color, var(--panel-border));
+  border-radius: 6px;
+  padding: 16px 20px;
+}
+.songs-grid.style-detailed .song-card:hover {
+  transform: translateX(6px); /* Pequeño desplazamiento lateral interactivo */
+}
+
+/* 3. Modo Lista Simple (simple) */
+.songs-grid.style-simple {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: var(--panel-bg);
+}
+.songs-grid.style-simple .song-card {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 14px 20px;
+  border: none;
+  border-bottom: 1px solid var(--panel-border);
+  border-left: 8px solid var(--stage-color, var(--panel-border));
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.songs-grid.style-simple .song-card:last-child {
+  border-bottom: none;
+}
+.songs-grid.style-simple .song-card:hover {
+  transform: none;
+  background-color: var(--panel-hover-border);
+  box-shadow: none;
+}
+.songs-grid.style-simple .song-card-subtitle,
+.songs-grid.style-simple .song-card-badges,
+.songs-grid.style-simple .song-card-number {
+  display: none !important;
+}
+.songs-grid.style-simple .song-card-title {
+  margin-bottom: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Sobrescribir borde de buscador en tema claro */
+.theme-light .search-box-container {
+  border-color: #a8caff !important;
+  background-color: #ffffff !important;
+}
+
+.theme-light .dashboard-settings-btn span {
+  color: #544d47 !important;
+}
+
+.theme-light .btn-inside-search {
+  color: #202020 !important;
+}
+
+.theme-light .search-input {
+  color: #202020 !important;
 }
 
