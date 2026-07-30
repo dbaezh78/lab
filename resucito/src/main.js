@@ -133,8 +133,12 @@ function routeSPA() {
 // --- Carga de Detalles de Canción ---
 async function loadSongView(songId) {
   try {
-    viewerSongTitle.textContent = "Cargando...";
-    viewerSongSubtitle.textContent = "";
+    if (viewerSongTitle) {
+      viewerSongTitle.textContent = "Cargando...";
+    }
+    if (viewerSongSubtitle) {
+      viewerSongSubtitle.textContent = "";
+    }
     cantoLeftCol.innerHTML = "";
     cantoRightCol.innerHTML = "";
     viewerAudioContainer.style.display = 'none';
