@@ -249,76 +249,88 @@
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
+      <!-- Selector de Pestañas de Ajustes -->
+      <div class="settings-tabs">
+        <button class="settings-tab-btn active" data-tab="theme">Tema</button>
+        <button class="settings-tab-btn" data-tab="general">General</button>
+      </div>
+
       <div class="settings-grid">
-        <!-- Fila Tema -->
-        <div class="setting-row">
-          <div class="setting-label">
-            <h4>Tema Visual</h4>
-            <p>Selecciona la paleta de colores</p>
+        <!-- Panel de Tema -->
+        <div id="settings-panel-theme" class="settings-panel-group">
+          <!-- Fila Tema -->
+          <div class="setting-row">
+            <div class="setting-label">
+              <h4>Tema Visual</h4>
+              <p>Selecciona la paleta de colores</p>
+            </div>
+            <div class="setting-control">
+              <button class="btn theme-btn" data-theme="dark">Oscuro</button>
+              <button class="btn theme-btn" data-theme="light">Claro</button>
+              <button class="btn theme-btn" data-theme="sepia">Sepia</button>
+            </div>
           </div>
-          <div class="setting-control">
-            <button class="btn theme-btn" data-theme="dark">Oscuro</button>
-            <button class="btn theme-btn" data-theme="light">Claro</button>
-            <button class="btn theme-btn" data-theme="sepia">Sepia</button>
+
+          <!-- Fila Estilo de Lista -->
+          <div class="setting-row">
+            <div class="setting-label">
+              <h4>Estilo de Lista</h4>
+              <p>Elige el formato de la lista de cantos</p>
+            </div>
+            <div class="setting-control">
+              <button class="btn list-style-btn" data-style="cards">Tarjetas</button>
+              <button class="btn list-style-btn" data-style="detailed">Detallada</button>
+              <button class="btn list-style-btn" data-style="simple">Simple</button>
+            </div>
           </div>
         </div>
 
-        <!-- Fila Estilo de Lista -->
-        <div class="setting-row">
-          <div class="setting-label">
-            <h4>Estilo de Lista</h4>
-            <p>Elige el formato de la lista de cantos</p>
+        <!-- Panel General -->
+        <div id="settings-panel-general" class="settings-panel-group" style="display: none;">
+          <!-- Fila Cejilla Calculada -->
+          <div class="setting-row">
+            <div class="setting-label">
+              <h4>Cejilla (Capo)</h4>
+              <p>Ajusta el traste de cejilla sugerido</p>
+            </div>
+            <div class="setting-control">
+              <select id="capo-select" style="padding: 6px; border-radius: 6px; background: var(--panel-bg); color: var(--text-color); border: 1px solid var(--panel-border);">
+                <option value="0">Sin cejilla</option>
+                <option value="1">1er traste</option>
+                <option value="2">2do traste</option>
+                <option value="3">3er traste</option>
+                <option value="4">4to traste</option>
+                <option value="5">5to traste</option>
+                <option value="6">6to traste</option>
+                <option value="7">7mo traste</option>
+                <option value="8">8vo traste</option>
+              </select>
+            </div>
           </div>
-          <div class="setting-control">
-            <button class="btn list-style-btn" data-style="cards">Tarjetas</button>
-            <button class="btn list-style-btn" data-style="detailed">Detallada</button>
-            <button class="btn list-style-btn" data-style="simple">Simple</button>
-          </div>
-        </div>
 
-        <!-- Fila Cejilla Calculada -->
-        <div class="setting-row">
-          <div class="setting-label">
-            <h4>Cejilla (Capo)</h4>
-            <p>Ajusta el traste de cejilla sugerido</p>
+          <!-- Fila Tamaño de Letra -->
+          <div class="setting-row">
+            <div class="setting-label">
+              <h4>Tamaño de Letra</h4>
+              <p>Ajusta el tamaño del texto del canto</p>
+            </div>
+            <div class="setting-control" style="display: flex; align-items: center; gap: 8px;">
+              <button id="settings-zoom-out-btn" class="btn btn-icon" style="width: 32px; height: 32px; padding: 0;" title="Reducir letra">-</button>
+              <span id="settings-zoom-badge" style="font-weight: 700; min-width: 45px; text-align: center;">100%</span>
+              <button id="settings-zoom-in-btn" class="btn btn-icon" style="width: 32px; height: 32px; padding: 0;" title="Aumentar letra">+</button>
+            </div>
           </div>
-          <div class="setting-control">
-            <select id="capo-select" style="padding: 6px; border-radius: 6px; background: var(--panel-bg); color: var(--text-color); border: 1px solid var(--panel-border);">
-              <option value="0">Sin cejilla</option>
-              <option value="1">1er traste</option>
-              <option value="2">2do traste</option>
-              <option value="3">3er traste</option>
-              <option value="4">4to traste</option>
-              <option value="5">5to traste</option>
-              <option value="6">6to traste</option>
-              <option value="7">7mo traste</option>
-              <option value="8">8vo traste</option>
-            </select>
-          </div>
-        </div>
 
-        <!-- Fila Tamaño de Letra -->
-        <div class="setting-row">
-          <div class="setting-label">
-            <h4>Tamaño de Letra</h4>
-            <p>Ajusta el tamaño del texto del canto</p>
-          </div>
-          <div class="setting-control" style="display: flex; align-items: center; gap: 8px;">
-            <button id="settings-zoom-out-btn" class="btn btn-icon" style="width: 32px; height: 32px; padding: 0;" title="Reducir letra">-</button>
-            <span id="settings-zoom-badge" style="font-weight: 700; min-width: 45px; text-align: center;">100%</span>
-            <button id="settings-zoom-in-btn" class="btn btn-icon" style="width: 32px; height: 32px; padding: 0;" title="Aumentar letra">+</button>
-          </div>
-        </div>
-
-        <!-- Copia de seguridad notas -->
-        <div class="setting-row">
-          <div class="setting-label">
-            <h4>Notas del Cantor</h4>
-            <p>Exportar/Importar anotaciones</p>
-          </div>
-          <div class="setting-control">
-            <button id="export-notes-btn" class="btn">Exportar</button>
-            <button id="import-notes-btn" class="btn">Importar</button>
+          <!-- Copia de seguridad notas -->
+          <div class="setting-row">
+            <div class="setting-label">
+              <h4>Notas del Cantor</h4>
+              <p>Exportar/Importar anotaciones</p>
+            </div>
+            <div class="setting-control">
+              <button id="export-notes-btn" class="btn">Exportar</button>
+              <button id="import-notes-btn" class="btn">Importar</button>
+            </div>
           </div>
         </div>
       </div>

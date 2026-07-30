@@ -63,7 +63,7 @@
 /* Colores de categorías litúrgicas */
 .badge-precatecumenado { background-color: #6c757d; color: white; }
 .badge-catecumenado { background-color: #0d6efd; color: white; }
-.badge-eleccion { background-color: #198754; color: white; }
+.badge-eleccion { background-color: #8bc34a; color: white; }
 .badge-liturgia { background-color: #ffc107; color: #212529; }
 .badge-catolicos { background-color: #6f42c1; color: white; }
 .badge-otros { background-color: #20c997; color: white; }
@@ -1334,5 +1334,44 @@ footer {
 
 .theme-light .search-input {
   color: #202020 !important;
+}
+
+/* --- Tabs del Modal de Ajustes --- */
+.settings-tabs {
+  display: flex;
+  border-bottom: 1.5px solid var(--panel-border);
+  margin-bottom: 20px;
+  gap: 12px;
+}
+
+.settings-tab-btn {
+  flex: 1;
+  padding: 12px;
+  font-weight: 600;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  border-bottom: 3px solid transparent;
+  font-size: 1.05rem;
+  transition: all 0.15s ease;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.settings-tab-btn:hover {
+  color: var(--text-color);
+}
+
+.settings-tab-btn.active {
+  color: var(--text-color);
+  font-weight: 700;
+  border-bottom-color: var(--accent-color);
+}
+
+.settings-panel-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
 }
 

@@ -567,7 +567,7 @@ function getStageColor(stageName) {
   const clean = (stageName || '').toLowerCase();
   if (clean.includes('pre')) return '#6c757d'; // Gris Precatecumenado
   if (clean.includes('cate')) return '#0d6efd'; // Azul Catecumenado
-  if (clean.includes('ele')) return '#198754'; // Verde Elección
+  if (clean.includes('ele')) return '#8bc34a'; // Verde Elección
   if (clean.includes('lit')) return '#ffc107'; // Amarillo/Oro Liturgia
   if (clean.includes('cat') || clean.includes('can') || clean.includes('ot')) return '#6f42c1'; // Púrpura Católicos/Otros
   return '#20c997'; // Teal Otros/Varios
@@ -1022,9 +1022,42 @@ function setupEventListeners() {
   // Botón de ajustes en la página principal
   if (dashboardSettingsBtn) {
     dashboardSettingsBtn.addEventListener('click', () => {
+      // Al abrir el modal, activar por defecto la pestaña "Tema"
+      const tabBtns = document.querySelectorAll('.settings-tab-btn');
+      tabBtns.forEach((b, idx) => {
+        b.classList.toggle('active', idx === 0);
+      });
+      const themePanel = document.getElementById('settings-panel-theme');
+      const generalPanel = document.getElementById('settings-panel-general');
+      if (themePanel) themePanel.style.display = 'block';
+      if (generalPanel) generalPanel.style.display = 'none';
+
       settingsModal.style.display = 'flex';
     });
   }
+
+  // Selección de pestañas del modal de Ajustes
+  const settingsTabBtns = document.querySelectorAll('.settings-tab-btn');
+  settingsTabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      settingsTabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      const tab = btn.dataset.tab;
+      const themePanel = document.getElementById('settings-panel-theme');
+      const generalPanel = document.getElementById('settings-panel-general');
+      
+      if (themePanel && generalPanel) {
+        if (tab === 'theme') {
+          themePanel.style.display = 'block';
+          generalPanel.style.display = 'none';
+        } else {
+          themePanel.style.display = 'none';
+          generalPanel.style.display = 'block';
+        }
+      }
+    });
+  });
   
   // Exportar / Importar notas
   exportNotesBtn.addEventListener('click', exportNotes);
