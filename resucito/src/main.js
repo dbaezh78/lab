@@ -565,12 +565,12 @@ function stopAutoScroll() {
 
 function getStageColor(stageName) {
   const clean = (stageName || '').toLowerCase();
-  if (clean.includes('pre')) return '#6c757d'; // Gris Precatecumenado
-  if (clean.includes('cate')) return '#0d6efd'; // Azul Catecumenado
-  if (clean.includes('ele')) return '#8bc34a'; // Verde Elección
-  if (clean.includes('lit')) return '#ffc107'; // Amarillo/Oro Liturgia
-  if (clean.includes('cat') || clean.includes('can') || clean.includes('ot')) return '#6f42c1'; // Púrpura Católicos/Otros
-  return '#20c997'; // Teal Otros/Varios
+  if (clean.includes('pre')) return getComputedStyle(document.documentElement).getPropertyValue('--color-pre').trim() || '#6c757d';
+  if (clean.includes('cate')) return getComputedStyle(document.documentElement).getPropertyValue('--color-cate').trim() || '#0d6efd';
+  if (clean.includes('ele')) return getComputedStyle(document.documentElement).getPropertyValue('--color-ele').trim() || '#8bc34a';
+  if (clean.includes('lit')) return getComputedStyle(document.documentElement).getPropertyValue('--color-lit').trim() || '#FFEB3B';
+  if (clean.includes('cat') || clean.includes('can') || clean.includes('ot')) return '#6f42c1';
+  return '#20c997';
 }
 
 // --- Buscador y Renderizado de Lista ---
@@ -1058,6 +1058,26 @@ function setupEventListeners() {
       }
     });
   });
+
+  // Selección de colores de etapa
+  document.querySelectorAll('.color-swatch-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const container = btn.closest('.color-swatches');
+      if (!container) return;
+      const stage = container.dataset.stage;
+      const color = btn.dataset.color;
+      
+      localStorage.setItem(`stage-color-${stage}`, color);
+      applyStageColors();
+      
+      // Forzar renderizado para recalcular los bordes del color de etapa al instante
+      if (filteredSongs && filteredSongs.length > 0) {
+        renderSongsList(filteredSongs);
+      } else {
+        renderSongsList(allSongs);
+      }
+    });
+  });
   
   // Exportar / Importar notas
   exportNotesBtn.addEventListener('click', exportNotes);
@@ -1113,6 +1133,35 @@ function initPreferences() {
 
   // Inicializar estilo visual de la lista de cantos
   setListStyle(songListStyle);
+
+  // Inicializar colores personalizados de etapas
+  applyStageColors();
+}
+
+function applyStageColors() {
+  const preColor = localStorage.getItem('stage-color-pre') || '#6c757d';
+  const cateColor = localStorage.getItem('stage-color-cate') || '#0d6efd';
+  const eleColor = localStorage.getItem('stage-color-ele') || '#8bc34a';
+  const litColor = localStorage.getItem('stage-color-lit') || '#FFEB3B';
+
+  document.documentElement.style.setProperty('--color-pre', preColor);
+  document.documentElement.style.setProperty('--color-cate', cateColor);
+  document.documentElement.style.setProperty('--color-ele', eleColor);
+  document.documentElement.style.setProperty('--color-lit', litColor);
+
+  // Resaltar los botones correspondientes
+  document.querySelectorAll('.color-swatches').forEach(container => {
+    const stage = container.dataset.stage;
+    let activeColor = '#6c757d';
+    if (stage === 'pre') activeColor = preColor;
+    if (stage === 'cate') activeColor = cateColor;
+    if (stage === 'ele') activeColor = eleColor;
+    if (stage === 'lit') activeColor = litColor;
+
+    container.querySelectorAll('.color-swatch-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.color.toLowerCase() === activeColor.toLowerCase());
+    });
+  });
 }
 
 function setListStyle(style) {

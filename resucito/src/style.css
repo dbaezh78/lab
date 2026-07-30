@@ -58,13 +58,19 @@
   --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.1);
   
   --chord-color: hsl(15, 80%, 45%);
+
+  /* Colores de etapas configurables */
+  --color-pre: #6c757d;
+  --color-cate: #0d6efd;
+  --color-ele: #8bc34a;
+  --color-lit: #FFEB3B;
 }
 
 /* Colores de categorías litúrgicas */
-.badge-precatecumenado { background-color: #6c757d; color: white; }
-.badge-catecumenado { background-color: #0d6efd; color: white; }
-.badge-eleccion { background-color: #8bc34a; color: white; }
-.badge-liturgia { background-color: #ffc107; color: #212529; }
+.badge-precatecumenado { background-color: var(--color-pre); color: white; }
+.badge-catecumenado { background-color: var(--color-cate); color: white; }
+.badge-eleccion { background-color: var(--color-ele); color: white; }
+.badge-liturgia { background-color: var(--color-lit); color: #212529; }
 .badge-catolicos { background-color: #6f42c1; color: white; }
 .badge-otros { background-color: #20c997; color: white; }
 
@@ -1378,5 +1384,64 @@ footer {
   flex-direction: column;
   gap: 16px;
   width: 100%;
+}
+
+/* --- Personalización de Colores de Etapa --- */
+.stage-colors-customizer {
+  margin-top: 16px;
+  border-top: 1.5px dashed var(--panel-border);
+  padding-top: 16px;
+}
+
+.stage-colors-header h4 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.stage-colors-header p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.stage-color-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.stage-color-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.color-swatches {
+  display: flex;
+  gap: 8px;
+}
+
+.color-swatch-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.15s, outline 0.15s;
+  box-sizing: border-box;
+}
+
+.color-swatch-btn:hover {
+  transform: scale(1.15);
+}
+
+.color-swatch-btn.active {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+  transform: scale(1.1);
 }
 
