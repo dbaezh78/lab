@@ -1017,7 +1017,7 @@ function updateZoom(factor) {
 
 // --- Ajustes Visuales y Preferencias ---
 function initPreferences() {
-  const savedTheme = localStorage.getItem('theme') || 'dark';
+  const savedTheme = localStorage.getItem('theme') || 'light';
   setTheme(savedTheme);
   
   const savedFavorites = localStorage.getItem('favorites');
