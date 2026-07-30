@@ -565,12 +565,12 @@ function stopAutoScroll() {
 
 function getStageColor(stageName) {
   const clean = (stageName || '').toLowerCase();
-  if (clean.includes('pre')) return '#9e9e9e'; // Gris
-  if (clean.includes('cate')) return '#1976d2'; // Azul
-  if (clean.includes('ele')) return '#4caf50'; // Verde
-  if (clean.includes('lit')) return '#ff9800'; // Naranja/Amarillo
-  if (clean.includes('cat') || clean.includes('can') || clean.includes('ot')) return '#9c27b0'; // Púrpura
-  return '#757575'; // Gris oscuro
+  if (clean.includes('pre')) return '#6c757d'; // Gris Precatecumenado
+  if (clean.includes('cate')) return '#0d6efd'; // Azul Catecumenado
+  if (clean.includes('ele')) return '#198754'; // Verde Elección
+  if (clean.includes('lit')) return '#ffc107'; // Amarillo/Oro Liturgia
+  if (clean.includes('cat') || clean.includes('can') || clean.includes('ot')) return '#6f42c1'; // Púrpura Católicos/Otros
+  return '#20c997'; // Teal Otros/Varios
 }
 
 // --- Buscador y Renderizado de Lista ---
@@ -656,18 +656,24 @@ async function renderCatequesis() {
 }
 
 async function handleSearchAndFilters() {
+  const searchBox = document.querySelector('.search-box-container');
+  const searchRow = document.querySelector('.search-and-settings-row');
+  const filtersToggleSec = document.querySelector('.filters-toggle-section');
+
   if (currentBook === 'catequesis') {
-    document.querySelector('.search-box-container').style.display = 'none';
-    document.querySelector('.filters-toggle-section').style.display = 'none';
+    if (searchBox) searchBox.style.display = 'none';
+    if (searchRow) searchRow.style.display = 'none';
+    if (filtersToggleSec) filtersToggleSec.style.display = 'none';
     filtersPanel.style.display = 'none';
-    toggleFiltersBtn.classList.remove('active');
+    if (toggleFiltersBtn) toggleFiltersBtn.classList.remove('active');
     
     await renderCatequesis();
     return;
   }
   
-  document.querySelector('.search-box-container').style.display = 'flex';
-  document.querySelector('.filters-toggle-section').style.display = 'block';
+  if (searchBox) searchBox.style.display = 'flex';
+  if (searchRow) searchRow.style.display = 'flex';
+  if (filtersToggleSec) filtersToggleSec.style.display = 'block';
   
   let sourceList = allSongs;
   if (currentBook === 'favoritos') {

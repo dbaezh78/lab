@@ -339,20 +339,20 @@ header {
   flex-direction: column;
   background: var(--panel-bg);
   border: 1.5px solid var(--panel-border);
-  border-radius: 14px;
+  /*  border-radius: 14px;    NO QUIERO ESTO  */
   padding: 16px;
   cursor: pointer;
   backdrop-filter: blur(8px);
   box-shadow: var(--shadow-sm);
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
   color: inherit;
 }
 
 .song-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--panel-hover-border);
-  box-shadow: var(--shadow-md), 0 0 12px var(--accent-glow);
+  transform: translateY(-2px); /* Elevado suave */
+  border-color: var(--stage-color, var(--accent-color)) !important; /* Borde completo del color de la etapa */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 0 15px var(--stage-color); /* Iluminación / resplandor del color de la etapa */
 }
 
 .song-card-number {
@@ -1269,7 +1269,7 @@ footer {
   width: 100%;
   box-sizing: border-box;
   border-left: 8px solid var(--stage-color, var(--panel-border));
-  border-radius: 6px;
+  /*  border-radius: 6px; NO QUIERO ESTO*/
   padding: 16px 20px;
 }
 .songs-grid.style-detailed .song-card:hover {
