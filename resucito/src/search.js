@@ -37,12 +37,15 @@ export function searchSongs(songs, query, activeStage = null, activeMoments = []
             return false;
         }
 
-        // 2. Filtrado por Momentos Litúrgicos
+        // 2. Filtrado por Momentos Litúrgicos / Categorías
         if (activeMoments.length > 0) {
-            const songMoments = (song.category || []).map(m => m.toLowerCase());
-            const matchesAllMoments = activeMoments.every(moment => 
-                songMoments.includes(moment.toLowerCase())
-            );
+            const songMoments = (song.category || []).map(m => normalizeText(m));
+            const matchesAllMoments = activeMoments.every(moment => {
+                const cleanMoment = normalizeText(moment);
+                return songMoments.includes(cleanMoment) ||
+                       (cleanMoment === 'aclamacion' && song.sourceBook === 'aclamaciones') ||
+                       (cleanMoment === 'catolicos' && (songMoments.includes('catolicos') || song.sourceBook === 'joven'));
+            });
             if (!matchesAllMoments) return false;
         }
 

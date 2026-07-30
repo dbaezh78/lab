@@ -704,7 +704,9 @@ function setupEventListeners() {
       activeStage = null;
       stageFiltersContainer.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
       activeMoments = [];
-      momentFiltersContainer.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+      momentFiltersContainer.querySelectorAll('.filter-pill').forEach(b => {
+        b.classList.toggle('active', b.id === 'btn-filter-indice');
+      });
       
       handleSearchAndFilters();
     });
@@ -752,14 +754,31 @@ function setupEventListeners() {
     if (!btn) return;
     
     const moment = btn.dataset.moment;
-    const index = activeMoments.indexOf(moment);
+    const btnIndice = document.getElementById('btn-filter-indice');
     
-    if (index > -1) {
-      activeMoments.splice(index, 1);
-      btn.classList.remove('active');
+    if (moment === 'Indice de Cantos') {
+      // Limpiar todos los filtros de momentos
+      activeMoments = [];
+      momentFiltersContainer.querySelectorAll('.filter-pill').forEach(b => {
+        b.classList.remove('active');
+      });
+      if (btnIndice) btnIndice.classList.add('active');
     } else {
-      activeMoments.push(moment);
-      btn.classList.add('active');
+      const index = activeMoments.indexOf(moment);
+      if (index > -1) {
+        activeMoments.splice(index, 1);
+        btn.classList.remove('active');
+      } else {
+        activeMoments.push(moment);
+        btn.classList.add('active');
+      }
+      
+      // Ajustar estado del botón de "Índice de Cantos"
+      if (activeMoments.length > 0) {
+        if (btnIndice) btnIndice.classList.remove('active');
+      } else {
+        if (btnIndice) btnIndice.classList.add('active');
+      }
     }
     handleSearchAndFilters();
   });

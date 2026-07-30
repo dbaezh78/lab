@@ -318,7 +318,7 @@ header {
 
 .filter-pill {
   padding: 6px 14px;
-  border-radius: 18px;
+  border-radius: 1px;
   font-size: 0.85rem;
   border: 1px solid var(--panel-border);
   background-color: hsla(0, 0%, 50%, 0.05);
@@ -330,6 +330,12 @@ header {
   color: white;
   border-color: var(--accent-color);
   box-shadow: var(--shadow-sm);
+}
+
+#btn-filter-indice.active {
+  background-color: #b71c1c !important;
+  border-color: #b71c1c !important;
+  color: white !important;
 }
 
 /* Listado de cantos */
