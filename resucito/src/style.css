@@ -347,12 +347,15 @@ header {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
   color: inherit;
+  position: relative;
+  z-index: 1;
 }
 
 .song-card:hover {
   transform: translateY(-2px); /* Elevado suave */
   border-color: var(--stage-color, var(--accent-color)) !important; /* Borde completo del color de la etapa */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 0 15px var(--stage-color); /* Iluminación / resplandor del color de la etapa */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 0 15px var(--stage-color); /* Iluminación / resplandor del color de la etapa */
+  z-index: 10; /* Eleva el elemento por encima de sus vecinos para que se dibuje encima del resto */
 }
 
 .song-card-number {
@@ -1272,9 +1275,6 @@ footer {
   /*  border-radius: 6px; NO QUIERO ESTO*/
   padding: 16px 20px;
 }
-.songs-grid.style-detailed .song-card:hover {
-  transform: translateX(6px); /* Pequeño desplazamiento lateral interactivo */
-}
 
 /* 3. Modo Lista Simple (simple) */
 .songs-grid.style-simple {
@@ -1291,7 +1291,7 @@ footer {
   align-items: center;
   justify-content: flex-start;
   padding: 14px 20px;
-  border: none;
+  border: 1.5px solid transparent;
   border-bottom: 1px solid var(--panel-border);
   border-left: 8px solid var(--stage-color, var(--panel-border));
   border-radius: 0;
@@ -1302,9 +1302,10 @@ footer {
   border-bottom: none;
 }
 .songs-grid.style-simple .song-card:hover {
-  transform: none;
-  background-color: var(--panel-hover-border);
-  box-shadow: none;
+  border: 1.5px solid var(--stage-color) !important;
+  border-left: 8px solid var(--stage-color) !important;
+  margin-top: -1.5px;
+  margin-bottom: -1.5px;
 }
 .songs-grid.style-simple .song-card-subtitle,
 .songs-grid.style-simple .song-card-badges,
