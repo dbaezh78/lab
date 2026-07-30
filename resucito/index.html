@@ -365,112 +365,99 @@
           <div class="stage-colors-customizer btn-colors-customizer">
             <div class="stage-colors-header">
               <h4>Personalizar Botones</h4>
-              <p>Color del botón por defecto y cuando está seleccionado</p>
+            </div>
+
+            <!-- Encabezado de columnas -->
+            <div class="btn-table-header">
+              <span class="btn-table-stage-col"></span>
+              <span class="btn-table-col-label">Por defecto</span>
+              <span class="btn-table-col-label">Seleccionado</span>
+              <span class="btn-table-col-label">Texto</span>
             </div>
 
             <!-- Precatecumenado -->
-            <div class="stage-color-row">
+            <div class="btn-table-row">
               <span class="stage-color-label">Precatecumenado</span>
-              <div class="btn-color-pair">
-                <div class="btn-color-slot">
-                  <span class="btn-color-slot-label">Por defecto</span>
-                  <label class="color-picker-label-btn btn-pill-preview" id="preview-pre-default" title="Color por defecto" style="background-color: var(--color-pre);">
-                    <span class="material-symbols-outlined">palette</span>
-                    <input type="color" class="btn-color-input" data-stage="pre" data-mode="default" value="#6c757d">
-                  </label>
-                </div>
-                <div class="btn-color-slot">
-                  <span class="btn-color-slot-label">Seleccionado</span>
-                  <label class="color-picker-label-btn btn-pill-preview" id="preview-pre-active" title="Color al seleccionar" style="background-color: var(--color-pre-active, #495057);">
-                    <span class="material-symbols-outlined">palette</span>
-                    <input type="color" class="btn-color-input" data-stage="pre" data-mode="active" value="#495057">
-                  </label>
-                </div>
-              </div>
+              <label class="color-picker-label-btn btn-pill-preview" id="preview-pre-default" title="Color por defecto" style="background-color:#ffffff; border-color: #cdd3d9;">
+                <span class="material-symbols-outlined" style="color:#212529;">palette</span>
+                <input type="color" class="btn-color-input" data-stage="pre" data-mode="default" value="#ffffff">
+              </label>
+              <label class="color-picker-label-btn btn-pill-preview" id="preview-pre-active" title="Color al seleccionar" style="background-color:#495057;">
+                <span class="material-symbols-outlined">palette</span>
+                <input type="color" class="btn-color-input" data-stage="pre" data-mode="active" value="#495057">
+              </label>
+              <label class="color-picker-label-btn btn-pill-preview" id="preview-pre-text" title="Color del texto" style="background-color:#212529;">
+                <span class="material-symbols-outlined">palette</span>
+                <input type="color" class="btn-color-input" data-stage="pre" data-mode="text" value="#212529">
+              </label>
             </div>
 
             <!-- Catecumenado -->
-            <div class="stage-color-row">
+            <div class="btn-table-row">
               <span class="stage-color-label">Catecumenado</span>
-              <div class="btn-color-pair">
-                <div class="btn-color-slot">
-                  <span class="btn-color-slot-label">Por defecto</span>
-                  <label class="color-picker-label-btn btn-pill-preview" id="preview-cate-default" title="Color por defecto" style="background-color: var(--color-cate);">
-                    <span class="material-symbols-outlined">palette</span>
-                    <input type="color" class="btn-color-input" data-stage="cate" data-mode="default" value="#0d6efd">
-                  </label>
-                </div>
-                <div class="btn-color-slot">
-                  <span class="btn-color-slot-label">Seleccionado</span>
-                  <label class="color-picker-label-btn btn-pill-preview" id="preview-cate-active" title="Color al seleccionar" style="background-color: var(--color-cate-active, #0a58ca);">
-                    <span class="material-symbols-outlined">palette</span>
-                    <input type="color" class="btn-color-input" data-stage="cate" data-mode="active" value="#0a58ca">
-                  </label>
-                </div>
-              </div>
+              <label class="color-picker-label-btn btn-pill-preview" id="preview-cate-default" title="Color por defecto" style="background-color:#0d6efd;">
+                <span class="material-symbols-outlined">palette</span>
+                <input type="color" class="btn-color-input" data-stage="cate" data-mode="default" value="#0d6efd">
+              </label>
+              <label class="color-picker-label-btn btn-pill-preview" id="preview-cate-active" title="Color al seleccionar" style="background-color:#0a58ca;">
+                <span class="material-symbols-outlined">palette</span>
+                <input type="color" class="btn-color-input" data-stage="cate" data-mode="active" value="#0a58ca">
+              </label>
+              <label class="color-picker-label-btn btn-pill-preview" id="preview-cate-text" title="Color del texto" style="background-color:#ffffff;">
+                <span class="material-symbols-outlined" style="color:#212529;">palette</span>
+                <input type="color" class="btn-color-input" data-stage="cate" data-mode="text" value="#ffffff">
+              </label>
             </div>
 
             <!-- Elección -->
-            <div class="stage-color-row">
+            <div class="btn-table-row">
               <span class="stage-color-label">Elección</span>
-              <div class="btn-color-pair">
-                <div class="btn-color-slot">
-                  <span class="btn-color-slot-label">Por defecto</span>
-                  <label class="color-picker-label-btn btn-pill-preview" id="preview-ele-default" title="Color por defecto" style="background-color: var(--color-ele);">
-                    <span class="material-symbols-outlined">palette</span>
-                    <input type="color" class="btn-color-input" data-stage="ele" data-mode="default" value="#8bc34a">
-                  </label>
-                </div>
-                <div class="btn-color-slot">
-                  <span class="btn-color-slot-label">Seleccionado</span>
-                  <label class="color-picker-label-btn btn-pill-preview" id="preview-ele-active" title="Color al seleccionar" style="background-color: var(--color-ele-active, #558b2f);">
-                    <span class="material-symbols-outlined">palette</span>
-                    <input type="color" class="btn-color-input" data-stage="ele" data-mode="active" value="#558b2f">
-                  </label>
-                </div>
-              </div>
+              <label class="color-picker-label-btn btn-pill-preview" id="preview-ele-default" title="Color por defecto" style="background-color:#8bc34a;">
+                <span class="material-symbols-outlined">palette</span>
+                <input type="color" class="btn-color-input" data-stage="ele" data-mode="default" value="#8bc34a">
+              </label>
+              <label class="color-picker-label-btn btn-pill-preview" id="preview-ele-active" title="Color al seleccionar" style="background-color:#558b2f;">
+                <span class="material-symbols-outlined">palette</span>
+                <input type="color" class="btn-color-input" data-stage="ele" data-mode="active" value="#558b2f">
+              </label>
+              <label class="color-picker-label-btn btn-pill-preview" id="preview-ele-text" title="Color del texto" style="background-color:#ffffff;">
+                <span class="material-symbols-outlined" style="color:#212529;">palette</span>
+                <input type="color" class="btn-color-input" data-stage="ele" data-mode="text" value="#ffffff">
+              </label>
             </div>
 
             <!-- Liturgia -->
-            <div class="stage-color-row">
+            <div class="btn-table-row">
               <span class="stage-color-label">Liturgia</span>
-              <div class="btn-color-pair">
-                <div class="btn-color-slot">
-                  <span class="btn-color-slot-label">Por defecto</span>
-                  <label class="color-picker-label-btn btn-pill-preview" id="preview-lit-default" title="Color por defecto" style="background-color: var(--color-lit);">
-                    <span class="material-symbols-outlined">palette</span>
-                    <input type="color" class="btn-color-input" data-stage="lit" data-mode="default" value="#FFEB3B">
-                  </label>
-                </div>
-                <div class="btn-color-slot">
-                  <span class="btn-color-slot-label">Seleccionado</span>
-                  <label class="color-picker-label-btn btn-pill-preview" id="preview-lit-active" title="Color al seleccionar" style="background-color: var(--color-lit-active, #f9a825);">
-                    <span class="material-symbols-outlined">palette</span>
-                    <input type="color" class="btn-color-input" data-stage="lit" data-mode="active" value="#f9a825">
-                  </label>
-                </div>
-              </div>
+              <label class="color-picker-label-btn btn-pill-preview" id="preview-lit-default" title="Color por defecto" style="background-color:#FFEB3B;">
+                <span class="material-symbols-outlined" style="color:#212529;">palette</span>
+                <input type="color" class="btn-color-input" data-stage="lit" data-mode="default" value="#FFEB3B">
+              </label>
+              <label class="color-picker-label-btn btn-pill-preview" id="preview-lit-active" title="Color al seleccionar" style="background-color:#f9a825;">
+                <span class="material-symbols-outlined" style="color:#212529;">palette</span>
+                <input type="color" class="btn-color-input" data-stage="lit" data-mode="active" value="#f9a825">
+              </label>
+              <label class="color-picker-label-btn btn-pill-preview" id="preview-lit-text" title="Color del texto" style="background-color:#212529;">
+                <span class="material-symbols-outlined">palette</span>
+                <input type="color" class="btn-color-input" data-stage="lit" data-mode="text" value="#212529">
+              </label>
             </div>
 
             <!-- Católicos -->
-            <div class="stage-color-row">
+            <div class="btn-table-row">
               <span class="stage-color-label">Otros Católicos</span>
-              <div class="btn-color-pair">
-                <div class="btn-color-slot">
-                  <span class="btn-color-slot-label">Por defecto</span>
-                  <label class="color-picker-label-btn btn-pill-preview" id="preview-cat-default" title="Color por defecto" style="background-color: var(--color-cat, #6f42c1);">
-                    <span class="material-symbols-outlined">palette</span>
-                    <input type="color" class="btn-color-input" data-stage="cat" data-mode="default" value="#6f42c1">
-                  </label>
-                </div>
-                <div class="btn-color-slot">
-                  <span class="btn-color-slot-label">Seleccionado</span>
-                  <label class="color-picker-label-btn btn-pill-preview" id="preview-cat-active" title="Color al seleccionar" style="background-color: var(--color-cat-active, #4a1d96);">
-                    <span class="material-symbols-outlined">palette</span>
-                    <input type="color" class="btn-color-input" data-stage="cat" data-mode="active" value="#4a1d96">
-                  </label>
-                </div>
-              </div>
+              <label class="color-picker-label-btn btn-pill-preview" id="preview-cat-default" title="Color por defecto" style="background-color:#6f42c1;">
+                <span class="material-symbols-outlined">palette</span>
+                <input type="color" class="btn-color-input" data-stage="cat" data-mode="default" value="#6f42c1">
+              </label>
+              <label class="color-picker-label-btn btn-pill-preview" id="preview-cat-active" title="Color al seleccionar" style="background-color:#4a1d96;">
+                <span class="material-symbols-outlined">palette</span>
+                <input type="color" class="btn-color-input" data-stage="cat" data-mode="active" value="#4a1d96">
+              </label>
+              <label class="color-picker-label-btn btn-pill-preview" id="preview-cat-text" title="Color del texto" style="background-color:#ffffff;">
+                <span class="material-symbols-outlined" style="color:#212529;">palette</span>
+                <input type="color" class="btn-color-input" data-stage="cat" data-mode="text" value="#ffffff">
+              </label>
             </div>
           </div>
         </div>

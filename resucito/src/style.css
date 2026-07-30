@@ -329,66 +329,66 @@ header {
 
 /* Botones de etapa coloreados por defecto */
 .stage-pill-pre {
-  background-color: var(--color-pre);
-  color: #fff;
-  border-color: var(--color-pre);
+  background-color: var(--color-pre, #ffffff);
+  color: var(--text-pre, #212529);
+  border-color: var(--color-pre, #cdd3d9);
 }
 .stage-pill-pre.active {
   background-color: var(--color-pre-active, #495057) !important;
   border-color: var(--color-pre-active, #495057) !important;
-  color: #fff !important;
+  color: var(--text-pre, #ffffff) !important;
   box-shadow: 0 0 0 3px rgba(108,117,125,0.35), var(--shadow-sm);
   transform: scale(1.04);
 }
 
 .stage-pill-cate {
-  background-color: var(--color-cate);
-  color: #fff;
-  border-color: var(--color-cate);
+  background-color: var(--color-cate, #0d6efd);
+  color: var(--text-cate, #fff);
+  border-color: var(--color-cate, #0d6efd);
 }
 .stage-pill-cate.active {
   background-color: var(--color-cate-active, #0a58ca) !important;
   border-color: var(--color-cate-active, #0a58ca) !important;
-  color: #fff !important;
+  color: var(--text-cate, #fff) !important;
   box-shadow: 0 0 0 3px rgba(13,110,253,0.35), var(--shadow-sm);
   transform: scale(1.04);
 }
 
 .stage-pill-ele {
-  background-color: var(--color-ele);
-  color: #fff;
-  border-color: var(--color-ele);
+  background-color: var(--color-ele, #8bc34a);
+  color: var(--text-ele, #fff);
+  border-color: var(--color-ele, #8bc34a);
 }
 .stage-pill-ele.active {
   background-color: var(--color-ele-active, #558b2f) !important;
   border-color: var(--color-ele-active, #558b2f) !important;
-  color: #fff !important;
+  color: var(--text-ele, #fff) !important;
   box-shadow: 0 0 0 3px rgba(139,195,74,0.35), var(--shadow-sm);
   transform: scale(1.04);
 }
 
 .stage-pill-lit {
-  background-color: var(--color-lit);
-  color: #212529;
-  border-color: var(--color-lit);
+  background-color: var(--color-lit, #FFEB3B);
+  color: var(--text-lit, #212529);
+  border-color: var(--color-lit, #FFEB3B);
 }
 .stage-pill-lit.active {
   background-color: var(--color-lit-active, #f9a825) !important;
   border-color: var(--color-lit-active, #f9a825) !important;
-  color: #212529 !important;
+  color: var(--text-lit, #212529) !important;
   box-shadow: 0 0 0 3px rgba(255,235,59,0.45), var(--shadow-sm);
   transform: scale(1.04);
 }
 
 .stage-pill-cat {
   background-color: var(--color-cat, #6f42c1);
-  color: #fff;
+  color: var(--text-cat, #fff);
   border-color: var(--color-cat, #6f42c1);
 }
 .stage-pill-cat.active {
   background-color: var(--color-cat-active, #4a1d96) !important;
   border-color: var(--color-cat-active, #4a1d96) !important;
-  color: #fff !important;
+  color: var(--text-cat, #fff) !important;
   box-shadow: 0 0 0 3px rgba(111,66,193,0.35), var(--shadow-sm);
   transform: scale(1.04);
 }
@@ -407,24 +407,41 @@ header {
   color: white !important;
 }
 
-/* --- Sección Personalizar Botones --- */
-.btn-color-pair {
-  display: flex;
-  gap: 14px;
+/* --- Sección Personalizar Botones (tabla con encabezados de columna) --- */
+.btn-table-header,
+.btn-table-row {
+  display: grid;
+  grid-template-columns: 1fr repeat(3, 34px);
   align-items: center;
+  gap: 10px;
+  padding: 4px 0;
 }
 
-.btn-color-slot {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
+.btn-table-header {
+  border-bottom: 1px solid var(--panel-border);
+  margin-bottom: 6px;
+  padding-bottom: 6px;
 }
 
-.btn-color-slot-label {
-  font-size: 0.7rem;
+.btn-table-col-label {
+  font-size: 0.68rem;
+  font-weight: 600;
   color: var(--text-muted);
+  text-align: center;
   white-space: nowrap;
+}
+
+.btn-table-stage-col {
+  /* empty first column header */
+}
+
+.btn-table-row {
+  border-bottom: 1px solid var(--panel-border);
+  padding: 6px 0;
+}
+
+.btn-table-row:last-child {
+  border-bottom: none;
 }
 
 .btn-pill-preview {
@@ -433,6 +450,7 @@ header {
   border-radius: 50%;
   border: 2px solid rgba(128, 128, 128, 0.4) !important;
   box-shadow: var(--shadow-sm);
+  justify-self: center;
 }
 
 .btn-pill-preview span {

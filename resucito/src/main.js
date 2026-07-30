@@ -1116,15 +1116,17 @@ function setupEventListeners() {
     });
   });
 
-  // Personalizar colores de botones de etapa (default y active)
+  // Personalizar colores de botones de etapa (default, active y text)
   document.querySelectorAll('.btn-color-input').forEach(input => {
     input.addEventListener('input', (e) => {
       const stage = input.dataset.stage;
-      const mode = input.dataset.mode; // 'default' | 'active'
+      const mode = input.dataset.mode; // 'default' | 'active' | 'text'
       const color = e.target.value;
       
       if (mode === 'default') {
         localStorage.setItem(`stage-color-${stage}`, color);
+      } else if (mode === 'text') {
+        localStorage.setItem(`btn-color-${stage}-text`, color);
       } else {
         localStorage.setItem(`btn-color-${stage}-active`, color);
       }
@@ -1192,18 +1194,25 @@ function initPreferences() {
 }
 
 function applyStageColors() {
-  const preColor = localStorage.getItem('stage-color-pre') || '#6c757d';
+  const preColor  = localStorage.getItem('stage-color-pre')  || '#ffffff';
   const cateColor = localStorage.getItem('stage-color-cate') || '#0d6efd';
-  const eleColor = localStorage.getItem('stage-color-ele') || '#8bc34a';
-  const litColor = localStorage.getItem('stage-color-lit') || '#FFEB3B';
-  const catColor = localStorage.getItem('stage-color-cat') || '#6f42c1';
+  const eleColor  = localStorage.getItem('stage-color-ele')  || '#8bc34a';
+  const litColor  = localStorage.getItem('stage-color-lit')  || '#FFEB3B';
+  const catColor  = localStorage.getItem('stage-color-cat')  || '#6f42c1';
 
   // Colores de estado activo para los botones de etapa
-  const preActive = localStorage.getItem('btn-color-pre-active') || '#495057';
+  const preActive  = localStorage.getItem('btn-color-pre-active')  || '#495057';
   const cateActive = localStorage.getItem('btn-color-cate-active') || '#0a58ca';
-  const eleActive = localStorage.getItem('btn-color-ele-active') || '#558b2f';
-  const litActive = localStorage.getItem('btn-color-lit-active') || '#f9a825';
-  const catActive = localStorage.getItem('btn-color-cat-active') || '#4a1d96';
+  const eleActive  = localStorage.getItem('btn-color-ele-active')  || '#558b2f';
+  const litActive  = localStorage.getItem('btn-color-lit-active')  || '#f9a825';
+  const catActive  = localStorage.getItem('btn-color-cat-active')  || '#4a1d96';
+
+  // Colores de texto de los botones de etapa
+  const preText  = localStorage.getItem('btn-color-pre-text')  || '#212529';
+  const cateText = localStorage.getItem('btn-color-cate-text') || '#ffffff';
+  const eleText  = localStorage.getItem('btn-color-ele-text')  || '#ffffff';
+  const litText  = localStorage.getItem('btn-color-lit-text')  || '#212529';
+  const catText  = localStorage.getItem('btn-color-cat-text')  || '#ffffff';
 
   // Aplicar variables CSS de color por defecto
   document.documentElement.style.setProperty('--color-pre', preColor);
@@ -1218,6 +1227,13 @@ function applyStageColors() {
   document.documentElement.style.setProperty('--color-ele-active', eleActive);
   document.documentElement.style.setProperty('--color-lit-active', litActive);
   document.documentElement.style.setProperty('--color-cat-active', catActive);
+
+  // Aplicar variables CSS de color de texto
+  document.documentElement.style.setProperty('--text-pre', preText);
+  document.documentElement.style.setProperty('--text-cate', cateText);
+  document.documentElement.style.setProperty('--text-ele', eleText);
+  document.documentElement.style.setProperty('--text-lit', litText);
+  document.documentElement.style.setProperty('--text-cat', catText);
 
   // Actualizar los preview labels de Personalizar Botones
   const updatePreview = (id, color) => {
@@ -1235,14 +1251,19 @@ function applyStageColors() {
   };
   updatePreview('preview-pre-default', preColor);
   updatePreview('preview-pre-active', preActive);
+  updatePreview('preview-pre-text', preText);
   updatePreview('preview-cate-default', cateColor);
   updatePreview('preview-cate-active', cateActive);
+  updatePreview('preview-cate-text', cateText);
   updatePreview('preview-ele-default', eleColor);
   updatePreview('preview-ele-active', eleActive);
+  updatePreview('preview-ele-text', eleText);
   updatePreview('preview-lit-default', litColor);
   updatePreview('preview-lit-active', litActive);
+  updatePreview('preview-lit-text', litText);
   updatePreview('preview-cat-default', catColor);
   updatePreview('preview-cat-active', catActive);
+  updatePreview('preview-cat-text', catText);
 
   // Resaltar los botones de los circulitos de color correspondientes
   document.querySelectorAll('.color-swatches').forEach(container => {
