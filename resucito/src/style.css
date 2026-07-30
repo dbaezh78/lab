@@ -1283,7 +1283,6 @@ footer {
   gap: 0;
   border: 1px solid var(--panel-border);
   border-radius: 8px;
-  overflow: hidden;
   background-color: var(--panel-bg);
 }
 .songs-grid.style-simple .song-card {
@@ -1298,7 +1297,13 @@ footer {
   box-shadow: none;
   backdrop-filter: none;
 }
+.songs-grid.style-simple .song-card:first-child {
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
+}
 .songs-grid.style-simple .song-card:last-child {
+  border-bottom-left-radius: 7px;
+  border-bottom-right-radius: 7px;
   border-bottom: none;
 }
 .songs-grid.style-simple .song-card:hover {
