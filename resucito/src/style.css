@@ -344,7 +344,7 @@ header {
   cursor: pointer;
   backdrop-filter: blur(8px);
   box-shadow: var(--shadow-sm);
-  transition: all 0.1s ease-out;
+  transition: none;
   text-decoration: none;
   color: inherit;
   position: relative;
@@ -1264,7 +1264,7 @@ footer {
 .songs-grid.style-detailed {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 1px;
 }
 .songs-grid.style-detailed .song-card {
   flex-direction: column;
