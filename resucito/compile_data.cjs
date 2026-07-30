@@ -7,9 +7,9 @@ const SRC_IMA_DIR = 'C:/db/Github/resucito/src/ima';
 const SRC_DATA_DIR = 'C:/db/Github/resucito/src/data';
 
 // Target paths
-const TARGET_DATA_DIR = path.resolve(__dirname, 'data');
+const TARGET_DATA_DIR = path.resolve(__dirname, 'public/data');
 const TARGET_SONGS_DIR = path.resolve(TARGET_DATA_DIR, 'songs');
-const TARGET_IMA_DIR = path.resolve(__dirname, 'ima');
+const TARGET_IMA_DIR = path.resolve(__dirname, 'public/ima');
 
 // Ensure target directories exist
 if (!fs.existsSync(TARGET_DATA_DIR)) {
@@ -181,7 +181,7 @@ try {
         JSON.stringify(songsIndex, null, 2), 
         'utf8'
     );
-    console.log(`Índice con buscador elástico escrito en: data/songs-index.json (${songsIndex.length} entradas)`);
+    console.log(`Índice con buscador elástico escrito en: public/data/songs-index.json (${songsIndex.length} entradas)`);
     
     // 4. Copiar archivos adicionales
     const extraFiles = ['catequesis.json', 'paises.json'];
