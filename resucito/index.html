@@ -96,53 +96,77 @@
       
       <!-- Toolbar del visor -->
       <div class="viewer-toolbar">
+        <!-- Izquierda: Volver y pantalla de Tono/Cejilla -->
         <div class="toolbar-left">
           <button id="viewer-back-btn" class="btn btn-icon" title="Volver al buscador">
             <span class="material-symbols-outlined">arrow_back</span>
           </button>
-          <button id="favorite-btn" class="btn btn-icon" title="Favorito">
+          
+          <div class="tone-capo-display" id="tone-capo-trigger" title="Cambiar tono o cejilla">
+            <span class="material-symbols-outlined tone-music-note">music_note</span>
+            <span id="key-badge" class="key-badge-text">La</span>
+            <img src="ima/cejilla.png" alt="Cejilla" class="cejilla-icon-img">
+            <span id="capo-badge" class="capo-badge-text">5/ 5º traste</span>
+          </div>
+
+          <button id="favorite-btn" class="btn btn-icon" title="Favorito" style="margin-left: 8px;">
             <span class="material-symbols-outlined" id="favorite-icon">star</span>
           </button>
-          <div class="transpose-controls">
-            <button id="transpose-down-btn" class="btn btn-icon" style="width:32px; height:32px; padding:0;" title="Bajar medio tono">-</button>
-            <span id="key-badge" class="key-badge">La</span>
-            <button id="transpose-up-btn" class="btn btn-icon" style="width:32px; height:32px; padding:0;" title="Subir medio tono">+</button>
-          </div>
         </div>
 
-        <div class="toolbar-center">
-          <h2 id="viewer-song-title">A la Víctima Pascual</h2>
-          <p id="viewer-song-subtitle">Secuencia de Pascua</p>
-        </div>
-
+        <!-- Derecha: Iconos de control, navegación y buscador rápido -->
         <div class="toolbar-right">
-          <!-- Zoom del Texto -->
-          <button id="zoom-out-btn" class="btn btn-icon" title="Reducir letra">
-            <span class="material-symbols-outlined">zoom_out</span>
-          </button>
-          <button id="zoom-in-btn" class="btn btn-icon" title="Aumentar letra">
-            <span class="material-symbols-outlined">zoom_in</span>
+          <!-- Abrir Modal de Acordes -->
+          <button id="chord-modal-trigger-btn" class="btn btn-icon" title="Transportar / Ver acordes">
+            <span class="material-symbols-outlined">music_note</span>
           </button>
 
-          <!-- Auto-scroll -->
-          <div class="scroll-speed-panel">
-            <button id="scroll-play-btn" class="btn btn-icon" title="Iniciar auto-desplazamiento">
-              <span class="material-symbols-outlined">south</span>
-            </button>
-            <input type="range" id="scroll-speed-slider" class="scroll-slider" min="1" max="100" value="25" title="Velocidad de scroll">
-          </div>
+          <!-- Dividir pantalla (Book icon) -->
+          <button id="split-layout-btn" class="btn btn-icon" title="Alternar vista en 2 columnas">
+            <span class="material-symbols-outlined">menu_book</span>
+          </button>
 
           <!-- Asamblea Toggle -->
           <button id="asamblea-toggle-btn" class="btn btn-icon" title="Alternar partes de asamblea">
             <span class="material-symbols-outlined">visibility</span>
           </button>
 
-          <!-- Ajustes -->
+          <!-- Auto-scroll y velocidad -->
+          <div class="scroll-speed-panel">
+            <button id="scroll-play-btn" class="btn btn-icon" title="Iniciar auto-desplazamiento">
+              <span class="material-symbols-outlined">play_circle</span>
+            </button>
+            <button id="scroll-speed-toggle-btn" class="btn btn-icon" title="Ajustar velocidad">
+              <span class="material-symbols-outlined">keyboard_arrow_down</span>
+            </button>
+            <div id="toolbar-speed-popover" class="speed-popover" style="display: none;">
+              <input type="range" id="scroll-speed-slider" class="scroll-slider" min="1" max="100" value="25" title="Velocidad de scroll">
+            </div>
+          </div>
+
+          <!-- Navegación de Cantos -->
+          <button id="prev-song-btn" class="btn btn-icon" title="Canto anterior">
+            <span class="material-symbols-outlined">arrow_left</span>
+          </button>
+          <button id="next-song-btn" class="btn btn-icon" title="Canto siguiente">
+            <span class="material-symbols-outlined">arrow_right</span>
+          </button>
+
+          <!-- Buscador rápido en barra superior -->
+          <div class="toolbar-search-container">
+            <input type="text" id="toolbar-search-input" class="toolbar-search-input" placeholder="Buscar..." autocomplete="off">
+            <div id="toolbar-search-suggestions" class="search-suggestions-dropdown" style="display: none;"></div>
+          </div>
+
+          <!-- Ajustes (Opcional oculto o discreto) -->
           <button id="settings-open-btn" class="btn btn-icon" title="Ajustes visuales">
             <span class="material-symbols-outlined">settings</span>
           </button>
         </div>
       </div>
+
+      <!-- Cabecera del canto (Título e imagen de Cristo estilo libro) -->
+      <div id="canto-header-block" class="canto-header-block"></div>
 
       <!-- Contenedor del Canto de dos columnas -->
       <div id="canto-columns" class="canto-columns-container">

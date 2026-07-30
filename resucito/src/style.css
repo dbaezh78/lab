@@ -493,10 +493,18 @@ header {
   min-width: 0; /* previene desbordamiento flex */
 }
 
+.canto-columns-container.single-column {
+  flex-direction: column;
+  gap: 16px;
+}
+
 /* Ajustes de columnas responsivas */
 @media (max-width: 768px) {
+  #split-layout-btn {
+    display: none !important;
+  }
   .canto-columns-container {
-    flex-direction: column;
+    flex-direction: column !important;
     gap: 16px;
   }
 }
@@ -505,17 +513,15 @@ header {
   position: relative;
   font-family: var(--font-family-lyrics);
   font-size: calc(1.1rem * var(--font-zoom));
-  line-height: 2.1; /* Amplio espacio para acordes */
-  min-height: 2rem;
+  line-height: 2.3; /* Espacio vertical ampliado para acordes */
+  min-height: 2.2rem;
   white-space: pre-wrap;
   padding-left: 2px;
 }
 
-.linea-canto .letra {
-  display: inline-block;
-  vertical-align: bottom;
+.chord-anchor-wrapper {
   position: relative;
-  z-index: 5;
+  display: inline-block;
 }
 
 /* Bloques colapsables de asamblea */
@@ -538,11 +544,11 @@ header {
   transition: max-height 0.25s ease-out;
 }
 
-/* Acordes posicionados */
+/* Acordes posicionados (Anclados con precisión de caracteres) */
 .nota-posicionada {
   position: absolute;
-  top: -1.25rem;
-  transform: translate(-10%, 0);
+  top: -1.35rem; /* Ajustado para quedar encima */
+  left: 0;
   font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
   font-size: calc(0.9rem * var(--font-zoom));
@@ -550,6 +556,7 @@ header {
   cursor: pointer;
   user-select: none;
   z-index: 10;
+  white-space: nowrap;
   background-color: var(--bg-color); /* previene traslape visual con letras */
   padding: 0 4px;
   border-radius: 4px;
@@ -919,5 +926,280 @@ footer {
 .theme-light .btn-picker:hover {
   background-color: #f7f7f7;
   border-color: #999999;
+}
+
+/* --- Rediseño de la Barra de Opciones y Cabecera --- */
+
+.song-viewer-view {
+  margin: -16px -16px 0 -16px;
+  background-color: var(--bg-color);
+}
+
+/* Toolbar superior del visor (Estilo original del libro) */
+.viewer-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #3d0706 !important; /* Color vino oscuro */
+  color: #ffffff !important;
+  border-bottom: 2px solid #2e0505;
+  padding: 8px 16px;
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  box-sizing: border-box;
+  border-radius: 0 !important;
+  backdrop-filter: none !important;
+}
+
+.viewer-toolbar .btn-icon {
+  background: transparent !important;
+  border: none !important;
+  color: #ffffff !important;
+  opacity: 0.85;
+  transition: all 0.2s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none !important;
+}
+
+.viewer-toolbar .btn-icon:hover {
+  opacity: 1;
+  transform: scale(1.05);
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.viewer-toolbar .btn-icon.active {
+  color: #ffc107 !important; /* Resaltado amarillo para botones activos */
+}
+
+/* Indicador de Tono y Cejilla */
+.tone-capo-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(255, 255, 255, 0.08);
+  padding: 4px 12px;
+  border-radius: 20px;
+  transition: background-color 0.2s;
+  user-select: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.tone-capo-display:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.tone-music-note {
+  font-size: 1.15rem;
+  color: #ffffff !important;
+}
+
+.key-badge-text {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.cejilla-icon-img {
+  height: 18px;
+  width: auto;
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
+}
+
+.capo-badge-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+/* Buscador rápido de la barra superior */
+.toolbar-search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.toolbar-search-input {
+  background-color: #ffffff;
+  color: #202020;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  width: 110px;
+  transition: width 0.3s;
+  outline: none;
+}
+
+.toolbar-search-input:focus {
+  width: 160px;
+  box-shadow: 0 0 0 2px var(--accent-color);
+}
+
+.search-suggestions-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  margin-top: 6px;
+  width: 250px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(10px);
+}
+
+.search-suggestion-item {
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: var(--text-color);
+  border-bottom: 1px solid var(--panel-border);
+  text-align: left;
+}
+
+.search-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.search-suggestion-item:hover {
+  background-color: var(--accent-glow);
+  color: var(--accent-color);
+}
+
+/* Popover de velocidad de scroll */
+.speed-popover {
+  position: absolute;
+  top: 100%;
+  right: 180px;
+  background-color: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  padding: 10px;
+  border-radius: 8px;
+  z-index: 999;
+  box-shadow: var(--shadow-md);
+  margin-top: 6px;
+}
+
+/* Cabecera del canto estilo libro original */
+.canto-header-block {
+  display: grid;
+  grid-template-columns: 100px 1fr 100px;
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 24px;
+  padding: 16px 32px;
+  border-bottom: 1px solid var(--panel-border);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.canto-header-left {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.canto-header-img {
+  max-height: 90px;
+  max-width: 90px;
+  object-fit: contain;
+  opacity: 0.85;
+}
+
+/* Invertir imagen de cristo en modo oscuro */
+.theme-dark .canto-header-img, .theme-sepia .canto-header-img {
+  filter: invert(1) brightness(0.95) contrast(1.1);
+}
+
+.canto-header-center {
+  text-align: center;
+}
+
+.canto-header-stage {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  color: var(--text-color);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.canto-header-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 1.8rem;
+  color: var(--accent-color);
+  margin: 4px 0;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+}
+
+.canto-header-subtitle {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.canto-header-right {
+  /* Vacío para balancear */
+}
+
+/* Ajustes adicionales del scroll speed slider en popover */
+.speed-popover .scroll-slider {
+  width: 120px;
+}
+
+@media (max-width: 768px) {
+  .viewer-toolbar {
+    flex-wrap: nowrap;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 6px 8px;
+  }
+  
+  .tone-capo-display {
+    padding: 4px 8px;
+  }
+  
+  .key-badge-text {
+    font-size: 0.85rem;
+  }
+  
+  .capo-badge-text {
+    display: none; /* Ocultar el texto del traste en pantallas chicas para ganar espacio */
+  }
+  
+  .toolbar-search-container {
+    display: none; /* Ocultar buscador rápido en barra superior en móviles */
+  }
+  
+  .canto-header-block {
+    grid-template-columns: 60px 1fr 60px;
+    padding: 10px 16px;
+  }
+  
+  .canto-header-img {
+    max-height: 50px;
+    max-width: 50px;
+  }
+  
+  .canto-header-title {
+    font-size: 1.3rem;
+  }
 }
 
