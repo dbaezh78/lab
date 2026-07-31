@@ -3,7 +3,40 @@
 
 /* --- variables del sistema de diseño --- */
 :root {
-  /* Tema Oscuro (Defecto) */
+  /* Tema Claro (Defecto) */
+  --bg-color: hsl(210deg 100% 95.35%);
+  --text-color: hsl(220, 25%, 15%);
+  --text-muted: hsl(220, 15%, 45%);
+  --accent-color: #d01212;
+  --accent-glow: rgba(208, 18, 18, 0.2);
+  
+  --panel-bg: rgba(255, 255, 255, 0.7);
+  --panel-border: rgba(0, 0, 0, 0.08);
+  --panel-hover-border: rgba(208, 18, 18, 0.3);
+  
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.12);
+  
+  --chord-color: #d01212;
+  --chord-color-alt: #944c18;
+  --font-zoom: 1;
+  --font-family-lyrics: 'Inter', sans-serif;
+  
+  /* Fondos de etapa para modo claro */
+  --stage-bg-pre: #ffffff;
+  --stage-bg-cate: #bde9ff;
+  --stage-bg-ele: #ceffcf;
+  --stage-bg-lit: #fffde7;
+  --stage-bg-cat: #f3e5f5;
+}
+
+/* --- Variantes de Temas --- */
+.theme-light {
+  /* Hereda las propiedades predeterminadas de :root */
+}
+
+.theme-dark {
   --bg-color: hsl(220, 20%, 10%);
   --text-color: hsl(220, 20%, 95%);
   --text-muted: hsl(220, 10%, 65%);
@@ -18,28 +51,15 @@
   --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.3);
   --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
   
-  --chord-color: hsl(35, 100%, 60%);
-  --font-zoom: 1;
-  --font-family-lyrics: 'Inter', sans-serif;
-}
-
-/* --- Variantes de Temas --- */
-.theme-light {
-  --bg-color: hsl(210, 20%, 97%);
-  --text-color: hsl(220, 25%, 15%);
-  --text-muted: hsl(220, 15%, 45%);
-  --accent-color: #d01212;
-  --accent-glow: rgba(208, 18, 18, 0.2);
+  --chord-color: #d01212;
+  --chord-color-alt: #944c18;
   
-  --panel-bg: rgba(255, 255, 255, 0.7);
-  --panel-border: rgba(0, 0, 0, 0.08);
-  --panel-hover-border: rgba(208, 18, 18, 0.3);
-  
-  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.12);
-  
-  --chord-color: hsl(25, 95%, 45%);
+  /* Fondos de etapa para modo oscuro */
+  --stage-bg-pre: hsla(220, 20%, 15%, 0.65);
+  --stage-bg-cate: rgba(13, 40, 75, 0.45);
+  --stage-bg-ele: rgba(24, 46, 24, 0.45);
+  --stage-bg-lit: rgba(46, 42, 15, 0.45);
+  --stage-bg-cat: rgba(37, 18, 51, 0.45);
 }
 
 .theme-sepia {
@@ -57,13 +77,21 @@
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.1);
   
-  --chord-color: hsl(15, 80%, 45%);
+  --chord-color: #d01212;
+  --chord-color-alt: #944c18;
 
   /* Colores de etapas configurables */
   --color-pre: #6c757d;
   --color-cate: #2196f3;
   --color-ele: #8bc34a;
   --color-lit: #FFEB3B;
+  
+  /* Fondos de etapa para modo sepia */
+  --stage-bg-pre: #faf4e8;
+  --stage-bg-cate: #c5e3f5;
+  --stage-bg-ele: #cae6cb;
+  --stage-bg-lit: #eae1c3;
+  --stage-bg-cat: #ded0de;
 }
 
 /* Colores de categorías litúrgicas */
@@ -114,7 +142,7 @@ button:active, .btn:active {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  max-width: 1400px;
+  max-width: var(--app-max-width, 1200px);
   margin: 0 auto;
   padding: 16px;
 }
@@ -679,6 +707,12 @@ header {
   gap: 32px;
   margin-top: 16px;
   width: 100%;
+  background-color: var(--current-stage-bg, var(--panel-bg));
+  /*border: 1px solid var(--panel-border);  NO QUIERO ESTO  */
+  border-radius: 8px;
+  padding: 20px 32px;
+  box-sizing: border-box;
+  transition: background-color 0.3s ease;
 }
 
 .canto-column {
@@ -701,6 +735,7 @@ header {
   .canto-columns-container {
     flex-direction: column !important;
     gap: 16px;
+    padding: 16px 12px; /* Reducir padding horizontal en móviles/tablets para ganar espacio */
   }
 }
 
@@ -751,47 +786,107 @@ header {
 
 /* Bloques colapsables de asamblea */
 .collapsible-block-container {
-  border-left: 3px solid var(--accent-color);
-  padding-left: 12px;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: stretch;
   margin: 12px 0;
-  background-color: hsla(0, 0%, 50%, 0.02);
-  border-radius: 0 8px 8px 0;
+}
+
+.collapsible-lines-wrapper {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.collapsible-bis-side {
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.bis-line {
+  width: 2px;
+  background-color: #adafb4;
+  align-self: stretch;
+  margin-right: 12px;
+}
+
+.bis-text {
+  font-family: var(--font-family-lyrics);
+  font-weight: 700;
+  color: #adafb4;
+  font-size: calc(1.05rem * var(--font-zoom));
+  white-space: nowrap;
 }
 
 .collapsible-trigger {
   cursor: pointer;
-  font-weight: 600;
-  color: var(--accent-color);
+  font-weight: 700;
+  color: inherit;
 }
 
 .collapsible-content {
   margin-top: 8px;
-  transition: max-height 0.25s ease-out;
 }
 
 /* Acordes posicionados (Anclados con precisión de caracteres) */
 .nota-posicionada {
   position: absolute;
-  top: -1.35rem; /* Ajustado para quedar encima */
+  top: -18px; /* Forzado exactamente a -18px */
   left: 0;
   font-family: sans-serif, cursive, 'system-ui', 'Franklin Gothic Medium', Arial;
   font-weight: 700;
-  font-size: calc(0.9rem * var(--font-zoom));
-  color: var(--chord-color);
+  font-size: calc(17.6px * var(--font-zoom)); /* Exactamente 17.6px en PC por defecto */
   cursor: pointer;
   user-select: none;
   z-index: 10;
   white-space: nowrap;
-  background-color: var(--bg-color); /* previene traslape visual con letras */
-  padding: 0 4px;
+  background-color: transparent; /* Fondo transparente */
+  /*padding: 0 4px;     NLQ*/
   border-radius: 4px;
   transition: left 0.15s ease, font-size 0.2s ease, transform 0.15s ease;
 }
 
+/* Color para los acordes de la asamblea (opuesto) y cantor (principal) */
+.linea-canto.as .nota-posicionada {
+  color: var(--chord-color-alt, #944c18);
+}
+
+.linea-canto:not(.as) .nota-posicionada {
+  color: var(--chord-color, #d01212);
+}
+
 .nota-posicionada:hover {
-  transform: translate(-10%, -2px) scale(1.1);
+  /*transform: translate(-10%, -2px) scale(1.1);    NLQ*/
   box-shadow: var(--shadow-sm);
   color: var(--accent-color);
+}
+
+/* Estilos para desplazar acordes en modo edición */
+.nota-posicionada.edit-mode-active {
+  /*padding: 2px 6px;*/
+  /*background-color: var(--panel-bg);*/
+  border: 1px dashed var(--accent-color);
+  border-radius: 4px;
+  display: inline-block;
+  cursor: grab;
+  user-select: none;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.1s ease, opacity 0.1s ease;
+}
+
+.nota-posicionada.edit-mode-active.dragging {
+  cursor: grabbing;
+  opacity: 0.85;
+  z-index: 100;
+  box-shadow: var(--shadow-md);
+  transition: none !important; /* Desactivar transiciones durante el arrastre para mayor fluidez */
+}
+
+.char-pos {
+  display: inline;
+  white-space: pre;
 }
 
 /* Línea de imagen (para cantos escaneados o especiales) */
@@ -1029,7 +1124,7 @@ header {
   }
   
   .nota-posicionada {
-    background-color: white !important;
+    background-color: transparent !important;
     color: black !important;
     border: none !important;
     box-shadow: none !important;
@@ -1243,8 +1338,11 @@ footer {
 /* --- Rediseño de la Barra de Opciones y Cabecera --- */
 
 .song-viewer-view {
-  margin: -16px -16px 0 -16px;
-  background-color: var(--bg-color);
+  margin: -16px -16px -16px -16px;
+  background-color: var(--current-stage-bg, var(--bg-color));
+  transition: background-color 0.3s ease;
+  min-height: calc(100vh - 32px);
+  padding-bottom: 32px;
 }
 
 /* Toolbar superior del visor (Estilo original del libro) */
@@ -1416,10 +1514,11 @@ footer {
   padding: 8px 32px;
   border-bottom: 4px solid var(--current-stage-color, var(--panel-border));
   box-shadow: 0 10px 20px -10px var(--current-stage-color, rgba(0, 0, 0, 0.1));
-  background-color: var(--panel-bg);
+  background-color: var(--current-stage-bg, var(--panel-bg));
   backdrop-filter: blur(8px);
   width: 100%;
   box-sizing: border-box;
+  transition: background-color 0.3s ease;
 }
 
 .canto-header-left {
@@ -1719,6 +1818,12 @@ footer {
   opacity: 1;
 }
 
+/* Evitar que se corten los acordes y que haya separación excesiva en los bloques de la asamblea */
+.collapsible-block-container .collapsible-content {
+  overflow: visible;
+  margin-top: 0;
+}
+
 .stage-colors-customizer.collapsed .collapsible-content {
   max-height: 0;
   opacity: 0;
@@ -1787,6 +1892,10 @@ footer {
 
 .color-picker-label-btn:hover {
   transform: scale(1.15);
+}
+
+.color-picker-label-btn.color-picker-square {
+  border-radius: 4px; /* Cuadrado con bordes levemente redondeados */
 }
 
 .color-picker-label-btn.active {

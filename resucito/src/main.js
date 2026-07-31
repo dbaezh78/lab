@@ -1,6 +1,17 @@
 import { registerServiceWorker } from './pwa.js';
 import { searchSongs } from './search.js';
 import { transposeNote, normalizeChord, CHROMATIC_SCALE } from './chords.js';
+import { onAuthStateChanged, loginMock, logoutMock, isCurrentUserAdmin, getCurrentUser } from './auth.js';
+import { 
+  guardarTonoEnNube, 
+  cargarTonoDesdeNube, 
+  guardarNotaEnNube, 
+  cargarNotaDesdeNube, 
+  guardarPosicionesEnNube, 
+  cargarPosicionesDesdeNube, 
+  publicarPosicionesGlobales, 
+  cargarPosicionesGlobales 
+} from './sync.js';
 
 // --- Estado Global de la SPA ---
 let allSongs = [];
@@ -17,6 +28,9 @@ let allAsambleaExpanded = true;
 let currentBook = 'resucito';
 let favorites = new Set();
 let catequesisData = null;
+let defaultChordPositions = {};
+let isChordEditMode = false;
+let isAdmin = false; // TODO: Conectar con el sistema de usuarios. Cambiar a true para pruebas locales de administrador.
 
 // Referencias del DOM
 const dashboardView = document.getElementById('dashboard-view');
@@ -96,12 +110,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Cargar preferencias guardadas
   initPreferences();
   
-  // Cargar índice de canciones
+  // Cargar índice de canciones y posiciones de acordes
   try {
-    const response = await fetch('data/songs-index.json');
-    allSongs = await response.json();
+    const [indexRes, posRes] = await Promise.all([
+      fetch('data/songs-index.json'),
+      fetch('data/chord_positions.json').catch(e => {
+        console.warn('No se pudo precargar chord_positions.json, se cargará bajo demanda.', e);
+        return null;
+      })
+    ]);
+    allSongs = await indexRes.json();
     filteredSongs = [...allSongs];
     renderSongsList(filteredSongs);
+    
+    if (posRes && posRes.ok) {
+      defaultChordPositions = await posRes.json();
+    }
   } catch (error) {
     console.error('Error al cargar la base de datos de canciones:', error);
     songsGrid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: red;">Error al cargar cantos. Comprueba la conexión o intenta recargar.</div>`;
@@ -130,6 +154,57 @@ function routeSPA() {
     songViewerView.style.display = 'none';
     dashboardView.style.display = 'flex';
     document.title = "RESUCITÓ - Cantos Neocatecumenales";
+  }
+}
+
+async function sincronizarCantoDesdeFirebase(songId) {
+  // 1. Cargar posiciones globales oficiales de acordes si existen en Firestore
+  try {
+    const globalPos = await cargarPosicionesGlobales(songId);
+    if (globalPos && (globalPos.lizq.length > 0 || globalPos.lder.length > 0)) {
+      if (!defaultChordPositions) defaultChordPositions = {};
+      defaultChordPositions[songId] = globalPos;
+      console.log(`📥 [Firebase] Posiciones globales aplicadas para el canto: ${songId}`);
+    }
+  } catch (e) {
+    console.error("Error al sincronizar posiciones globales:", e);
+  }
+
+  // 2. Si el usuario está autenticado, descargar sus datos personales
+  const user = getCurrentUser();
+  if (user) {
+    // 2a. Descargar transportación
+    try {
+      const offset = await cargarTonoDesdeNube(songId, originalSongKey);
+      if (offset !== null) {
+        currentKeyOffset = offset;
+        console.log(`📥 [Firebase] Transportación cargada de la nube: offset = ${offset}`);
+      }
+    } catch (e) {
+      console.error("Error al sincronizar tono desde la nube:", e);
+    }
+    
+    // 2b. Descargar nota del cantor
+    try {
+      const nota = await cargarNotaDesdeNube(songId);
+      if (nota !== null) {
+        localStorage.setItem(`notes_${songId}`, nota);
+        console.log("📥 [Firebase] Nota del cantor cargada de la nube.");
+      }
+    } catch (e) {
+      console.error("Error al sincronizar nota del cantor desde la nube:", e);
+    }
+    
+    // 2c. Descargar posiciones personalizadas
+    try {
+      const personalPos = await cargarPosicionesDesdeNube(songId);
+      if (personalPos && (personalPos.lizq.length > 0 || personalPos.lder.length > 0)) {
+        localStorage.setItem(`custom-positions-${songId}`, JSON.stringify(personalPos));
+        console.log("📥 [Firebase] Posiciones personalizadas cargadas de la nube.");
+      }
+    } catch (e) {
+      console.error("Error al sincronizar posiciones personalizadas desde la nube:", e);
+    }
   }
 }
 
@@ -166,6 +241,16 @@ async function loadSongView(songId) {
     // Asignar el color de etapa actual a nivel de body para la cabecera y el sombreado
     const stageColor = getStageColor(currentCanto.catCanto || currentCanto.stage);
     document.body.style.setProperty('--current-stage-color', stageColor);
+    
+    // Asignar el fondo de etapa actual a nivel de body
+    const cleanStage = (currentCanto.catCanto || currentCanto.stage || '').toLowerCase();
+    let stageKey = 'pre';
+    if (cleanStage.includes('pre')) stageKey = 'pre';
+    else if (cleanStage.includes('cate')) stageKey = 'cate';
+    else if (cleanStage.includes('ele')) stageKey = 'ele';
+    else if (cleanStage.includes('lit')) stageKey = 'lit';
+    else if (cleanStage.includes('cat') || cleanStage.includes('can') || cleanStage.includes('ot')) stageKey = 'cat';
+    document.body.style.setProperty('--current-stage-bg', `var(--stage-bg-${stageKey})`);
     
     // Actualizar estado activo en las tarjetas del índice
     document.querySelectorAll('.song-card').forEach(card => {
@@ -248,8 +333,16 @@ async function loadSongView(songId) {
       viewerAudioContainer.style.display = 'none';
     }
     
-    // Renderizar letras y acordes
+    // Renderizar letras y acordes locales primero para máxima velocidad
     renderSongContent();
+    
+    // Descarga asíncrona de configuraciones desde Firebase en segundo plano
+    sincronizarCantoDesdeFirebase(songId).then(() => {
+      // Si la descarga actualizó algo, re-renderizamos para reflejar los cambios
+      updateTransposeBadge();
+      notesTextarea.value = localStorage.getItem(`notes_${songId}`) || '';
+      renderSongContent();
+    });
     
     // Mostrar visor
     dashboardView.style.display = 'none';
@@ -281,35 +374,38 @@ function renderSongContent() {
   
   // Renderizar lado izquierdo
   if (currentCanto.lizq) {
-    renderSection(cantoLeftCol, currentCanto.lizq);
+    renderSection(cantoLeftCol, currentCanto.lizq, 'lizq');
   }
   
   // Renderizar lado derecho
   if (currentCanto.lder && currentCanto.lder.length > 0) {
     cantoRightCol.style.display = '';
-    renderSection(cantoRightCol, currentCanto.lder);
+    renderSection(cantoRightCol, currentCanto.lder, 'lder');
   } else {
     // Si no hay lado derecho, ocultarlo para pantallas grandes
     cantoRightCol.style.display = 'none';
   }
 }
 
-function renderSection(container, lines) {
-  lines.forEach(item => {
+function renderSection(container, lines, side) {
+  lines.forEach((item, lineIdx) => {
     if (item.type === "collapsible-block") {
       // Bloque colapsable (Asamblea)
       const containerDiv = document.createElement('div');
       containerDiv.className = 'collapsible-block-container';
       containerDiv.dataset.blockId = item.id;
       
-      const triggerLine = renderLine(item.triggerLine);
+      const linesWrapper = document.createElement('div');
+      linesWrapper.className = 'collapsible-lines-wrapper';
+      
+      const triggerLine = renderLine(item.triggerLine, side, lineIdx, -1);
       triggerLine.classList.add('collapsible-trigger');
       
       const contentDiv = document.createElement('div');
       contentDiv.className = 'collapsible-content';
       
-      item.lines.forEach(subLine => {
-        contentDiv.appendChild(renderLine(subLine));
+      item.lines.forEach((subLine, subLineIdx) => {
+        contentDiv.appendChild(renderLine(subLine, side, lineIdx, subLineIdx));
       });
       
       // Manejar estado inicial de colapso
@@ -334,8 +430,25 @@ function renderSection(container, lines) {
         }
       });
       
-      containerDiv.appendChild(triggerLine);
-      containerDiv.appendChild(contentDiv);
+      linesWrapper.appendChild(triggerLine);
+      linesWrapper.appendChild(contentDiv);
+      containerDiv.appendChild(linesWrapper);
+      
+      // Agregar indicador lateral "BIS A." a la derecha
+      const bisSide = document.createElement('div');
+      bisSide.className = 'collapsible-bis-side';
+      
+      const bisLine = document.createElement('div');
+      bisLine.className = 'bis-line';
+      
+      const bisText = document.createElement('div');
+      bisText.className = 'bis-text';
+      bisText.textContent = 'BIS A.';
+      
+      bisSide.appendChild(bisLine);
+      bisSide.appendChild(bisText);
+      containerDiv.appendChild(bisSide);
+      
       container.appendChild(containerDiv);
     } else if (item.img) {
       // Entrada de imagen (Diagramas, partituras)
@@ -348,12 +461,12 @@ function renderSection(container, lines) {
       container.appendChild(imgLineDiv);
     } else {
       // Línea de canto normal
-      container.appendChild(renderLine(item));
+      container.appendChild(renderLine(item, side, lineIdx));
     }
   });
 }
 
-function renderLine(lineItem) {
+function renderLine(lineItem, side, lineIdx, subLineIdx) {
   const lineDiv = document.createElement('div');
   lineDiv.className = 'linea-canto';
   
@@ -385,8 +498,8 @@ function renderLine(lineItem) {
     cleanLetra = trimmed.substring(1, trimmed.length - 1);
   }
   
-  // Coleccionar acordes
-  const matches = [];
+  // Coleccionar acordes de base
+  const baseChords = [];
   if (firstParenIndex !== -1) {
     const chordsString = content.substring(firstParenIndex);
     const noteMatches = chordsString.match(/\(([^)]+)\)/g);
@@ -397,21 +510,14 @@ function renderLine(lineItem) {
         const noteType = parts[1] ? parts[1].trim() : '';
         const rawPosition = parseFloat(parts[2]) || 0;
         if (noteName) {
-          let pos = Math.round(rawPosition);
-          // Corregir escala mixta (algunos índices vienen multiplicados por 10 en la base de datos)
-          if (cleanLetra.length > 0 && pos >= cleanLetra.length) {
-            const scaled = Math.round(pos / 10);
-            if (scaled < cleanLetra.length) {
-              pos = scaled;
-            } else {
-              pos = cleanLetra.length - 1; // Forzar al último carácter para que no se desborde
-            }
-          }
-          matches.push({ noteName, noteType, position: pos });
+          baseChords.push({ name: noteName, type: noteType, originalPos: Math.round(rawPosition) });
         }
       });
     }
   }
+  
+  // Resolver las posiciones reales (custom de usuario, default de JSON o escala mixta)
+  const matches = resolveChordPositions(side, lineIdx, subLineIdx, baseChords, cleanLetra);
   
   // Si no hay acordes, renderizar simple
   if (matches.length === 0) {
@@ -423,6 +529,49 @@ function renderLine(lineItem) {
     return lineDiv;
   }
   
+  // RENDERIZADO MODO EDICIÓN (ARRASTRAR CON RATÓN / TOUCH)
+  if (isChordEditMode) {
+    lineDiv.style.position = 'relative';
+    
+    const charSpans = [];
+    const textToRender = cleanLetra.length > 0 ? cleanLetra : ' ';
+    
+    for (let i = 0; i < textToRender.length; i++) {
+      const charSpan = document.createElement('span');
+      charSpan.className = 'char-pos';
+      charSpan.dataset.idx = i;
+      charSpan.textContent = textToRender[i];
+      if (textColor) charSpan.style.color = textColor;
+      lineDiv.appendChild(charSpan);
+      charSpans.push(charSpan);
+    }
+    
+    matches.forEach((match, matchIdx) => {
+      const chordSpan = document.createElement('span');
+      chordSpan.className = 'nota-posicionada edit-mode-active';
+      chordSpan.dataset.originalNote = match.noteName;
+      chordSpan.dataset.noteType = match.noteType;
+      
+      const transposedNote = transposeNote(match.noteName, currentKeyOffset);
+      chordSpan.textContent = transposedNote + (match.noteType ? ' ' : '') + match.noteType;
+      
+      // Posicionar inicialmente encima del caracter correspondiente
+      const pos = Math.min(match.position, charSpans.length - 1);
+      const targetChar = charSpans[pos];
+      if (targetChar) {
+        requestAnimationFrame(() => {
+          chordSpan.style.left = targetChar.offsetLeft + 'px';
+        });
+      }
+      
+      setupChordDrag(chordSpan, side, lineIdx, subLineIdx, matchIdx, charSpans, lineDiv);
+      lineDiv.appendChild(chordSpan);
+    });
+    
+    return lineDiv;
+  }
+  
+  // RENDERIZADO MODO NORMAL (ESTÁNDAR)
   // Ordenar acordes por posición
   matches.sort((a, b) => a.position - b.position);
   
@@ -476,6 +625,252 @@ function renderLine(lineItem) {
   return lineDiv;
 }
 
+function resolveChordPositions(side, lineIdx, subLineIdx, baseChords, cleanLetra) {
+  if (!currentCanto || !side) return baseChords.map(c => ({
+    noteName: c.name,
+    noteType: c.type,
+    position: c.originalPos
+  }));
+
+  const customKey = `custom-positions-${currentCanto.id}`;
+  const customStore = localStorage.getItem(customKey);
+  let customPositions = null;
+  if (customStore) {
+    try {
+      customPositions = JSON.parse(customStore);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  const getLinePositions = (db) => {
+    if (!db || !db[side]) return null;
+    const item = db[side][lineIdx];
+    if (!item) return null;
+    if (subLineIdx !== undefined && subLineIdx >= 0) {
+      if (item.type === 'collapsible-block' && item.lines) {
+        return item.lines[subLineIdx];
+      }
+      return null;
+    } else {
+      if (item.type === 'collapsible-block') {
+        return item.triggerLine;
+      }
+      return item;
+    }
+  };
+
+  let savedLineChords = null;
+  if (customPositions) {
+    savedLineChords = getLinePositions(customPositions);
+  }
+  if (!savedLineChords && defaultChordPositions) {
+    savedLineChords = getLinePositions(defaultChordPositions[currentCanto.id]);
+  }
+
+  return baseChords.map((chord, chordIdx) => {
+    let pos = chord.originalPos;
+    if (savedLineChords && savedLineChords[chordIdx] !== undefined) {
+      pos = savedLineChords[chordIdx].pos;
+    } else {
+      if (cleanLetra.length > 0 && pos >= cleanLetra.length) {
+        const scaled = Math.round(pos / 10);
+        if (scaled < cleanLetra.length) {
+          pos = scaled;
+        } else {
+          pos = cleanLetra.length - 1;
+        }
+      }
+    }
+    if (cleanLetra.length > 0) {
+      pos = Math.max(0, Math.min(pos, cleanLetra.length - 1));
+    }
+    return {
+      noteName: chord.name,
+      noteType: chord.type,
+      position: pos
+    };
+  });
+}
+
+function setupChordDrag(chordSpan, side, lineIdx, subLineIdx, chordIdx, charSpans, lineDiv) {
+  let isDragging = false;
+  let currentTempPos = -1;
+
+  chordSpan.addEventListener('pointerdown', (e) => {
+    isDragging = true;
+    chordSpan.setPointerCapture(e.pointerId);
+    chordSpan.classList.add('dragging');
+    e.preventDefault();
+  });
+
+  chordSpan.addEventListener('pointermove', (e) => {
+    if (!isDragging) return;
+    
+    // Buscar el caracter más cercano usando cálculo de distancia euclídea 2D
+    let closestCharSpan = null;
+    let minDistance = Infinity;
+    
+    charSpans.forEach(charSpan => {
+      const charRect = charSpan.getBoundingClientRect();
+      const charCenterX = charRect.left + charRect.width / 2;
+      const charCenterY = charRect.top + charRect.height / 2;
+      
+      const dist = Math.hypot(e.clientX - charCenterX, e.clientY - charCenterY);
+      if (dist < minDistance) {
+        minDistance = dist;
+        closestCharSpan = charSpan;
+      }
+    });
+    
+    if (closestCharSpan) {
+      currentTempPos = parseInt(closestCharSpan.dataset.idx);
+      // Alinear el acorde de manera magnética y exacta con el inicio del carácter más cercano (evitando desplazamientos inesperados)
+      chordSpan.style.left = closestCharSpan.offsetLeft + 'px';
+    }
+  });
+
+  chordSpan.addEventListener('pointerup', (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    chordSpan.releasePointerCapture(e.pointerId);
+    chordSpan.classList.remove('dragging');
+    
+    if (currentTempPos !== -1) {
+      saveChordPosition(side, lineIdx, subLineIdx, chordIdx, currentTempPos);
+    } else {
+      renderSongContent();
+    }
+  });
+}
+
+function saveChordPosition(side, lineIdx, subLineIdx, chordIdx, newPos) {
+  if (!currentCanto) return;
+  const songId = currentCanto.id;
+  const customKey = `custom-positions-${songId}`;
+  
+  let customPositions = localStorage.getItem(customKey);
+  if (customPositions) {
+    customPositions = JSON.parse(customPositions);
+  } else {
+    const baseDb = defaultChordPositions && defaultChordPositions[songId] ? defaultChordPositions[songId] : null;
+    customPositions = {
+      lizq: baseDb && baseDb.lizq ? JSON.parse(JSON.stringify(baseDb.lizq)) : extractCurrentSongChords(currentCanto.lizq, 'lizq'),
+      lder: baseDb && baseDb.lder ? JSON.parse(JSON.stringify(baseDb.lder)) : extractCurrentSongChords(currentCanto.lder, 'lder')
+    };
+  }
+  
+  const getLine = (db) => {
+    if (!db || !db[side]) return null;
+    const item = db[side][lineIdx];
+    if (!item) return null;
+    if (subLineIdx !== undefined && subLineIdx >= 0) {
+      if (item.type === 'collapsible-block' && item.lines) {
+        return item.lines[subLineIdx];
+      }
+      return null;
+    } else {
+      if (item.type === 'collapsible-block') {
+        return item.triggerLine;
+      }
+      return item;
+    }
+  };
+
+  const lineChords = getLine(customPositions);
+  if (lineChords && lineChords[chordIdx]) {
+    lineChords[chordIdx].pos = newPos;
+    localStorage.setItem(customKey, JSON.stringify(customPositions));
+    renderSongContent();
+  }
+}
+
+function extractCurrentSongChords(section, side) {
+  if (!section) return [];
+  return section.map((item, lineIdx) => {
+    if (item.type === 'collapsible-block') {
+      return {
+        type: 'collapsible-block',
+        id: item.id,
+        triggerLine: extractChordsFromLineItem(item.triggerLine, side, lineIdx, -1),
+        lines: item.lines.map((line, subLineIdx) => extractChordsFromLineItem(line, side, lineIdx, subLineIdx))
+      };
+    } else {
+      return extractChordsFromLineItem(item, side, lineIdx);
+    }
+  });
+}
+
+function extractChordsFromLineItem(lineItem, side, lineIdx, subLineIdx) {
+  if (!lineItem) return [];
+  const content = typeof lineItem === 'string' ? lineItem : (lineItem.line || '');
+  const firstParenIndex = content.indexOf('(');
+  let cleanLetra = firstParenIndex !== -1 ? content.substring(0, firstParenIndex) : content;
+  if (cleanLetra.endsWith(' ')) cleanLetra = cleanLetra.replace(/\s+$/, '');
+  if (cleanLetra.endsWith(',')) cleanLetra = cleanLetra.substring(0, cleanLetra.length - 1);
+  if (cleanLetra.trim().startsWith('"') && cleanLetra.trim().endsWith('"')) {
+    const trimmed = cleanLetra.trim();
+    cleanLetra = trimmed.substring(1, trimmed.length - 1);
+  }
+
+  const chords = [];
+  if (firstParenIndex !== -1) {
+    const chordsString = content.substring(firstParenIndex);
+    const noteMatches = chordsString.match(/\(([^)]+)\)/g);
+    if (noteMatches) {
+      noteMatches.forEach(noteBlock => {
+        const parts = noteBlock.substring(1, noteBlock.length - 1).split(',');
+        const noteName = parts[0] ? parts[0].trim() : '';
+        const noteType = parts[1] ? parts[1].trim() : '';
+        const rawPosition = parseFloat(parts[2]) || 0;
+        if (noteName) {
+          let pos = Math.round(rawPosition);
+          if (cleanLetra.length > 0 && pos >= cleanLetra.length) {
+            const scaled = Math.round(pos / 10);
+            if (scaled < cleanLetra.length) {
+              pos = scaled;
+            } else {
+              pos = cleanLetra.length - 1;
+            }
+          }
+          chords.push({ name: noteName, type: noteType, pos: pos });
+        }
+      });
+    }
+  }
+  return chords;
+}
+
+function getCleanLyrics(side, lineIdx, subLineIdx) {
+  if (!currentCanto) return '';
+  const section = currentCanto[side];
+  if (!section) return '';
+  const item = section[lineIdx];
+  if (!item) return '';
+  
+  let lineItem = item;
+  if (subLineIdx !== undefined && subLineIdx >= 0) {
+    if (item.type === 'collapsible-block' && item.lines) {
+      lineItem = item.lines[subLineIdx];
+    } else {
+      return '';
+    }
+  } else if (item.type === 'collapsible-block') {
+    lineItem = item.triggerLine;
+  }
+  
+  const content = typeof lineItem === 'string' ? lineItem : (lineItem.line || '');
+  const firstParenIndex = content.indexOf('(');
+  let cleanLetra = firstParenIndex !== -1 ? content.substring(0, firstParenIndex) : content;
+  if (cleanLetra.endsWith(' ')) cleanLetra = cleanLetra.replace(/\s+$/, '');
+  if (cleanLetra.endsWith(',')) cleanLetra = cleanLetra.substring(0, cleanLetra.length - 1);
+  if (cleanLetra.trim().startsWith('"') && cleanLetra.trim().endsWith('"')) {
+    const trimmed = cleanLetra.trim();
+    cleanLetra = trimmed.substring(1, trimmed.length - 1);
+  }
+  return cleanLetra;
+}
+
 // --- Transposición cromática ---
 function updateTransposeBadge() {
   const transposedKey = transposeNote(originalSongKey, currentKeyOffset);
@@ -493,6 +888,11 @@ function shiftKey(semitones) {
     const transposedNote = transposeNote(originalNote, currentKeyOffset);
     span.textContent = transposedNote + (noteType ? ' ' : '') + noteType;
   });
+  
+  if (currentCanto) {
+    const transposedKey = transposeNote(originalSongKey, currentKeyOffset);
+    guardarTonoEnNube(currentCanto.id, transposedKey);
+  }
 }
 
 // --- Diagramas de Acordes ---
@@ -994,9 +1394,18 @@ function setupEventListeners() {
   });
   
   // Guardado de notas del cantor
+  let notesSaveTimeout;
   notesTextarea.addEventListener('input', () => {
     if (currentCanto) {
-      localStorage.setItem(`notes_${currentCanto.id}`, notesTextarea.value);
+      const songId = currentCanto.id;
+      const val = notesTextarea.value;
+      localStorage.setItem(`notes_${songId}`, val);
+      
+      // Sincronizar con Firebase de forma debounced
+      clearTimeout(notesSaveTimeout);
+      notesSaveTimeout = setTimeout(() => {
+        guardarNotaEnNube(songId, val);
+      }, 1000);
     }
   });
   
@@ -1083,8 +1492,10 @@ function setupEventListeners() {
       });
       const themePanel = document.getElementById('settings-panel-theme');
       const generalPanel = document.getElementById('settings-panel-general');
+      const accountPanel = document.getElementById('settings-panel-account');
       if (themePanel) themePanel.style.display = 'block';
       if (generalPanel) generalPanel.style.display = 'none';
+      if (accountPanel) accountPanel.style.display = 'none';
 
       settingsModal.style.display = 'flex';
     });
@@ -1100,14 +1511,21 @@ function setupEventListeners() {
       const tab = btn.dataset.tab;
       const themePanel = document.getElementById('settings-panel-theme');
       const generalPanel = document.getElementById('settings-panel-general');
+      const accountPanel = document.getElementById('settings-panel-account');
       
-      if (themePanel && generalPanel) {
+      if (themePanel && generalPanel && accountPanel) {
         if (tab === 'theme') {
           themePanel.style.display = 'block';
           generalPanel.style.display = 'none';
-        } else {
+          accountPanel.style.display = 'none';
+        } else if (tab === 'general') {
           themePanel.style.display = 'none';
           generalPanel.style.display = 'block';
+          accountPanel.style.display = 'none';
+        } else if (tab === 'account') {
+          themePanel.style.display = 'none';
+          generalPanel.style.display = 'none';
+          accountPanel.style.display = 'block';
         }
       }
     });
@@ -1190,14 +1608,18 @@ function setupEventListeners() {
         localStorage.removeItem(`book-theme-bg-${suffix}`);
         localStorage.removeItem(`book-theme-accent-${suffix}`);
         localStorage.removeItem(`book-theme-text-${suffix}`);
+        localStorage.removeItem(`book-theme-chord-${suffix}`);
+        localStorage.removeItem(`book-theme-chord-alt-${suffix}`);
       });
       // Limpiar claves heredadas antiguas
       localStorage.removeItem('book-theme-bg');
       localStorage.removeItem('book-theme-accent');
       localStorage.removeItem('book-theme-text');
+      localStorage.removeItem('book-theme-chord');
+      localStorage.removeItem('book-theme-chord-alt');
       
       // Limpiar inline style overrides de body y documentElement para forzar recálculo
-      const props = ['--bg-color', '--accent-color', '--text-color', '--accent-glow'];
+      const props = ['--bg-color', '--accent-color', '--text-color', '--accent-glow', '--chord-color', '--chord-color-alt'];
       props.forEach(p => {
         document.body.style.removeProperty(p);
         document.documentElement.style.removeProperty(p);
@@ -1221,6 +1643,115 @@ function setupEventListeners() {
   exportNotesBtn.addEventListener('click', exportNotes);
   importNotesBtn.addEventListener('click', importNotes);
   
+  // Control de Edición de Acordes
+  const toggleChordEditBtn = document.getElementById('toggle-chord-edit-btn');
+  const saveChordPositionsBtn = document.getElementById('save-chord-positions-btn');
+  if (toggleChordEditBtn) {
+    toggleChordEditBtn.addEventListener('click', () => {
+      if (!isAdmin) {
+        alert('Acceso denegado: Se requieren privilegios de Administrador para editar acordes.');
+        return;
+      }
+      isChordEditMode = !isChordEditMode;
+      toggleChordEditBtn.textContent = isChordEditMode ? 'Edición Activa' : 'Bloqueados';
+      toggleChordEditBtn.classList.toggle('active', isChordEditMode);
+      if (saveChordPositionsBtn) {
+        saveChordPositionsBtn.style.display = isChordEditMode ? 'block' : 'none';
+      }
+      renderSongContent(); // Re-renderizar para activar/desactivar controles en acordes
+    });
+  }
+
+  if (saveChordPositionsBtn) {
+    saveChordPositionsBtn.addEventListener('click', async () => {
+      if (!isAdmin) {
+        alert('Acceso denegado: Se requieren privilegios de Administrador.');
+        return;
+      }
+      if (!currentCanto) return;
+      const songId = currentCanto.id;
+      const customKey = `custom-positions-${songId}`;
+      const customStore = localStorage.getItem(customKey);
+      
+      if (!customStore) {
+        alert('No hay cambios de posición pendientes para guardar en este canto.');
+        return;
+      }
+      
+      try {
+        const parsed = JSON.parse(customStore);
+        saveChordPositionsBtn.disabled = true;
+        saveChordPositionsBtn.textContent = 'Guardando...';
+        
+        let localSaved = false;
+        
+        // 1. Intentar guardado local en el archivo físico (Entorno de desarrollo)
+        try {
+          const response = await fetch('/api/save-positions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              songId: songId,
+              lizq: parsed.lizq,
+              lder: parsed.lder
+            })
+          });
+          if (response.ok) {
+            localSaved = true;
+            console.log("💾 Guardado local en JSON exitoso.");
+          }
+        } catch (e) {
+          console.warn("⚠️ Servidor local no disponible o producción. Guardando solo en Firebase Firestore.");
+        }
+        
+        // 2. Guardar en Firebase Firestore (Posiciones globales de administrador)
+        await publicarPosicionesGlobales(songId, parsed);
+        
+        // Actualizar base de datos en memoria y limpiar localStorage
+        if (!defaultChordPositions) defaultChordPositions = {};
+        defaultChordPositions[songId] = { lizq: parsed.lizq, lder: parsed.lder };
+        localStorage.removeItem(customKey);
+        
+        if (localSaved) {
+          alert('¡Posiciones guardadas en el archivo local y publicadas en Firebase Firestore!');
+        } else {
+          alert('¡Posiciones publicadas con éxito en Firebase Firestore!');
+        }
+      } catch (err) {
+        console.error('Error al guardar posiciones:', err);
+        alert('Error al intentar guardar las posiciones en la base de datos.');
+      } finally {
+        saveChordPositionsBtn.disabled = false;
+        saveChordPositionsBtn.textContent = 'Guardar en Archivo';
+      }
+    });
+  }
+
+  // Ancho máximo del cancionero (.app-container)
+  const widthSlider = document.getElementById('app-width-slider');
+  const widthBadge = document.getElementById('app-width-badge');
+  const widthDefaultBtn = document.getElementById('app-width-default-btn');
+  
+  if (widthSlider) {
+    widthSlider.addEventListener('input', (e) => {
+      const val = e.target.value;
+      if (widthBadge) widthBadge.textContent = val + 'px';
+      document.documentElement.style.setProperty('--app-max-width', val + 'px');
+      localStorage.setItem('app-max-width', val);
+    });
+  }
+  
+  if (widthDefaultBtn) {
+    widthDefaultBtn.addEventListener('click', () => {
+      if (widthSlider) widthSlider.value = 1200;
+      if (widthBadge) widthBadge.textContent = '1200px';
+      document.documentElement.style.setProperty('--app-max-width', '1200px');
+      localStorage.setItem('app-max-width', '1200');
+    });
+  }
+  
   // Cerrar con Escape
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
@@ -1236,6 +1767,80 @@ function setupEventListeners() {
     resizeTimeout = setTimeout(() => {
       if (currentCanto) renderSongContent();
     }, 150);
+  });
+
+  // --- Autenticación y Cuenta de Usuario ---
+  const authLoginBtn = document.getElementById('auth-login-btn');
+  const authLogoutBtn = document.getElementById('auth-logout-btn');
+  if (authLoginBtn) {
+    authLoginBtn.addEventListener('click', async () => {
+      try {
+        authLoginBtn.disabled = true;
+        authLoginBtn.textContent = 'Conectando...';
+        await loginMock();
+      } catch (err) {
+        alert('Error al iniciar sesión: ' + err.message);
+        authLoginBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" width="18" height="18" style="background: white; border-radius: 50%; padding: 2px;">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+          </svg>
+          Iniciar Sesión con Google
+        `;
+      } finally {
+        authLoginBtn.disabled = false;
+      }
+    });
+  }
+
+  if (authLogoutBtn) {
+    authLogoutBtn.addEventListener('click', () => {
+      logoutMock();
+    });
+  }
+
+  // Escuchar cambios de autenticación
+  onAuthStateChanged((user) => {
+    isAdmin = isCurrentUserAdmin();
+    
+    const authUnauthenticated = document.getElementById('auth-unauthenticated');
+    const authAuthenticated = document.getElementById('auth-authenticated');
+    const authUserEmail = document.getElementById('auth-user-email');
+    const authAdminBadge = document.getElementById('auth-admin-badge');
+    const authRegularBadge = document.getElementById('auth-regular-badge');
+    const chordEditSettingRow = document.getElementById('chord-edit-setting-row');
+    const toggleChordEditBtn = document.getElementById('toggle-chord-edit-btn');
+    const saveChordPositionsBtn = document.getElementById('save-chord-positions-btn');
+    
+    if (user) {
+      if (authUnauthenticated) authUnauthenticated.style.display = 'none';
+      if (authAuthenticated) authAuthenticated.style.display = 'block';
+      if (authUserEmail) authUserEmail.textContent = user.email;
+      
+      const isAdm = isCurrentUserAdmin();
+      if (authAdminBadge) authAdminBadge.style.display = isAdm ? 'inline-flex' : 'none';
+      if (authRegularBadge) authRegularBadge.style.display = isAdm ? 'none' : 'inline-flex';
+      if (chordEditSettingRow) chordEditSettingRow.style.display = isAdm ? 'flex' : 'none';
+    } else {
+      if (authUnauthenticated) authUnauthenticated.style.display = 'block';
+      if (authAuthenticated) authAuthenticated.style.display = 'none';
+      if (chordEditSettingRow) chordEditSettingRow.style.display = 'none';
+      
+      // Desactivar modo edición si el usuario cierra sesión
+      if (isChordEditMode) {
+        isChordEditMode = false;
+        if (toggleChordEditBtn) {
+          toggleChordEditBtn.textContent = 'Bloqueados';
+          toggleChordEditBtn.classList.remove('active');
+        }
+        if (saveChordPositionsBtn) {
+          saveChordPositionsBtn.style.display = 'none';
+        }
+        renderSongContent();
+      }
+    }
   });
 }
 
@@ -1275,6 +1880,20 @@ function initPreferences() {
   // Inicializar colores personalizados de etapas y tema del libro
   applyStageColors();
   applyBookTheme();
+
+  // Inicializar ancho de página
+  const savedWidth = localStorage.getItem('app-max-width') || '1200';
+  document.documentElement.style.setProperty('--app-max-width', savedWidth + 'px');
+  const widthSlider = document.getElementById('app-width-slider');
+  const widthBadge = document.getElementById('app-width-badge');
+  if (widthSlider) widthSlider.value = savedWidth;
+  if (widthBadge) widthBadge.textContent = savedWidth + 'px';
+
+  // Ocultar opción de edición de acordes si no es administrador (para futura autenticación)
+  const chordEditSettingRow = document.getElementById('chord-edit-setting-row');
+  if (chordEditSettingRow) {
+    chordEditSettingRow.style.display = isAdmin ? 'flex' : 'none';
+  }
 }
 
 function applyStageColors() {
@@ -1392,6 +2011,8 @@ function applyBookTheme() {
   const customBg = localStorage.getItem('book-theme-bg-' + suffix);
   const customAccent = localStorage.getItem('book-theme-accent-' + suffix);
   const customText = localStorage.getItem('book-theme-text-' + suffix);
+  const customChord = localStorage.getItem('book-theme-chord-' + suffix);
+  const customChordAlt = localStorage.getItem('book-theme-chord-alt-' + suffix);
   
   if (customBg) {
     document.body.style.setProperty('--bg-color', customBg);
@@ -1421,17 +2042,33 @@ function applyBookTheme() {
   } else {
     document.body.style.removeProperty('--text-color');
   }
+
+  if (customChord) {
+    document.body.style.setProperty('--chord-color', customChord);
+  } else {
+    document.body.style.removeProperty('--chord-color');
+  }
+
+  if (customChordAlt) {
+    document.body.style.setProperty('--chord-color-alt', customChordAlt);
+  } else {
+    document.body.style.removeProperty('--chord-color-alt');
+  }
   
   // Actualizar los inputs en el customizer de tema del libro
   const bgInput = document.querySelector('.book-theme-input[data-type="bg"]');
   const accentInput = document.querySelector('.book-theme-input[data-type="accent"]');
   const textInput = document.querySelector('.book-theme-input[data-type="text"]');
+  const chordInput = document.querySelector('.book-theme-input[data-type="chord"]');
+  const chordAltInput = document.querySelector('.book-theme-input[data-type="chord-alt"]');
   
   requestAnimationFrame(() => {
     const computedStyle = getComputedStyle(document.body);
     const currentBg = computedStyle.getPropertyValue('--bg-color').trim();
     const currentAccent = computedStyle.getPropertyValue('--accent-color').trim();
     const currentText = computedStyle.getPropertyValue('--text-color').trim();
+    const currentChord = computedStyle.getPropertyValue('--chord-color').trim();
+    const currentChordAlt = computedStyle.getPropertyValue('--chord-color-alt').trim();
     
     if (bgInput) {
       const hex = formatColorToHex(currentBg) || '#0a0a0a';
@@ -1465,6 +2102,34 @@ function applyBookTheme() {
       const hex = formatColorToHex(currentText) || '#ffffff';
       textInput.value = hex;
       const preview = textInput.closest('.btn-pill-preview');
+      if (preview) {
+        preview.style.backgroundColor = hex;
+        const icon = preview.querySelector('span');
+        if (icon) {
+          const isLight = /ffeb3b|ffffff|eeeeee|fafafa|fff9c4|f0f4c3/i.test(hex.replace('#',''));
+          icon.style.color = isLight ? '#212529' : '#ffffff';
+        }
+      }
+    }
+
+    if (chordInput) {
+      const hex = formatColorToHex(currentChord) || '#d01212';
+      chordInput.value = hex;
+      const preview = chordInput.closest('.btn-pill-preview');
+      if (preview) {
+        preview.style.backgroundColor = hex;
+        const icon = preview.querySelector('span');
+        if (icon) {
+          const isLight = /ffeb3b|ffffff|eeeeee|fafafa|fff9c4|f0f4c3/i.test(hex.replace('#',''));
+          icon.style.color = isLight ? '#212529' : '#ffffff';
+        }
+      }
+    }
+
+    if (chordAltInput) {
+      const hex = formatColorToHex(currentChordAlt) || '#944c18';
+      chordAltInput.value = hex;
+      const preview = chordAltInput.closest('.btn-pill-preview');
       if (preview) {
         preview.style.backgroundColor = hex;
         const icon = preview.querySelector('span');

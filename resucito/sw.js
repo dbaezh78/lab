@@ -1,5 +1,5 @@
 // sw.js - Service Worker para el cancionero Resucito
-const CACHE_NAME = 'resucito-cache-v36';
+const CACHE_NAME = 'resucito-cache-v55';
 const STATIC_ASSETS = [
   './',
   'index.html',
@@ -8,7 +8,11 @@ const STATIC_ASSETS = [
   'src/search.js',
   'src/chords.js',
   'src/pwa.js',
+  'src/auth.js',
+  'src/firebase.js',
+  'src/sync.js',
   'data/songs-index.json',
+  'data/chord_positions.json',
   'data/catequesis.json',
   'data/paises.json'
 ];
