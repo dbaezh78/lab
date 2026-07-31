@@ -21,7 +21,8 @@
   --chord-color: #d01212;
   --chord-color-alt: #944c18;
   --font-zoom: 1;
-  --font-family-lyrics: 'Inter', sans-serif;
+  --font-family-lyrics: 'Franklin Gothic Medium', Arial, sans-serif;
+  --font-size-lyrics: 22.4px;
   
   /* Fondos de etapa para modo claro */
   --stage-bg-pre: #ffffff;
@@ -111,7 +112,8 @@
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-family-lyrics);
+  font-size: var(--font-size-lyrics, 22.4px);
   background-color: var(--bg-color);
   color: var(--text-color);
   overflow-x: hidden;

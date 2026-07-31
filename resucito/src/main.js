@@ -1315,6 +1315,21 @@ function setupEventListeners() {
   if (settingsZoomOutBtn) settingsZoomOutBtn.addEventListener('click', () => updateZoom(zoomFactor - 0.1));
   if (settingsZoomInBtn) settingsZoomInBtn.addEventListener('click', () => updateZoom(zoomFactor + 0.1));
 
+  // Selector de tipografía
+  const fontFamilySelect = document.getElementById('font-family-select');
+  if (fontFamilySelect) {
+    // Restaurar selección guardada
+    const savedFont = localStorage.getItem('lyrics-font-family') || 'franklin';
+    fontFamilySelect.value = savedFont;
+    applyFontFamily(savedFont);
+
+    fontFamilySelect.addEventListener('change', () => {
+      const key = fontFamilySelect.value;
+      applyFontFamily(key);
+      localStorage.setItem('lyrics-font-family', key);
+    });
+  }
+
   // Clic en Tone/Capo trigger para abrir transposición
   if (toneCapoTrigger) {
     toneCapoTrigger.addEventListener('click', () => {
@@ -1971,6 +1986,27 @@ function updateZoom(factor) {
   }
 }
 
+// Mapa de fuentes tipográficas (igual que en la Biblia)
+const FONT_MAP = {
+  'franklin': "'Franklin Gothic Medium', Arial, sans-serif",
+  'sans-serif': "sans-serif",
+  'arial': "'Arial', sans-serif",
+  'aptos': "'Aptos', sans-serif",
+  'cavolini': "'Cavolini', sans-serif",
+  'comic-sans': "'Comic Sans MS', cursive, sans-serif",
+  'fairwater-script': "'Fairwater Script', 'Brush Script MT', cursive",
+  'mv-boli': "'MV Boli', sans-serif",
+  'neocat': "'Neocat', sans-serif",
+  'pristina': "'Pristina', cursive, serif",
+  'segoe-print': "'Segoe Print', cursive, sans-serif",
+  'viner-hand': "'Viner Hand ITC', cursive, serif"
+};
+
+function applyFontFamily(key) {
+  const css = FONT_MAP[key] || FONT_MAP['franklin'];
+  document.documentElement.style.setProperty('--font-family-lyrics', css);
+}
+
 // --- Ajustes Visuales y Preferencias ---
 function initPreferences() {
   const savedTheme = localStorage.getItem('theme') || 'light';
@@ -2007,6 +2043,10 @@ function initPreferences() {
   const widthBadge = document.getElementById('app-width-badge');
   if (widthSlider) widthSlider.value = savedWidth;
   if (widthBadge) widthBadge.textContent = savedWidth + 'px';
+
+  // Inicializar tipografía guardada
+  const savedFont = localStorage.getItem('lyrics-font-family') || 'franklin';
+  applyFontFamily(savedFont);
 
   // Ocultar opción de edición de acordes si no es administrador (para futura autenticación)
   const chordEditSettingRow = document.getElementById('chord-edit-setting-row');

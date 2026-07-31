@@ -100,9 +100,10 @@ export async function guardarPosicionesEnNube(cantoId, posiciones) {
   
   try {
     const docRef = doc(db, "usuarios", user.uid, "posiciones", cantoId);
+    // Firestore no permite arrays anidados: serializamos cada línea como string JSON
     await setDoc(docRef, {
-      lizq: posiciones.lizq || [],
-      lder: posiciones.lder || [],
+      lizq: serializarLineas(posiciones.lizq),
+      lder: serializarLineas(posiciones.lder),
       ultimaActualizacion: new Date()
     });
     console.log(`☁️ [Firebase] Posiciones personalizadas guardadas para el canto ${cantoId}`);
@@ -121,7 +122,10 @@ export async function cargarPosicionesDesdeNube(cantoId) {
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       const data = docSnap.data();
-      return { lizq: data.lizq || [], lder: data.lder || [] };
+      return {
+        lizq: deserializarLineas(data.lizq),
+        lder: deserializarLineas(data.lder)
+      };
     }
   } catch (e) {
     console.warn("⚠️ [Firebase] No se pudieron cargar posiciones (permisos/offline):", e.message || e);
@@ -129,13 +133,29 @@ export async function cargarPosicionesDesdeNube(cantoId) {
   return null;
 }
 
+// Convierte las líneas a un array de strings JSON (serialización plana para Firestore)
+function serializarLineas(lines) {
+  if (!Array.isArray(lines)) return [];
+  return lines.map(line => JSON.stringify(line));
+}
+
+// Revierte la serialización de líneas
+function deserializarLineas(lines) {
+  if (!Array.isArray(lines)) return [];
+  return lines.map(item => {
+    try { return typeof item === 'string' ? JSON.parse(item) : item; }
+    catch (e) { return item; }
+  });
+}
+
 // Sincroniza posiciones globales (Administrador)
 export async function publicarPosicionesGlobales(cantoId, posiciones) {
   try {
     const docRef = doc(db, "global_positions", cantoId);
+    // Firestore no permite arrays anidados: serializamos cada línea como string JSON
     await setDoc(docRef, {
-      lizq: posiciones.lizq || [],
-      lder: posiciones.lder || [],
+      lizq: serializarLineas(posiciones.lizq),
+      lder: serializarLineas(posiciones.lder),
       ultimaActualizacion: new Date()
     });
     console.log(`☁️ [Firebase Admin] Posiciones globales publicadas para el canto ${cantoId}`);
@@ -151,7 +171,10 @@ export async function cargarPosicionesGlobales(cantoId) {
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       const data = docSnap.data();
-      return { lizq: data.lizq || [], lder: data.lder || [] };
+      return {
+        lizq: deserializarLineas(data.lizq),
+        lder: deserializarLineas(data.lder)
+      };
     }
   } catch (e) {
     console.warn("⚠️ [Firebase] No se pudieron cargar posiciones globales (permisos/offline):", e.message || e);
