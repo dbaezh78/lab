@@ -1988,7 +1988,7 @@ function updateZoom(factor) {
 
 // Mapa de fuentes tipográficas (igual que en la Biblia)
 const FONT_MAP = {
-  'franklin': "'Franklin Gothic Medium', Arial, sans-serif",
+  'franklin': "'Franklin Gothic', 'Franklin Gothic Medium', Arial, sans-serif",
   'sans-serif': "sans-serif",
   'arial': "'Arial', sans-serif",
   'aptos': "'Aptos', sans-serif",

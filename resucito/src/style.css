@@ -21,7 +21,7 @@
   --chord-color: #d01212;
   --chord-color-alt: #944c18;
   --font-zoom: 1;
-  --font-family-lyrics: 'Franklin Gothic Medium', Arial, sans-serif;
+  --font-family-lyrics: 'Franklin Gothic', 'Franklin Gothic Medium', Arial, sans-serif;
   --font-size-lyrics: 22.4px;
   
   /* Fondos de etapa para modo claro */
@@ -745,7 +745,8 @@ header {
 .linea-canto {
   position: relative;
   font-family: var(--font-family-lyrics);
-  font-size: calc(1.1rem * var(--font-zoom));
+  font-size: calc(1.4rem * var(--font-zoom));
+  /*font-size: calc(1.1rem * var(--font-zoom));*/
   line-height: 2.3; /* Espacio vertical ampliado para acordes */
   min-height: 2.2rem;
   white-space: pre-wrap;
@@ -803,7 +804,7 @@ header {
 .collapsible-bis-side {
   display: flex;
   align-items: center;
-  margin-left: 20px;
+  margin-left: 40px;
   flex-shrink: 0;
   user-select: none;
 }
