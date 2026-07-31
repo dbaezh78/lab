@@ -83,6 +83,7 @@ const chordModalTitle = document.getElementById('chord-modal-title');
 const chordModalClose = document.getElementById('chord-modal-close');
 const chordDiagramImg = document.getElementById('chord-diagram-img');
 const modalChordNotePicker = document.getElementById('modal-chord-note-picker');
+const modalChordTypePicker = document.getElementById('modal-chord-type-picker');
 
 const settingsModal = document.getElementById('settings-modal');
 const settingsModalClose = document.getElementById('settings-modal-close');
@@ -98,6 +99,7 @@ const listStyleBtns = document.querySelectorAll('.list-style-btn');
 // Estado interno para el prontuario de acordes activo
 let selectedModalNote = 'La';
 let selectedModalType = 'm';
+let currentEditingChordInfo = null; // Almacena { side, lineIdx, subLineIdx, chordIdx } en modo edición
 let isSplitLayout = localStorage.getItem('split-layout') !== 'false';
 let activeSongsPlaylist = []; // Almacena el listado activo de cantos en pantalla para navegar
 let songListStyle = localStorage.getItem('song-list-style') || 'cards'; // Estilo visual de la lista: cards, detailed, simple
@@ -604,6 +606,13 @@ function renderLine(lineItem, side, lineIdx, subLineIdx) {
     const transposedNote = transposeNote(match.noteName, currentKeyOffset);
     chordSpan.textContent = transposedNote + (match.noteType ? ' ' : '') + match.noteType;
     
+    chordSpan.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // Calcular la nota transpuesta de forma dinámica al hacer click para evitar capturar una variable obsoleta del closure
+      const liveTransposedNote = transposeNote(match.noteName, currentKeyOffset);
+      showChordDiagram(liveTransposedNote, match.noteType);
+    });
+    
     wrapper.appendChild(chordSpan);
     wrapper.appendChild(document.createTextNode(char));
     
@@ -696,9 +705,13 @@ function resolveChordPositions(side, lineIdx, subLineIdx, baseChords, cleanLetra
 function setupChordDrag(chordSpan, side, lineIdx, subLineIdx, chordIdx, charSpans, lineDiv) {
   let isDragging = false;
   let currentTempPos = -1;
+  let startX = 0;
+  let startY = 0;
 
   chordSpan.addEventListener('pointerdown', (e) => {
     isDragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
     chordSpan.setPointerCapture(e.pointerId);
     chordSpan.classList.add('dragging');
     e.preventDefault();
@@ -736,7 +749,16 @@ function setupChordDrag(chordSpan, side, lineIdx, subLineIdx, chordIdx, charSpan
     chordSpan.releasePointerCapture(e.pointerId);
     chordSpan.classList.remove('dragging');
     
-    if (currentTempPos !== -1) {
+    const deltaX = Math.abs(e.clientX - startX);
+    const deltaY = Math.abs(e.clientY - startY);
+    
+    if (deltaX < 4 && deltaY < 4) {
+      // Es un click/tap simple (no arrastrado): abre el modal para cambiar/editar este acorde
+      const noteName = chordSpan.dataset.originalNote || '';
+      const noteType = chordSpan.dataset.noteType || '';
+      currentEditingChordInfo = { side, lineIdx, subLineIdx, chordIdx };
+      showChordDiagram(noteName, noteType);
+    } else if (currentTempPos !== -1) {
       saveChordPosition(side, lineIdx, subLineIdx, chordIdx, currentTempPos);
     } else {
       renderSongContent();
@@ -783,6 +805,54 @@ function saveChordPosition(side, lineIdx, subLineIdx, chordIdx, newPos) {
     localStorage.setItem(customKey, JSON.stringify(customPositions));
     renderSongContent();
   }
+}
+
+function saveSingleChordEdit(chosenNote, chosenType) {
+  if (!currentCanto || !currentEditingChordInfo) return;
+  const { side, lineIdx, subLineIdx, chordIdx } = currentEditingChordInfo;
+  
+  const songId = currentCanto.id;
+  const customKey = `custom-positions-${songId}`;
+  
+  let customPositions = localStorage.getItem(customKey);
+  if (customPositions) {
+    customPositions = JSON.parse(customPositions);
+  } else {
+    const baseDb = defaultChordPositions && defaultChordPositions[songId] ? defaultChordPositions[songId] : null;
+    customPositions = {
+      lizq: baseDb && baseDb.lizq ? JSON.parse(JSON.stringify(baseDb.lizq)) : extractCurrentSongChords(currentCanto.lizq, 'lizq'),
+      lder: baseDb && baseDb.lder ? JSON.parse(JSON.stringify(baseDb.lder)) : extractCurrentSongChords(currentCanto.lder, 'lder')
+    };
+  }
+  
+  const getLine = (db) => {
+    if (!db || !db[side]) return null;
+    const item = db[side][lineIdx];
+    if (!item) return null;
+    if (subLineIdx !== undefined && subLineIdx >= 0) {
+      if (item.type === 'collapsible-block' && item.lines) {
+        return item.lines[subLineIdx];
+      }
+      return null;
+    } else {
+      if (item.type === 'collapsible-block') {
+        return item.triggerLine;
+      }
+      return item;
+    }
+  };
+
+  const lineChords = getLine(customPositions);
+  if (lineChords && lineChords[chordIdx]) {
+    if (chosenNote !== undefined) {
+      const unTransposedNote = transposeNote(chosenNote, -currentKeyOffset);
+      lineChords[chordIdx].name = unTransposedNote;
+    }
+    if (chosenType !== undefined) lineChords[chordIdx].type = chosenType;
+    localStorage.setItem(customKey, JSON.stringify(customPositions));
+    renderSongContent();
+  }
+  currentEditingChordInfo = null;
 }
 
 function extractCurrentSongChords(section, side) {
@@ -900,11 +970,29 @@ function updateModalChordDiagram() {
   const noteName = selectedModalNote;
   const noteType = selectedModalType;
   
+  // Actualizar título según si es transporte o edición
+  const titleEl = document.getElementById('chord-modal-title');
+  if (titleEl) {
+    if (isChordEditMode && currentEditingChordInfo) {
+      titleEl.textContent = "Editar Acorde";
+    } else {
+      titleEl.textContent = "Transportar Acorde";
+    }
+  }
+  
   // Resaltar botón de Nota
   modalChordNotePicker.querySelectorAll('.btn-picker').forEach(btn => {
     const btnNote = btn.dataset.note;
     btn.classList.toggle('active', btnNote.toLowerCase() === noteName.toLowerCase());
   });
+  
+  // Resaltar botón de Variación
+  if (modalChordTypePicker) {
+    modalChordTypePicker.querySelectorAll('.btn-type-picker').forEach(btn => {
+      const btnType = btn.dataset.type || '';
+      btn.classList.toggle('active', btnType.toLowerCase() === (noteType || '').toLowerCase());
+    });
+  }
   
   // Actualizar textos informativos en el modal
   const subtitle = document.getElementById('chord-modal-subtitle');
@@ -1435,9 +1523,15 @@ function setupEventListeners() {
   });
   
   // Cerrar modales
-  chordModalClose.addEventListener('click', () => chordModal.style.display = 'none');
+  chordModalClose.addEventListener('click', () => {
+    chordModal.style.display = 'none';
+    currentEditingChordInfo = null;
+  });
   chordModal.addEventListener('click', (e) => {
-    if (e.target === chordModal) chordModal.style.display = 'none';
+    if (e.target === chordModal) {
+      chordModal.style.display = 'none';
+      currentEditingChordInfo = null;
+    }
   });
   
   settingsModalClose.addEventListener('click', () => settingsModal.style.display = 'none');
@@ -1451,6 +1545,13 @@ function setupEventListeners() {
     if (!btn) return;
     
     const chosenNote = btn.dataset.note;
+    
+    if (isChordEditMode && currentEditingChordInfo) {
+      saveSingleChordEdit(chosenNote, undefined);
+      chordModal.style.display = 'none';
+      return;
+    }
+    
     const fromIdx = CHROMATIC_SCALE.indexOf(normalizeChord(selectedModalNote));
     const toIdx = CHROMATIC_SCALE.indexOf(normalizeChord(chosenNote));
     
@@ -1465,6 +1566,24 @@ function setupEventListeners() {
       chordModal.style.display = 'none';
     }
   });
+
+  if (modalChordTypePicker) {
+    modalChordTypePicker.addEventListener('click', (e) => {
+      const btn = e.target.closest('.btn-type-picker');
+      if (!btn) return;
+      
+      const chosenType = btn.dataset.type || '';
+      
+      if (isChordEditMode && currentEditingChordInfo) {
+        saveSingleChordEdit(undefined, chosenType);
+        chordModal.style.display = 'none';
+        return;
+      }
+      
+      selectedModalType = chosenType;
+      updateModalChordDiagram();
+    });
+  }
   
   // Selección de temas
   document.querySelectorAll('.theme-btn').forEach(btn => {

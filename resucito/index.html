@@ -250,6 +250,18 @@
         </div>
       </div>
       
+      <!-- Selector de Tipo/Variación -->
+      <div class="chord-picker-row" style="margin-top: 15px; border-top: 1px dashed var(--panel-border); padding-top: 12px;">
+        <h4 style="font-size: 0.85rem; margin-bottom: 8px; font-weight: 600; color: var(--text-color); opacity: 0.8;">Variación:</h4>
+        <div class="chord-picker-grid" id="modal-chord-type-picker" style="grid-template-columns: repeat(5, 1fr); gap: 6px;">
+          <button class="btn btn-type-picker" data-type="">Mayor</button>
+          <button class="btn btn-type-picker" data-type="m">m</button>
+          <button class="btn btn-type-picker" data-type="7">7</button>
+          <button class="btn btn-type-picker" data-type="m7">m7</button>
+          <button class="btn btn-type-picker" data-type="maj7">maj7</button>
+        </div>
+      </div>
+      
       <div class="chord-diagram-view" style="margin-top: 15px; border-top: 1px solid var(--panel-border); padding-top: 15px;">
         <h4 id="chord-diagram-title" style="font-size: 0.95rem; margin-bottom: 8px; text-align: center; color: var(--accent-color); font-weight: 700;">Digitación del acorde:</h4>
         <img id="chord-diagram-img" src="" alt="Cargando diagrama..." style="max-height: 240px; display: block; margin: 0 auto; border-radius: 8px;">
