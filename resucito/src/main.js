@@ -20,6 +20,19 @@ let currentCanto = null;
 let currentKeyOffset = 0; // Transposición en semitonos
 let originalSongKey = 'La'; // Nota base del canto cargado
 let zoomFactor = 1.0;
+
+// Zoom por defecto según dispositivo
+function getDefaultZoom() {
+  const w = window.innerWidth;
+  // Solo usar el guardado si el usuario lo cambió manualmente
+  if (localStorage.getItem('font-zoom-custom') === 'true') {
+    const saved = localStorage.getItem('font-zoom');
+    if (saved) return parseFloat(saved);
+  }
+  if (w <= 384)  return 0.7;   // 📱 Celular   (≤ 384px)  =>  80%
+  if (w <= 992)  return 1.4;   // 📟 Tablet    (≤ 992px)  => 150%
+  return 1.0;                  // 🖥️ PC/Laptop (> 992px)  => 100%
+}
 let isScrollActive = false;
 let scrollIntervalId = null;
 let activeStage = null;
@@ -1978,13 +1991,22 @@ function setupEventListeners() {
   });
 }
 
-function updateZoom(factor) {
+// Aplica el zoom sin guardar (usado al inicializar el default por dispositivo)
+function applyZoom(factor) {
   zoomFactor = Math.max(0.6, Math.min(2.0, factor));
   document.documentElement.style.setProperty('--font-zoom', zoomFactor);
   if (settingsZoomBadge) {
     settingsZoomBadge.textContent = `${Math.round(zoomFactor * 100)}%`;
   }
 }
+
+// Aplica el zoom Y lo persiste (usado cuando el usuario lo cambia manualmente)
+function updateZoom(factor) {
+  applyZoom(factor);
+  localStorage.setItem('font-zoom', zoomFactor);
+  localStorage.setItem('font-zoom-custom', 'true');
+}
+
 
 // Mapa de fuentes tipográficas (igual que en la Biblia)
 const FONT_MAP = {
@@ -2047,6 +2069,10 @@ function initPreferences() {
   // Inicializar tipografía guardada
   const savedFont = localStorage.getItem('lyrics-font-family') || 'franklin';
   applyFontFamily(savedFont);
+
+  // Inicializar zoom con valor guardado o defecto por dispositivo
+  const initialZoom = getDefaultZoom();
+  applyZoom(initialZoom); // no guardar: es el default automático
 
   // Ocultar opción de edición de acordes si no es administrador (para futura autenticación)
   const chordEditSettingRow = document.getElementById('chord-edit-setting-row');

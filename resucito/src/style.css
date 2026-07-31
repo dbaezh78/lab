@@ -756,6 +756,8 @@ header {
   word-break: break-word;
 }
 
+@media (max-width: 384px) {.linea-canto {padding-left: 27px; }}
+
 /* Negrita para las partes de la asamblea */
 .linea-canto.as {
   font-weight: 700;
