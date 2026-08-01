@@ -200,13 +200,27 @@
         </div>
       </div>
 
-      <!-- Cabecera del canto (Título e imagen de Cristo estilo libro) -->
-      <div id="canto-header-block" class="canto-header-block"></div>
+      <!-- Contenedor deslizante de tres diapositivas (carrusel interactivo) -->
+      <div id="canto-carousel-viewport" style="width: 100%; overflow: hidden; position: relative;">
+        <div id="canto-slider-container" style="display: flex; width: calc(300% + 80px); gap: 40px; transform: translate3d(calc(-100% / 3 - 13.333px), 0, 0); transition: none; user-select: none;">
+          <div id="canto-slide-prev" class="canto-slide" style="width: calc((100% - 80px) / 3); flex-shrink: 0; opacity: 0.8; box-sizing: border-box; padding: 0 10px;"></div>
+          
+          <div id="canto-slide-active" class="canto-slide" style="width: calc((100% - 80px) / 3); flex-shrink: 0; box-sizing: border-box; padding: 0 10px;">
+            <!-- Contenedor del contenido del canto para transiciones -->
+            <div id="canto-content-transition-wrapper" class="canto-content-transition-wrapper">
+              <!-- Cabecera del canto (Título e imagen de Cristo estilo libro) -->
+              <div id="canto-header-block" class="canto-header-block"></div>
 
-      <!-- Contenedor del Canto de dos columnas -->
-      <div id="canto-columns" class="canto-columns-container">
-        <div id="canto-left-col" class="canto-column"></div>
-        <div id="canto-right-col" class="canto-column"></div>
+              <!-- Contenedor del Canto de dos columnas -->
+              <div id="canto-columns" class="canto-columns-container">
+                <div id="canto-left-col" class="canto-column"></div>
+                <div id="canto-right-col" class="canto-column"></div>
+              </div>
+            </div>
+          </div>
+          
+          <div id="canto-slide-next" class="canto-slide" style="width: calc((100% - 80px) / 3); flex-shrink: 0; opacity: 0.8; box-sizing: border-box; padding: 0 10px;"></div>
+        </div>
       </div>
 
       <!-- Notas del Cantor -->

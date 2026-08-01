@@ -20,6 +20,8 @@ let currentCanto = null;
 let currentKeyOffset = 0; // Transposición en semitonos
 let originalSongKey = 'La'; // Nota base del canto cargado
 let zoomFactor = 1.0;
+let transitionDirection = null;
+let loadedSongsCache = {}; // Cache de cantos con letra y acordes completos
 
 // Zoom por defecto según dispositivo
 function getDefaultZoom() {
@@ -249,10 +251,16 @@ async function loadSongView(songId) {
     cantoRightCol.innerHTML = "";
     viewerAudioContainer.classList.remove('open');
     
-    const response = await fetch(`data/songs/${songId}.json`);
-    if (!response.ok) throw new Error('Canto no encontrado');
-    
-    currentCanto = await response.json();
+    let songData;
+    if (loadedSongsCache[songId]) {
+      songData = loadedSongsCache[songId];
+    } else {
+      const response = await fetch(`data/songs/${songId}.json`);
+      if (!response.ok) throw new Error('Canto no encontrado');
+      songData = await response.json();
+      loadedSongsCache[songId] = songData;
+    }
+    currentCanto = songData;
     
     // Configurar zoom por defecto según el dispositivo (Tablet vs Móvil/PC) y canto específico
     const isTablet = window.innerWidth >= 768 && window.innerWidth <= 1024;
@@ -378,6 +386,28 @@ async function loadSongView(songId) {
     dashboardView.style.display = 'none';
     songViewerView.style.display = 'flex';
     window.scrollTo(0, 0);
+    
+    // Restablecer el contenedor deslizante a su posición central por defecto
+    const sliderContainer = document.getElementById('canto-slider-container');
+    const slidePrev = document.getElementById('canto-slide-prev');
+    const slideNext = document.getElementById('canto-slide-next');
+    
+    if (sliderContainer) {
+      sliderContainer.style.transition = 'none';
+      sliderContainer.style.transform = 'translate3d(calc(-100% / 3 - 13.333px), 0, 0)';
+    }
+    if (slidePrev) slidePrev.innerHTML = '';
+    if (slideNext) slideNext.innerHTML = '';
+
+    // Pre-cargar los cantos adyacentes (anterior y siguiente) en segundo plano
+    if (currentIdxToUse > 0) {
+      const prevSong = playListToUse[currentIdxToUse - 1];
+      obtenerCantoCompleto(prevSong.id); // Prefetch en background
+    }
+    if (currentIdxToUse !== -1 && currentIdxToUse < playListToUse.length - 1) {
+      const nextSong = playListToUse[currentIdxToUse + 1];
+      obtenerCantoCompleto(nextSong.id); // Prefetch en background
+    }
   } catch (error) {
     console.error('Error al cargar detalle del canto:', error);
     alert('No se pudo cargar la letra del canto.');
@@ -1238,6 +1268,315 @@ async function handleSearchAndFilters() {
   renderSongsList(filteredSongs);
 }
 
+// --- Auxiliares de Navegación con Transición ---
+function navigateToSong(direction, isSwipe = false) {
+  if (!currentCanto) return;
+  const currentIndex = activeSongsPlaylist.findIndex(s => s.id === currentCanto.id);
+  const playListToUse = currentIndex !== -1 ? activeSongsPlaylist : allSongs;
+  const currentIdxToUse = currentIndex !== -1 ? currentIndex : allSongs.findIndex(s => s.id === currentCanto.id);
+  
+  if (direction === 'prev' && currentIdxToUse > 0) {
+    const prevSong = playListToUse[currentIdxToUse - 1];
+    transitionToSong(prevSong.id, 'prev', isSwipe);
+  } else if (direction === 'next' && currentIdxToUse !== -1 && currentIdxToUse < playListToUse.length - 1) {
+    const nextSong = playListToUse[currentIdxToUse + 1];
+    transitionToSong(nextSong.id, 'next', isSwipe);
+  }
+}
+
+function transitionToSong(nextSongId, direction, isSwipe = false) {
+  const sliderContainer = document.getElementById('canto-slider-container');
+  if (!sliderContainer) {
+    window.location.hash = `#canto=${nextSongId}`;
+    return;
+  }
+  
+  stopAutoScroll();
+  
+  if (isSwipe) {
+    // Si viene de swipe, la animación ya está en progreso o completada, actualizamos directamente el hash
+    window.location.hash = `#canto=${nextSongId}`;
+  } else {
+    // Si viene de clic en botón, cargamos primero la vista previa en el contenedor correspondiente
+    const slidePrev = document.getElementById('canto-slide-prev');
+    const slideNext = document.getElementById('canto-slide-next');
+    const targetSlide = direction === 'next' ? slideNext : slidePrev;
+    
+    // Mostramos la cabecera básica de inmediato
+    const nextSongMeta = allSongs.find(s => s.id === nextSongId);
+    if (nextSongMeta && targetSlide) {
+      targetSlide.innerHTML = generarHtmlCantoBasico(nextSongMeta);
+    }
+    
+    // Cargamos completo y animamos la transición del slider
+    obtenerCantoCompleto(nextSongId).then(fullSong => {
+      if (fullSong && targetSlide) {
+        targetSlide.innerHTML = generarHtmlCanto(fullSong);
+      }
+      
+      // Animamos el slider para mostrar el slide adyacente
+      sliderContainer.style.transition = 'transform 0.25s ease';
+      const targetTransform = direction === 'next' 
+        ? 'translate3d(calc(-200% / 3 - 26.667px), 0, 0)' 
+        : 'translate3d(0px, 0, 0)';
+      sliderContainer.style.transform = targetTransform;
+      
+      setTimeout(() => {
+        window.location.hash = `#canto=${nextSongId}`;
+      }, 250);
+    });
+  }
+}
+
+// --- Obtener datos completos de canción desde caché o red ---
+async function obtenerCantoCompleto(songId) {
+  if (loadedSongsCache[songId]) {
+    return loadedSongsCache[songId];
+  }
+  try {
+    const response = await fetch(`data/songs/${songId}.json`);
+    if (response.ok) {
+      const songData = await response.json();
+      loadedSongsCache[songId] = songData;
+      return songData;
+    }
+  } catch (e) {
+    console.error(`Error al cargar datos completos del canto ${songId}:`, e);
+  }
+  return null;
+}
+
+// --- Generador de HTML Básico como Marcador de Posición ---
+function generarHtmlCantoBasico(song) {
+  if (!song) return '';
+  const stage = (song.catCanto || '').toUpperCase();
+  const title = (song.title || song.tt || '').toUpperCase();
+  const subtitle = song.subtitle || '';
+  
+  return `
+    <div class="canto-header-block" style="border-bottom-color: var(--stage-color-${song.catCanto}, var(--panel-border));">
+      <div class="canto-header-left">
+        <img src="img/christ.png" alt="Cristo" class="canto-header-img">
+      </div>
+      <div class="canto-header-center">
+        <div class="canto-header-stage">${stage}</div>
+        <h1 class="canto-header-title">${title}</h1>
+        <div class="canto-header-subtitle">${subtitle}</div>
+      </div>
+      <div class="canto-header-right"></div>
+    </div>
+    <div class="canto-columns-container">
+      <div class="canto-column" style="text-align: center; color: var(--text-muted); font-style: italic; padding-top: 60px;">
+        Cargando acordes y letra...
+      </div>
+    </div>
+  `;
+}
+
+// --- Generador de HTML Estático para las diapositivas del Carrusel ---
+function generarHtmlCanto(song) {
+  if (!song) return '';
+  const stage = (song.catCanto || '').toUpperCase();
+  const title = (song.title || song.tt || '').toUpperCase();
+  const subtitle = song.subtitle || '';
+  
+  // Recuperar offset de tono de esta canción en localStorage
+  const savedKeyOffset = parseInt(localStorage.getItem(`keyOffset_${song.id}`)) || 0;
+  
+  let leftHtml = '';
+  if (song.lizq) {
+    leftHtml = song.lizq.map((lineItem, idx) => generarHtmlLinea(song, lineItem, 'lizq', idx, savedKeyOffset)).join('');
+  }
+  
+  let rightHtml = '';
+  if (song.lder && song.lder.length > 0) {
+    rightHtml = song.lder.map((lineItem, idx) => generarHtmlLinea(song, lineItem, 'lder', idx, savedKeyOffset)).join('');
+  }
+  
+  const rightColStyle = rightHtml ? '' : 'display: none;';
+  
+  return `
+    <div class="canto-header-block" style="border-bottom-color: var(--stage-color-${song.catCanto}, var(--panel-border));">
+      <div class="canto-header-left">
+        <img src="img/christ.png" alt="Cristo" class="canto-header-img">
+      </div>
+      <div class="canto-header-center">
+        <div class="canto-header-stage">${stage}</div>
+        <h1 class="canto-header-title">${title}</h1>
+        <div class="canto-header-subtitle">${subtitle}</div>
+      </div>
+      <div class="canto-header-right"></div>
+    </div>
+    <div class="canto-columns-container">
+      <div class="canto-column">${leftHtml}</div>
+      <div class="canto-column" style="${rightColStyle}">${rightHtml}</div>
+    </div>
+  `;
+}
+
+function generarHtmlLinea(song, lineItem, side, lineIdx, keyOffset) {
+  if (lineItem.type === "collapsible-block") {
+    const triggerHtml = generarHtmlLineaItem(song, lineItem.triggerLine, side, lineIdx, -1, keyOffset);
+    const subLinesHtml = lineItem.lines.map((l, subIdx) => 
+      generarHtmlLineaItem(song, l, side, lineIdx, subIdx, keyOffset)
+    ).join('');
+    
+    const isExpanded = allAsambleaExpanded || lineItem.initialState === 'expanded';
+    const displayStyle = isExpanded ? 'block' : 'none';
+    
+    return `
+      <div class="collapsible-block-container">
+        <div class="collapsible-lines-wrapper">
+          <div class="linea-canto collapsible-trigger">${triggerHtml}</div>
+          <div class="collapsible-content" style="display: ${displayStyle};">
+            ${subLinesHtml}
+          </div>
+        </div>
+        <div class="collapsible-bis-side">
+          <div class="bis-line"></div>
+          <div class="bis-text">BIS A.</div>
+        </div>
+      </div>
+    `;
+  } else if (lineItem.img) {
+    return `<div class="linea-imagen"><img src="${lineItem.img}" alt="Diagrama musical"></div>`;
+  } else {
+    return generarHtmlLineaItem(song, lineItem, side, lineIdx, undefined, keyOffset);
+  }
+}
+
+function generarHtmlLineaItem(song, lineItem, side, lineIdx, subLineIdx, keyOffset) {
+  const content = typeof lineItem === 'string' ? lineItem : (lineItem.line || '');
+  const sectionClass = lineItem.sC || '';
+  const textColor = lineItem.color || '';
+  
+  const firstParenIndex = content.indexOf('(');
+  let rawLetra = firstParenIndex !== -1 ? content.substring(0, firstParenIndex) : content;
+  
+  let cleanLetra = rawLetra;
+  if (cleanLetra.endsWith(' ')) {
+    cleanLetra = cleanLetra.replace(/\s+$/, '');
+  }
+  if (cleanLetra.endsWith(',')) {
+    cleanLetra = cleanLetra.substring(0, cleanLetra.length - 1);
+  }
+  if (cleanLetra.trim().startsWith('"') && cleanLetra.trim().endsWith('"')) {
+    const trimmed = cleanLetra.trim();
+    cleanLetra = trimmed.substring(1, trimmed.length - 1);
+  }
+  
+  const baseChords = [];
+  if (firstParenIndex !== -1) {
+    const chordsString = content.substring(firstParenIndex);
+    const noteMatches = chordsString.match(/\(([^)]+)\)/g);
+    if (noteMatches) {
+      noteMatches.forEach(noteBlock => {
+        const parts = noteBlock.substring(1, noteBlock.length - 1).split(',');
+        const noteName = parts[0] ? parts[0].trim() : '';
+        const noteType = parts[1] ? parts[1].trim() : '';
+        const rawPosition = parseFloat(parts[2]) || 0;
+        if (noteName) {
+          baseChords.push({ name: noteName, type: noteType, originalPos: Math.round(rawPosition) });
+        }
+      });
+    }
+  }
+  
+  const matches = resolveChordPositionsForPreview(song, side, lineIdx, subLineIdx, baseChords);
+  
+  if (matches.length === 0) {
+    const styleAttr = textColor ? `style="color: ${textColor};"` : '';
+    return `<div class="linea-canto ${sectionClass}"><span class="letra" ${styleAttr}>${cleanLetra}</span></div>`;
+  }
+  
+  let spansHtml = '';
+  let lastPos = 0;
+  
+  matches.forEach(chord => {
+    const pos = Math.min(chord.position, cleanLetra.length);
+    if (pos > lastPos) {
+      spansHtml += `<span>${cleanLetra.substring(lastPos, pos)}</span>`;
+    }
+    
+    const transposedNote = transposeNote(chord.noteName, keyOffset);
+    const chordText = transposedNote + chord.noteType;
+    
+    spansHtml += `<span class="chord-anchor-wrapper" style="position: relative; display: inline-block;">
+      <span class="acorde-canto" style="position: absolute; top: -1.35rem; left: 0; font-family: sans-serif; font-weight: bold; color: var(--chord-color);">${chordText}</span>
+    </span>`;
+    lastPos = pos;
+  });
+  
+  if (lastPos < cleanLetra.length) {
+    spansHtml += `<span>${cleanLetra.substring(lastPos)}</span>`;
+  }
+  
+  const styleAttr = textColor ? `style="color: ${textColor};"` : '';
+  return `<div class="linea-canto ${sectionClass}" ${styleAttr}>${spansHtml}</div>`;
+}
+
+function resolveChordPositionsForPreview(song, side, lineIdx, subLineIdx, baseChords) {
+  if (!song || !side) return baseChords.map(c => ({
+    noteName: c.name,
+    noteType: c.type,
+    position: c.originalPos
+  }));
+
+  const customKey = `custom-positions-${song.id}`;
+  const customStore = localStorage.getItem(customKey);
+  let customPositions = null;
+  if (customStore) {
+    try {
+      customPositions = JSON.parse(customStore);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  const getLinePositions = (db) => {
+    if (!db || !db[side]) return null;
+    const item = db[side][lineIdx];
+    if (!item) return null;
+    if (subLineIdx !== undefined && subLineIdx !== -1) {
+      if (item.type === "collapsible-block" && item.lines) {
+        const sub = item.lines[subLineIdx];
+        return sub ? sub.chordsPos : null;
+      }
+      return null;
+    }
+    return item.chordsPos;
+  };
+
+  let posArray = getLinePositions(customPositions);
+  if (!posArray) {
+    const globalKey = `global-positions-${song.id}`;
+    const globalStore = localStorage.getItem(globalKey);
+    if (globalStore) {
+      try {
+        const parsed = JSON.parse(globalStore);
+        posArray = getLinePositions(parsed);
+      } catch (e) {}
+    }
+  }
+  if (!posArray) {
+    posArray = getLinePositions(defaultChordPositions[song.id]);
+  }
+
+  if (posArray && posArray.length === baseChords.length) {
+    return baseChords.map((c, i) => ({
+      noteName: c.name,
+      noteType: c.type,
+      position: posArray[i]
+    }));
+  }
+
+  return baseChords.map(c => ({
+    noteName: c.name,
+    noteType: c.type,
+    position: c.originalPos
+  }));
+}
+
 // --- Event Listeners ---
 function setupEventListeners() {
   // Pestañas de Libros
@@ -1336,7 +1675,11 @@ function setupEventListeners() {
   
   // Botones de visor
   viewerBackBtn.addEventListener('click', () => {
-    window.location.hash = '';
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.hash = '';
+    }
   });
   
   // Zoom settings
@@ -1406,31 +1749,155 @@ function setupEventListeners() {
   // Navegación de Canto Anterior
   if (prevSongBtn) {
     prevSongBtn.addEventListener('click', () => {
-      if (!currentCanto) return;
-      const currentIndex = activeSongsPlaylist.findIndex(s => s.id === currentCanto.id);
-      const playListToUse = currentIndex !== -1 ? activeSongsPlaylist : allSongs;
-      const currentIdxToUse = currentIndex !== -1 ? currentIndex : allSongs.findIndex(s => s.id === currentCanto.id);
-      
-      if (currentIdxToUse > 0) {
-        const prevSong = playListToUse[currentIdxToUse - 1];
-        window.location.hash = `#canto=${prevSong.id}`;
-      }
+      navigateToSong('prev');
     });
   }
 
   // Navegación de Canto Siguiente
   if (nextSongBtn) {
     nextSongBtn.addEventListener('click', () => {
-      if (!currentCanto) return;
-      const currentIndex = activeSongsPlaylist.findIndex(s => s.id === currentCanto.id);
-      const playListToUse = currentIndex !== -1 ? activeSongsPlaylist : allSongs;
-      const currentIdxToUse = currentIndex !== -1 ? currentIndex : allSongs.findIndex(s => s.id === currentCanto.id);
-      
-      if (currentIdxToUse !== -1 && currentIdxToUse < playListToUse.length - 1) {
-        const nextSong = playListToUse[currentIdxToUse + 1];
-        window.location.hash = `#canto=${nextSong.id}`;
-      }
+      navigateToSong('next');
     });
+  }
+
+  // Gestos táctiles en móviles y tablets para pasar de página (carrusel interactivo)
+  const songViewer = document.getElementById('song-viewer-view');
+  const sliderContainer = document.getElementById('canto-slider-container');
+  const slidePrev = document.getElementById('canto-slide-prev');
+  const slideNext = document.getElementById('canto-slide-next');
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let isDragging = false;
+  let directionLocked = false;
+  let isSwipeHoriz = false;
+  
+  if (songViewer && sliderContainer) {
+    songViewer.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      isDragging = true;
+      directionLocked = false;
+      isSwipeHoriz = false;
+      sliderContainer.style.transition = 'none'; // Sin transición durante el arrastre
+    }, { passive: true });
+    
+    songViewer.addEventListener('touchmove', (e) => {
+      if (!isDragging || e.touches.length !== 1) return;
+      
+      const currentX = e.touches[0].clientX;
+      const currentY = e.touches[0].clientY;
+      const diffX = currentX - touchStartX;
+      const diffY = currentY - touchStartY;
+      
+      if (!directionLocked) {
+        if (Math.abs(diffX) > 10 || Math.abs(diffY) > 10) {
+          directionLocked = true;
+          // Si el movimiento es predominantemente horizontal, es swipe
+          if (Math.abs(diffX) > Math.abs(diffY) * 1.2) {
+            isSwipeHoriz = true;
+          } else {
+            isDragging = false; // Permitir scroll vertical nativo normal
+          }
+        }
+      }
+      
+      if (isDragging && isSwipeHoriz) {
+        // Prevenir el scroll y gestos nativos del navegador
+        if (e.cancelable) e.preventDefault();
+        
+        // Carga dinámica de la vista previa de las diapositivas adyacentes si no están cargadas
+        if (diffX > 0 && slidePrev && slidePrev.innerHTML === '') {
+          if (currentCanto) {
+            const currentIndex = activeSongsPlaylist.findIndex(s => s.id === currentCanto.id);
+            const playListToUse = currentIndex !== -1 ? activeSongsPlaylist : allSongs;
+            const currentIdxToUse = currentIndex !== -1 ? currentIndex : allSongs.findIndex(s => s.id === currentCanto.id);
+            if (currentIdxToUse > 0) {
+              const prevSong = playListToUse[currentIdxToUse - 1];
+              // Si ya está en caché, renderizar síncronamente (evita parpadeos)
+              if (loadedSongsCache[prevSong.id]) {
+                slidePrev.innerHTML = generarHtmlCanto(loadedSongsCache[prevSong.id]);
+              } else {
+                slidePrev.innerHTML = generarHtmlCantoBasico(prevSong);
+                obtenerCantoCompleto(prevSong.id).then(fullSong => {
+                  if (isDragging && slidePrev && fullSong) {
+                    slidePrev.innerHTML = generarHtmlCanto(fullSong);
+                  }
+                });
+              }
+            }
+          }
+        } else if (diffX < 0 && slideNext && slideNext.innerHTML === '') {
+          if (currentCanto) {
+            const currentIndex = activeSongsPlaylist.findIndex(s => s.id === currentCanto.id);
+            const playListToUse = currentIndex !== -1 ? activeSongsPlaylist : allSongs;
+            const currentIdxToUse = currentIndex !== -1 ? currentIndex : allSongs.findIndex(s => s.id === currentCanto.id);
+            if (currentIdxToUse !== -1 && currentIdxToUse < playListToUse.length - 1) {
+              const nextSong = playListToUse[currentIdxToUse + 1];
+              // Si ya está en caché, renderizar síncronamente (evita parpadeos)
+              if (loadedSongsCache[nextSong.id]) {
+                slideNext.innerHTML = generarHtmlCanto(loadedSongsCache[nextSong.id]);
+              } else {
+                slideNext.innerHTML = generarHtmlCantoBasico(nextSong);
+                obtenerCantoCompleto(nextSong.id).then(fullSong => {
+                  if (isDragging && slideNext && fullSong) {
+                    slideNext.innerHTML = generarHtmlCanto(fullSong);
+                  }
+                });
+              }
+            }
+          }
+        }
+        
+        // Mover el contenedor completo
+        // La posición central es calc(-100% / 3 - 13.333px)
+        sliderContainer.style.transform = `translate3d(calc(-100% / 3 - 13.333px + ${diffX}px), 0, 0)`;
+      }
+    }, { passive: false });
+    
+    songViewer.addEventListener('touchend', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      
+      const touchEndX = e.changedTouches[0].clientX;
+      const diffX = touchEndX - touchStartX;
+      touchStartX = 0;
+      
+      if (!isSwipeHoriz) return;
+      
+      const threshold = 100; // Distancia mínima en px para cambiar de canto
+      
+      if (Math.abs(diffX) > threshold) {
+        const direction = diffX < 0 ? 'next' : 'prev';
+        
+        // Verificar si cargó diapositiva de destino
+        const destinationLoaded = direction === 'next' 
+          ? (slideNext && slideNext.innerHTML !== '') 
+          : (slidePrev && slidePrev.innerHTML !== '');
+          
+        if (destinationLoaded) {
+          // Animar transición completa al slide de destino
+          sliderContainer.style.transition = 'transform 0.25s ease';
+          const targetTransform = direction === 'next'
+            ? 'translate3d(calc(-200% / 3 - 26.667px), 0, 0)'
+            : 'translate3d(0px, 0, 0)';
+            
+          sliderContainer.style.transform = targetTransform;
+          
+          setTimeout(() => {
+            navigateToSong(direction, true);
+          }, 250);
+        } else {
+          // Bote de vuelta al centro
+          sliderContainer.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+          sliderContainer.style.transform = 'translate3d(calc(-100% / 3 - 13.333px), 0, 0)';
+        }
+      } else {
+        // Devolverse al centro (snap back)
+        sliderContainer.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+        sliderContainer.style.transform = 'translate3d(calc(-100% / 3 - 13.333px), 0, 0)';
+      }
+    }, { passive: true });
   }
 
   // Buscador rápido de la barra de herramientas superior
