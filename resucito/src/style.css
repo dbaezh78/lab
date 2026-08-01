@@ -1555,11 +1555,11 @@ footer {
 /* Cabecera del canto estilo libro original */
 .canto-header-block {
   display: grid;
-  grid-template-columns: 100px 1fr 100px;
+  grid-template-columns: 140px 1fr 140px;
   align-items: center;
   margin-top: 2px;
   margin-bottom: 12px;
-  padding: 8px 32px;
+  padding: 0px 5px;
   border-bottom: 4px solid var(--current-stage-color, var(--panel-border));
   box-shadow: 0 10px 20px -10px var(--current-stage-color, rgba(0, 0, 0, 0.1));
   background-color: var(--current-stage-bg, var(--panel-bg));
@@ -1575,10 +1575,9 @@ footer {
 }
 
 .canto-header-img {
-  max-height: 90px;
-  max-width: 90px;
+  width: 130px;
   object-fit: contain;
-  opacity: 0.85;
+  opacity: 0.4;
 }
 
 /* Invertir imagen de cristo en modo oscuro */
@@ -1679,6 +1678,7 @@ footer {
   .canto-header-title {
     font-size: 1.25rem;
     line-height: 1.2;
+    text-align: center;
   }
 }
 

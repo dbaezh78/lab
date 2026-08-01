@@ -260,10 +260,10 @@ async function loadSongView(songId) {
       if (songId === 'atilevantomisojos') {
         updateZoom(1.5);
       } else {
-        updateZoom(1.6);
+        updateZoom(1.5);
       }
     } else {
-      updateZoom(1.0);
+      updateZoom(0.8);
     }
     
     // Asignar el color de etapa actual a nivel de body para la cabecera y el sombreado
@@ -294,7 +294,7 @@ async function loadSongView(songId) {
       
       cantoHeaderBlock.innerHTML = `
         <div class="canto-header-left">
-          <img src="img/logo_cantos.png" alt="Cristo" class="canto-header-img">
+          <img src="img/christ.png" alt="Cristo" class="canto-header-img">
         </div>
         <div class="canto-header-center">
           <div class="canto-header-stage">${stage}</div>
