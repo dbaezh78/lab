@@ -70,6 +70,7 @@ const scrollPlayBtn = document.getElementById('scroll-play-btn');
 const scrollSpeedSlider = document.getElementById('scroll-speed-slider');
 const splitLayoutBtn = document.getElementById('split-layout-btn');
 const asambleaToggleBtn = document.getElementById('asamblea-toggle-btn');
+const audioPlayBtn = document.getElementById('audio-play-btn');
 const settingsOpenBtn = document.getElementById('settings-open-btn');
 const cantoLeftCol = document.getElementById('canto-left-col');
 const cantoRightCol = document.getElementById('canto-right-col');
@@ -169,6 +170,18 @@ function routeSPA() {
     songViewerView.style.display = 'none';
     dashboardView.style.display = 'flex';
     document.title = "RESUCITÓ - Cantos Neocatecumenales";
+    
+    // Detener audio al volver al buscador
+    if (viewerAudioPlayer) {
+      viewerAudioPlayer.pause();
+      viewerAudioPlayer.src = '';
+    }
+    if (viewerAudioContainer) {
+      viewerAudioContainer.classList.remove('open');
+    }
+    if (audioPlayBtn) {
+      audioPlayBtn.classList.remove('active');
+    }
   }
 }
 
@@ -234,7 +247,7 @@ async function loadSongView(songId) {
     }
     cantoLeftCol.innerHTML = "";
     cantoRightCol.innerHTML = "";
-    viewerAudioContainer.style.display = 'none';
+    viewerAudioContainer.classList.remove('open');
     
     const response = await fetch(`data/songs/${songId}.json`);
     if (!response.ok) throw new Error('Canto no encontrado');
@@ -342,11 +355,13 @@ async function loadSongView(songId) {
     // Configurar audio
     if (currentCanto.audioSrc) {
       viewerAudioPlayer.src = currentCanto.audioSrc;
-      viewerAudioContainer.style.display = 'flex';
+      if (audioPlayBtn) audioPlayBtn.style.display = 'flex';
     } else {
       viewerAudioPlayer.src = '';
-      viewerAudioContainer.style.display = 'none';
+      if (audioPlayBtn) audioPlayBtn.style.display = 'none';
     }
+    viewerAudioContainer.classList.remove('open');
+    if (audioPlayBtn) audioPlayBtn.classList.remove('active');
     
     // Renderizar letras y acordes locales primero para máxima velocidad
     renderSongContent();
@@ -1486,6 +1501,45 @@ function setupEventListeners() {
       }
     });
   });
+  
+  if (audioPlayBtn) {
+    audioPlayBtn.addEventListener('click', () => {
+      if (viewerAudioPlayer.paused) {
+        viewerAudioPlayer.play();
+      } else {
+        viewerAudioPlayer.pause();
+      }
+    });
+  }
+  
+  if (viewerAudioPlayer) {
+    viewerAudioPlayer.addEventListener('play', () => {
+      viewerAudioContainer.classList.add('open');
+      if (audioPlayBtn) {
+        audioPlayBtn.classList.add('active');
+        const iconSpan = audioPlayBtn.querySelector('span');
+        if (iconSpan) iconSpan.textContent = 'pause';
+      }
+    });
+    
+    viewerAudioPlayer.addEventListener('pause', () => {
+      viewerAudioContainer.classList.remove('open');
+      if (audioPlayBtn) {
+        audioPlayBtn.classList.remove('active');
+        const iconSpan = audioPlayBtn.querySelector('span');
+        if (iconSpan) iconSpan.textContent = 'play_arrow';
+      }
+    });
+    
+    viewerAudioPlayer.addEventListener('ended', () => {
+      viewerAudioContainer.classList.remove('open');
+      if (audioPlayBtn) {
+        audioPlayBtn.classList.remove('active');
+        const iconSpan = audioPlayBtn.querySelector('span');
+        if (iconSpan) iconSpan.textContent = 'play_arrow';
+      }
+    });
+  }
   
   settingsOpenBtn.addEventListener('click', () => {
     settingsModal.style.display = 'flex';

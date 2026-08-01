@@ -619,7 +619,7 @@ header {
   gap: 12px;
   box-shadow: var(--shadow-sm);
   position: sticky;
-  top: 0px;
+  top: 8px;
   z-index: 50;
 }
 
@@ -931,13 +931,14 @@ header {
   opacity: 0;
   overflow: hidden;
   transition: max-height 2.3s cubic-bezier(0.4, 0, 0.2, 1), 
-                 opacity 2.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                 opacity 1.3s cubic-bezier(0.4, 0, 0.2, 1), 
                  padding 2.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .audio-player-container.open {
+  max-height: 60px; /* Altura total del reproductor más padding (40px + 20px) */
   opacity: 1;
-  padding: 15px 0px;
+  padding: 10px 0px;
   height: 25px;
   width: 100%;
 }
