@@ -2,6 +2,7 @@ import { registerServiceWorker } from './pwa.js';
 import { searchSongs } from './search.js';
 import { transposeNote, normalizeChord, CHROMATIC_SCALE } from './chords.js';
 import { onAuthStateChanged, loginMock, logoutMock, isCurrentUserAdmin, getCurrentUser } from './auth.js';
+import { cantoConfig, loadBisConfig, saveBisConfig, isBisEnabled, setBisForSong } from './config/canto.js';
 import { 
   guardarTonoEnNube, 
   cargarTonoDesdeNube, 
@@ -128,6 +129,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Cargar preferencias guardadas
   initPreferences();
   
+  // Cargar configuración de BIS por canto desde localStorage
+  loadBisConfig();
   // Cargar índice de canciones y posiciones de acordes
   try {
     const [indexRes, posRes] = await Promise.all([
@@ -321,7 +324,8 @@ async function loadSongView(songId) {
     }
     document.title = `${currentCanto.title || currentCanto.tt || 'Sin Título'} - Resucitó`;
     
-    // Tono original
+    renderSongContent();
+// Tono original
     originalSongKey = normalizeChord(currentCanto.acorde || 'La');
     currentKeyOffset = 0; // Reiniciar offset
     updateTransposeBadge();
@@ -494,20 +498,22 @@ function renderSection(container, lines, side) {
       linesWrapper.appendChild(contentDiv);
       containerDiv.appendChild(linesWrapper);
       
-      // Agregar indicador lateral "BIS A." a la derecha
-      const bisSide = document.createElement('div');
-      bisSide.className = 'collapsible-bis-side';
-      
-      const bisLine = document.createElement('div');
-      bisLine.className = 'bis-line';
-      
-      const bisText = document.createElement('div');
-      bisText.className = 'bis-text';
-      bisText.textContent = 'BIS A.';
-      
-      bisSide.appendChild(bisLine);
-      bisSide.appendChild(bisText);
-      containerDiv.appendChild(bisSide);
+      // Agregar indicador lateral "BIS A." a la derecha (controlado por configuración por canto)
+      if (currentCanto && isBisEnabled(currentCanto.id)) {
+        const bisSide = document.createElement('div');
+        bisSide.className = 'collapsible-bis-side';
+
+        const bisLine = document.createElement('div');
+        bisLine.className = 'bis-line';
+
+        const bisText = document.createElement('div');
+        bisText.className = 'bis-text';
+        bisText.textContent = 'BIS A.';
+
+        bisSide.appendChild(bisLine);
+        bisSide.appendChild(bisText);
+        containerDiv.appendChild(bisSide);
+      }
       
       container.appendChild(containerDiv);
     } else if (item.img) {
@@ -2009,6 +2015,8 @@ function setupEventListeners() {
   }
   
   settingsOpenBtn.addEventListener('click', () => {
+    // Poblar la lista de BIS por canto al abrir ajustes
+    populateBisSongList();
     settingsModal.style.display = 'flex';
   });
   
@@ -2161,9 +2169,14 @@ function setupEventListeners() {
       const themePanel = document.getElementById('settings-panel-theme');
       const generalPanel = document.getElementById('settings-panel-general');
       const accountPanel = document.getElementById('settings-panel-account');
+      const cantoPanel = document.getElementById('settings-panel-canto');
       if (themePanel) themePanel.style.display = 'block';
       if (generalPanel) generalPanel.style.display = 'none';
       if (accountPanel) accountPanel.style.display = 'none';
+      if (cantoPanel) cantoPanel.style.display = 'none';
+
+      // Poblar la lista de BIS por canto al abrir ajustes
+      populateBisSongList();
 
       settingsModal.style.display = 'flex';
     });
@@ -2180,24 +2193,64 @@ function setupEventListeners() {
       const themePanel = document.getElementById('settings-panel-theme');
       const generalPanel = document.getElementById('settings-panel-general');
       const accountPanel = document.getElementById('settings-panel-account');
+      const cantoPanel = document.getElementById('settings-panel-canto');
       
-      if (themePanel && generalPanel && accountPanel) {
-        if (tab === 'theme') {
-          themePanel.style.display = 'block';
-          generalPanel.style.display = 'none';
-          accountPanel.style.display = 'none';
-        } else if (tab === 'general') {
-          themePanel.style.display = 'none';
-          generalPanel.style.display = 'block';
-          accountPanel.style.display = 'none';
-        } else if (tab === 'account') {
-          themePanel.style.display = 'none';
-          generalPanel.style.display = 'none';
-          accountPanel.style.display = 'block';
-        }
+      const allPanels = [themePanel, generalPanel, accountPanel, cantoPanel];
+      allPanels.forEach(p => { if (p) p.style.display = 'none'; });
+      
+      const targetPanel = document.getElementById(`settings-panel-${tab}`);
+      if (targetPanel) targetPanel.style.display = 'block';
+
+      // Poblar la lista de BIS al entrar a la pestaña Canto
+      if (tab === 'canto') {
+        populateBisSongList();
       }
     });
   });
+
+  // Función para poblar la lista de cantos con toggles BIS individuales
+  function populateBisSongList() {
+    const listContainer = document.getElementById('bis-song-list');
+    if (!listContainer) return;
+    listContainer.innerHTML = '';
+    
+    // Usar allSongs para listar todos los cantos
+    const songsToShow = allSongs.length > 0 ? allSongs : filteredSongs;
+    songsToShow.forEach(song => {
+      const row = document.createElement('div');
+      row.className = 'setting-row bis-song-row';
+      row.style.cssText = 'padding: 8px 0; border-bottom: 1px solid var(--panel-border); display: flex; align-items: center; justify-content: space-between;';
+      
+      const label = document.createElement('span');
+      label.className = 'bis-song-label';
+      label.textContent = song.title;
+      label.style.cssText = 'font-size: 0.85rem; flex: 1; margin-right: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;';
+      
+      const toggle = document.createElement('label');
+      toggle.className = 'toggle-switch';
+      
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.checked = isBisEnabled(song.id);
+      input.addEventListener('change', (e) => {
+        setBisForSong(song.id, e.target.checked);
+        // Re-renderizar si es el canto abierto actualmente
+        if (currentCanto && currentCanto.id === song.id) {
+          renderSongContent();
+        }
+      });
+      
+      const slider = document.createElement('span');
+      slider.className = 'toggle-slider';
+      
+      toggle.appendChild(input);
+      toggle.appendChild(slider);
+      
+      row.appendChild(label);
+      row.appendChild(toggle);
+      listContainer.appendChild(row);
+    });
+  }
 
   // Selección de colores de etapa
   document.querySelectorAll('.color-swatch-btn').forEach(btn => {
