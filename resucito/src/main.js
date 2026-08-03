@@ -2208,47 +2208,20 @@ function setupEventListeners() {
     });
   });
 
-  // Función para poblar la lista de cantos con toggles BIS individuales
+  // Sincronizar el toggle BIS con el canto actual
   function populateBisSongList() {
-    const listContainer = document.getElementById('bis-song-list');
-    if (!listContainer) return;
-    listContainer.innerHTML = '';
-    
-    // Usar allSongs para listar todos los cantos
-    const songsToShow = allSongs.length > 0 ? allSongs : filteredSongs;
-    songsToShow.forEach(song => {
-      const row = document.createElement('div');
-      row.className = 'setting-row bis-song-row';
-      row.style.cssText = 'padding: 8px 0; border-bottom: 1px solid var(--panel-border); display: flex; align-items: center; justify-content: space-between;';
-      
-      const label = document.createElement('span');
-      label.className = 'bis-song-label';
-      label.textContent = song.title;
-      label.style.cssText = 'font-size: 0.85rem; flex: 1; margin-right: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;';
-      
-      const toggle = document.createElement('label');
-      toggle.className = 'toggle-switch';
-      
-      const input = document.createElement('input');
-      input.type = 'checkbox';
-      input.checked = isBisEnabled(song.id);
-      input.addEventListener('change', (e) => {
-        setBisForSong(song.id, e.target.checked);
-        // Re-renderizar si es el canto abierto actualmente
-        if (currentCanto && currentCanto.id === song.id) {
-          renderSongContent();
-        }
-      });
-      
-      const slider = document.createElement('span');
-      slider.className = 'toggle-slider';
-      
-      toggle.appendChild(input);
-      toggle.appendChild(slider);
-      
-      row.appendChild(label);
-      row.appendChild(toggle);
-      listContainer.appendChild(row);
+    const bisToggle = document.getElementById('bis-toggle');
+    if (!bisToggle) return;
+    bisToggle.checked = currentCanto ? isBisEnabled(currentCanto.id) : false;
+  }
+
+  // Listener del toggle BIS
+  const bisToggleInput = document.getElementById('bis-toggle');
+  if (bisToggleInput) {
+    bisToggleInput.addEventListener('change', (e) => {
+      if (!currentCanto) return;
+      setBisForSong(currentCanto.id, e.target.checked);
+      renderSongContent();
     });
   }
 

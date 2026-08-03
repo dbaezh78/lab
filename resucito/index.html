@@ -746,19 +746,15 @@
 
         <!-- Panel Canto -->
         <div id="settings-panel-canto" class="settings-panel-group" style="display: none;">
-          <!-- Indicador BIS por canto -->
-          <div class="setting-row" style="flex-direction: column; align-items: stretch;">
-            <div class="setting-label" style="margin-bottom: 12px;">
-              <h4>Indicador BIS por canto</h4>
-              <p>Habilita o deshabilita el marcador lateral "BIS A." de forma individual para cada canto</p>
+          <div class="setting-row">
+            <div class="setting-label">
+              <h4>Indicador BIS</h4>
             </div>
-            <!-- Buscador dentro del panel -->
-            <div style="margin-bottom: 10px;">
-              <input type="text" id="bis-song-search" placeholder="Buscar canto..." style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--panel-border); background: var(--panel-bg); color: var(--text-color); font-size: 0.85rem; box-sizing: border-box;">
-            </div>
-            <!-- Lista scrolleable de cantos -->
-            <div id="bis-song-list" style="max-height: 320px; overflow-y: auto; border: 1px solid var(--panel-border); border-radius: 8px; padding: 4px 10px;">
-              <!-- Se llena dinámicamente con JS -->
+            <div class="setting-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="bis-toggle">
+                <span class="toggle-slider"></span>
+              </label>
             </div>
           </div>
         </div>
