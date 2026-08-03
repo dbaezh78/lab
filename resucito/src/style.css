@@ -19,7 +19,7 @@
   --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.12);
   
   --chord-color: #d01212;
-  --chord-color-alt: #944c18;
+  --chord-color-alt: #d01212;
   --font-zoom: 1;
   --font-family-lyrics: 'Franklin Gothic', 'Franklin Gothic Medium', Arial, sans-serif;
   --font-size-lyrics: 22.4px;
@@ -53,7 +53,7 @@
   --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
   
   --chord-color: #d01212;
-  --chord-color-alt: #944c18;
+  --chord-color-alt: #d01212;
   
   /* Fondos de etapa para modo oscuro */
   --stage-bg-pre: hsla(220, 20%, 15%, 0.65);
@@ -79,7 +79,7 @@
   --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.1);
   
   --chord-color: #d01212;
-  --chord-color-alt: #944c18;
+  --chord-color-alt: #d01212;
 
   /* Colores de etapas configurables */
   --color-pre: #6c757d;
@@ -860,7 +860,7 @@ header {
 
 /* Color para los acordes de la asamblea (opuesto) y cantor (principal) */
 .linea-canto.as .nota-posicionada {
-  color: var(--chord-color-alt, #944c18);
+  color: var(--chord-color-alt, #d01212);
 }
 
 .linea-canto:not(.as) .nota-posicionada {
