@@ -266,24 +266,15 @@ async function loadSongView(songId) {
     currentCanto = songData;
     
     // Configurar zoom por defecto según el dispositivo (Tablet vs Móvil/PC) y canto específico
-  // Obtener el ancho de la pantalla
-    const screenWidth = window.innerWidth;
-
-    if (screenWidth < 768) {
-      // 1. CELULAR (Menor a 768px)
-      updateZoom(0.8); 
-
-    } else if (screenWidth >= 768 && screenWidth <= 1024) {
-      // 2. TABLET (Entre 768px y 1024px)
+    const isTablet = window.innerWidth >= 768 && window.innerWidth <= 1024;
+    if (isTablet) {
       if (songId === 'atilevantomisojos') {
-        updateZoom(1.5); 
+        updateZoom(1.5);
       } else {
-        updateZoom(1.5); // (Ambos están en 1.5 ahora, pero tienes la estructura lista por si quieres cambiar uno)
+        updateZoom(1.5);
       }
-
     } else {
-      // 3. PC (Mayor a 1024px)
-      updateZoom(1.0); // Cambia este 1.0 por el valor que prefieras para la computadora
+      updateZoom(0.8);
     }
     
     // Asignar el color de etapa actual a nivel de body para la cabecera y el sombreado

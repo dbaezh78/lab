@@ -36,7 +36,7 @@
   "lizq": [
     {
       "line": "Amo al Señor, porque escucha, (Re,,10)(Fa#,m,253)",
-      "sC": "tc"
+      "sC": "tc b2"
     },
     {
       "line": "mi voz suplicante;, (Sol,,127)",
@@ -48,14 +48,14 @@
     },
     {
       "line": "el día en que lo invoco., (Re,,188)",
-      "sC": ""
+      "sC": "b2"
     },
     {
       "line": "",
       "sC": "adb1"
     },
     {
-      "line": "Me envolvían redes de muerte,(Re,,11)",
+      "line": "Me envolvían redes de muerte,,(Re,,11)",
       "sC": "tc"
     },
     {
@@ -63,7 +63,7 @@
       "sC": ""
     },
     {
-      "line": "me rodeaban tristeza y angustia,(Sol,,87)(Mi,m6,268)",
+      "line": "me rodeaban tristeza y angustia,,(Sol,,87)(Mi,m6,268)",
       "sC": ""
     },
     {
@@ -109,7 +109,7 @@
       "sC": "tc"
     },
     {
-      "line": "«Yo soy un desgraciado»!,",
+      "line": "«Yo soy un desgraciado»!,,",
       "sC": ""
     },
     {
@@ -148,7 +148,7 @@
       "type": "collapsible-block",
       "id": "asamblea_anadie_1",
       "initialState": "collapsed",
-      "triggerLine": "RECOBRA, ALMA MÍA, TU REPOSO,(Re,,11)(Fa#,m,297)",
+      "triggerLine": "RECOBRA, ALMA MÍA, TU REPOSO,,(Re,,11)(Fa#,m,297)",
       "sC": "ta as",
       "lines": [
         {
